@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mitamo kitchen ｜ 出汁から作る、日本の家庭料理</title>
+<meta name="description" content="出汁から作る日本の家庭料理を日本語と英語で発信。レシピ開発、商品PR、監修のご依頼を受け付けています。">
+
+<!-- OGP：SNSでシェアされたときに表示される情報 -->
+<meta property="og:title" content="mitamo kitchen ｜ 出汁から作る、日本の家庭料理">
+<meta property="og:description" content="出汁から作る日本の家庭料理を日本語と英語で発信。お仕事のご依頼はこちらから。">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Cormorant:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  /* 出汁の素材から取った色 */
+  --kombu:      #141A14;  /* 昆布の墨緑：背景 */
+  --kombu-up:   #1D251C;  /* ひとつ持ち上げた面 */
+  --kombu-line: #2E3A2C;  /* 罫線 */
+  --yuge:       #F0EBDF;  /* 湯気：本文の白 */
+  --yuge-dim:   #A8A79C;  /* 控えめな文字 */
+  --dashi:      #C9A45C;  /* 出汁の金：主アクセント */
+  --katsuo:     #B5705C;  /* 鰹節の赤茶：副アクセント */
+  --sage:       #7C8A72;  /* 昆布の緑：ラベル */
+
+  --serif: "Shippori Mincho", serif;
+  --sans:  "Zen Kaku Gothic New", system-ui, sans-serif;
+  --latin: "Cormorant", Georgia, serif;
+
+  --pad: clamp(20px, 5vw, 64px);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  background:var(--kombu);
+  color:var(--yuge);
+  font-family:var(--sans);
+  font-weight:400;
+  line-height:1.9;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+a{ color:inherit; }
+
+:focus-visible{
+  outline:2px solid var(--dashi);
+  outline-offset:3px;
+}
+
+/* ============ 出汁が引かれていく罫線（このサイトの目印） ============ */
+.steep{
+  height:1px;
+  border:0;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    var(--kombu-line) 12%,
+    var(--sage) 38%,
+    var(--dashi) 62%,
+    var(--katsuo) 82%,
+    transparent 100%);
+  opacity:.85;
+}
+
+/* ============ ヘッダー ============ */
+.bar{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px;
+  padding:14px var(--pad);
+  background:rgba(20,26,20,.82);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--kombu-line);
+}
+.bar__name{
+  font-family:var(--serif);
+  font-size:17px; font-weight:700; letter-spacing:.14em;
+  text-decoration:none;
+}
+.bar__name small{
+  display:block;
+  font-family:var(--latin);
+  font-size:10px; font-style:italic; font-weight:300;
+  letter-spacing:.28em; color:var(--sage);
+  margin-top:2px;
+}
+.bar__cta{
+  flex:none;
+  font-size:13px; font-weight:700; letter-spacing:.08em;
+  text-decoration:none;
+  padding:10px 18px;
+  border:1px solid var(--dashi);
+  color:var(--dashi);
+  border-radius:2px;
+  transition:background .25s, color .25s;
+}
+.bar__cta:hover{ background:var(--dashi); color:var(--kombu); }
+
+/* ============ 共通の見出し（日本語＋英語が対になる） ============ */
+.head{ margin-bottom:36px; }
+.head__eyebrow{
+  font-family:var(--latin);
+  font-size:12px; font-style:italic; font-weight:300;
+  letter-spacing:.34em; text-transform:uppercase;
+  color:var(--sage);
+  margin-bottom:10px;
+}
+.head__ja{
+  font-family:var(--serif); font-weight:700;
+  font-size:clamp(24px, 4.4vw, 36px);
+  letter-spacing:.06em; line-height:1.5;
+}
+
+section{ padding:clamp(64px, 11vw, 128px) var(--pad); }
+.wrap{ max-width:1080px; margin:0 auto; }
+
+/* ============ ヒーロー ============ */
+.hero{ padding-top:clamp(48px, 9vw, 96px); }
+.hero__grid{
+  display:grid; gap:clamp(32px, 6vw, 64px);
+  grid-template-columns:1fr;
+  align-items:center;
+}
+.hero__title{
+  font-family:var(--serif); font-weight:700;
+  font-size:clamp(40px, 10vw, 82px);
+  line-height:1.28; letter-spacing:.04em;
+}
+.hero__title em{ font-style:normal; color:var(--dashi); }
+.hero__en{
+  font-family:var(--latin); font-style:italic; font-weight:300;
+  font-size:clamp(16px, 2.6vw, 22px);
+  letter-spacing:.14em; color:var(--yuge-dim);
+  margin-top:18px;
+}
+.hero__lead{
+  margin-top:26px; max-width:34em;
+  font-size:15px; color:var(--yuge-dim);
+}
+.hero__photo{
+  aspect-ratio:4/5;
+  border:1px dashed var(--kombu-line);
+  border-radius:2px;
+  background:var(--kombu-up);
+  display:grid; place-items:center;
+  color:var(--sage); font-size:12px; letter-spacing:.16em;
+  text-align:center; padding:20px;
+}
+.hero__photo img{ width:100%; height:100%; object-fit:cover; border-radius:2px; }
+
+/* ============ 数字 ============ */
+.stats{
+  display:grid; gap:1px;
+  grid-template-columns:repeat(2, 1fr);
+  background:var(--kombu-line);
+  border:1px solid var(--kombu-line);
+  margin-top:52px;
+}
+.stat{ background:var(--kombu); padding:24px 20px; }
+.stat__num{
+  font-family:var(--serif); font-weight:700;
+  font-size:clamp(28px, 5vw, 40px);
+  color:var(--dashi); line-height:1.2;
+}
+.stat__num span{ font-size:.5em; color:var(--yuge-dim); margin-left:3px; }
+.stat__label{
+  font-size:11px; letter-spacing:.14em; color:var(--yuge-dim); margin-top:8px;
+}
+
+/* ============ できること ============ */
+.menu{ display:grid; gap:1px; background:var(--kombu-line); border:1px solid var(--kombu-line); }
+.item{
+  background:var(--kombu-up);
+  padding:clamp(24px, 4vw, 40px);
+}
+.item__no{
+  font-family:var(--latin); font-size:13px; font-style:italic;
+  letter-spacing:.2em; color:var(--katsuo); margin-bottom:12px;
+}
+.item__ttl{
+  font-family:var(--serif); font-weight:700;
+  font-size:19px; letter-spacing:.05em; margin-bottom:12px;
+}
+.item__txt{ font-size:14px; color:var(--yuge-dim); }
+
+/* ============ プロフィール ============ */
+.about{ background:var(--kombu-up); }
+.about__grid{ display:grid; gap:clamp(28px, 5vw, 56px); grid-template-columns:1fr; }
+.about__body p{ font-size:15px; margin-bottom:20px; }
+.about__body p:last-child{ margin-bottom:0; }
+.about__pull{
+  font-family:var(--serif); font-weight:500;
+  font-size:clamp(19px, 3.2vw, 26px);
+  line-height:1.8; letter-spacing:.05em;
+  color:var(--dashi);
+  border-left:2px solid var(--katsuo);
+  padding-left:22px;
+}
+
+/* ============ お仕事のご依頼 ============ */
+.hire__note{
+  border:1px solid var(--dashi);
+  border-radius:2px;
+  padding:clamp(20px, 4vw, 32px);
+  margin-bottom:32px;
+  font-size:14px;
+}
+.hire__note strong{ color:var(--dashi); font-weight:700; }
+.hire__form{
+  width:100%; min-height:900px; border:0; border-radius:2px;
+  background:var(--yuge);
+}
+.hire__fallback{
+  display:inline-block; margin-top:20px;
+  font-size:14px; letter-spacing:.06em;
+  color:var(--dashi); text-decoration:none;
+  border-bottom:1px solid var(--dashi); padding-bottom:2px;
+}
+
+/* ============ SNS ============ */
+.links{ display:grid; gap:1px; background:var(--kombu-line); border:1px solid var(--kombu-line); }
+.link{
+  background:var(--kombu); padding:22px clamp(18px,3vw,32px);
+  display:flex; align-items:baseline; justify-content:space-between; gap:14px;
+  text-decoration:none; transition:background .25s;
+}
+.link:hover{ background:var(--kombu-up); }
+.link__name{ font-family:var(--serif); font-weight:700; font-size:17px; letter-spacing:.08em; }
+.link__meta{ font-size:12px; color:var(--yuge-dim); letter-spacing:.1em; }
+.link__arrow{ color:var(--dashi); font-size:14px; }
+
+/* ============ フッター ============ */
+footer{
+  padding:40px var(--pad);
+  border-top:1px solid var(--kombu-line);
+  font-size:11px; letter-spacing:.12em; color:var(--yuge-dim);
+  display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between;
+}
+
+/* ============ 画面が広いとき ============ */
+@media (min-width:760px){
+  .hero__grid{ grid-template-columns:1.25fr .75fr; }
+  .stats{ grid-template-columns:repeat(4, 1fr); }
+  .menu{ grid-template-columns:repeat(2, 1fr); }
+  .about__grid{ grid-template-columns:.85fr 1.15fr; }
+}
+
+/* ============ ふわっと出る動き ============ */
+.rise{ opacity:0; transform:translateY(18px); transition:opacity .8s ease, transform .8s ease; }
+.rise.on{ opacity:1; transform:none; }
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .rise{ opacity:1; transform:none; transition:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== ヘッダー ===================== -->
+<header class="bar">
+  <a class="bar__name" href="#top">
+    mitamo kitchen
+    <small>Dashi &amp; Home Cooking</small>
+  </a>
+  <a class="bar__cta" href="#hire">お仕事のご依頼</a>
+</header>
+
+<!-- ===================== ヒーロー ===================== -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero__grid">
+      <div>
+        <h1 class="hero__title">出汁から、<br><em>はじめる。</em></h1>
+        <p class="hero__en">Everything begins with dashi.</p>
+        <p class="hero__lead">
+          昆布と鰹節でとった出汁を土台に、日本の家庭料理をつくっています。
+          レシピはすべて日本語と英語で公開していて、国内だけでなく海外の方にも見ていただいています。
+        </p>
+      </div>
+
+      <!-- ▼ 写真を入れる場所。差し替え方は手順書の「7-2」を見てください -->
+      <div class="hero__photo">
+        ここに料理の写真<br>（縦長・4:5）
+        <!-- <img src="hero.jpg" alt="鍋で出汁をとっているところ"> -->
+      </div>
+    </div>
+
+    <!-- ▼ 数字はすべて仮です。実際の数字に書き換えてください -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat__num">27<span>万</span></div>
+        <div class="stat__label">INSTAGRAM フォロワー</div>
+      </div>
+      <div class="stat">
+        <div class="stat__num">00<span>万</span></div>
+        <div class="stat__label">TIKTOK フォロワー</div>
+      </div>
+      <div class="stat">
+        <div class="stat__num">00<span>万</span></div>
+        <div class="stat__label">月間リーチ</div>
+      </div>
+      <div class="stat">
+        <div class="stat__num">00<span>%</span></div>
+        <div class="stat__label">海外からの閲覧</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="steep">
+
+<!-- ===================== できること ===================== -->
+<section id="works">
+  <div class="wrap">
+    <div class="head rise">
+      <p class="head__eyebrow">What I can do</p>
+      <h2 class="head__ja">できること</h2>
+    </div>
+
+    <div class="menu rise">
+      <div class="item">
+        <p class="item__no">i.</p>
+        <h3 class="item__ttl">レシピ開発</h3>
+        <p class="item__txt">御社の商品を使ったレシピを開発します。写真とテキストでの納品、SNS投稿までのセット、どちらにも対応します。</p>
+      </div>
+      <div class="item">
+        <p class="item__no">ii.</p>
+        <h3 class="item__ttl">商品を紹介する動画</h3>
+        <p class="item__txt">リールやTikTok向けの縦型動画を撮影・編集して投稿します。日英の字幕をつけるので、海外向けの発信にも使えます。</p>
+      </div>
+      <div class="item">
+        <p class="item__no">iii.</p>
+        <h3 class="item__ttl">商品の監修・共同開発</h3>
+        <p class="item__txt">出汁パックや調味料など、商品づくりの段階からご一緒します。味の設計とネーミング、パッケージの相談まで。</p>
+      </div>
+      <div class="item">
+        <p class="item__no">iv.</p>
+        <h3 class="item__ttl">撮影素材のご提供</h3>
+        <p class="item__txt">御社の広告やECサイトで使える写真・動画をお渡しします。使用する媒体と期間に応じてお見積りします。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="steep">
+
+<!-- ===================== プロフィール ===================== -->
+<section class="about" id="about">
+  <div class="wrap">
+    <div class="head rise">
+      <p class="head__eyebrow">Profile</p>
+      <h2 class="head__ja">つくっている人</h2>
+    </div>
+
+    <div class="about__grid rise">
+      <div>
+        <!-- ▼ ここに自己紹介文を書いてください。手順書の「7-1」に書き方があります -->
+        <p class="about__pull">出汁をとる時間は、<br>省いてもいい時間じゃなかった。</p>
+      </div>
+      <div class="about__body">
+        <p>（ここにあなたの話を書きます。どんな仕事をしていて、なぜ料理を撮りはじめたのか。最初はうまくいかなかったこと。出汁にたどりついた理由。）</p>
+        <p>（読んだ人が「この人から買いたい」と思うのは、上手な料理の説明ではなく、その人の来た道です。3〜4段落で十分です。）</p>
+        <p>（最後に、これから何をやっていきたいかを一言。企業の担当者はここを読んで、一緒に組めるかを判断します。）</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="steep">
+
+<!-- ===================== お仕事のご依頼 ===================== -->
+<section id="hire">
+  <div class="wrap">
+    <div class="head rise">
+      <p class="head__eyebrow">Contact</p>
+      <h2 class="head__ja">お仕事のご依頼</h2>
+    </div>
+
+    <div class="hire__note rise">
+      <p><strong>ご依頼はこちらのフォームからお願いします。</strong></p>
+      <p style="margin-top:10px;color:var(--yuge-dim)">
+        SNSのDMは数が多く、お返事が遅れたり届かないことがあります。確実にお受けできるのはこのフォームです。
+        3営業日以内にご返信します。料金表と媒体資料（PDF）もこちらからお送りします。
+      </p>
+    </div>
+
+    <!-- ▼ Googleフォームのアドレスに差し替えてください。手順書の「6」を見てください -->
+    <iframe class="hire__form rise"
+            src="about:blank"
+            title="お仕事のご依頼フォーム"
+            loading="lazy">読み込んでいます…</iframe>
+
+    <a class="hire__fallback" href="mailto:you@example.com">フォームが開かない場合はメールでどうぞ</a>
+  </div>
+</section>
+
+<hr class="steep">
+
+<!-- ===================== SNS ===================== -->
+<section id="links">
+  <div class="wrap">
+    <div class="head rise">
+      <p class="head__eyebrow">Where to find me</p>
+      <h2 class="head__ja">発信している場所</h2>
+    </div>
+
+    <div class="links rise">
+      <a class="link" href="https://www.instagram.com/mitamo.kitchen" target="_blank" rel="noopener">
+        <span class="link__name">Instagram</span>
+        <span class="link__meta">レシピと日々の料理</span>
+        <span class="link__arrow">→</span>
+      </a>
+      <a class="link" href="#" target="_blank" rel="noopener">
+        <span class="link__name">TikTok</span>
+        <span class="link__meta">短い動画</span>
+        <span class="link__arrow">→</span>
+      </a>
+      <a class="link" href="#" target="_blank" rel="noopener">
+        <span class="link__name">YouTube</span>
+        <span class="link__meta">つくり方をじっくり</span>
+        <span class="link__arrow">→</span>
+      </a>
+      <a class="link" href="#" target="_blank" rel="noopener">
+        <span class="link__name">使っている道具</span>
+        <span class="link__meta">Amazon ストアフロント</span>
+        <span class="link__arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 mitamo kitchen</span>
+  <span>出汁から作る、日本の家庭料理</span>
+</footer>
+
+<script>
+// スクロールしたときに、ふわっと表示する
+(function(){
+  var targets = document.querySelectorAll('.rise');
+  if(!('IntersectionObserver' in window)){
+    targets.forEach(function(el){ el.classList.add('on'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); }
+    });
+  }, { threshold:.12 });
+  targets.forEach(function(el){ io.observe(el); });
+})();
+</script>
+
+</body>
+</html>
