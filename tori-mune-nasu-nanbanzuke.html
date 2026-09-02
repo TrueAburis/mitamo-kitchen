@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja" data-lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鶏むね肉と茄子の南蛮漬け｜みたもっちゃんねる</title>
+<meta name="description" content="いつもは魚で作る南蛮漬けを鶏むね肉で。昆布と鰹節でひいた出汁の甘酢だれに、揚げた茄子とパプリカを合わせます。日本語・英語対応。">
+<!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+
+<script>
+  /* 表示前に言語を決める。ちらつき防止のため head で実行する */
+  (function () {
+    var lang = null;
+    try { lang = localStorage.getItem('mk-lang'); } catch (e) {}
+    if (lang !== 'ja' && lang !== 'en') {
+      lang = (navigator.language || 'ja').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en';
+    }
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.lang = lang;
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main"><span class="t-ja">本文へスキップ</span><span class="t-en">Skip to content</span></a>
+
+<!-- ヘッダーは全ページ共通。ここを直したら他のHTMLも同じように直すこと -->
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="brand" href="index.html">
+      <span class="brand-ja">みたもっちゃんねる</span>
+      <span class="brand-en">Mitamo Kitchen</span>
+    </a>
+
+    <nav class="nav" aria-label="サイト内">
+      <a href="recipes.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+
+    <div class="lang" role="group" aria-label="言語 / Language">
+      <button type="button" data-set-lang="ja" aria-pressed="true">JA</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="recipes" id="recipes">
+    <div class="wrap">
+      <p class="sec-title"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></p>
+
+      <article id="tori-mune-nasu-nanbanzuke">
+        <h1 class="recipe-title">鶏むね肉と茄子の南蛮漬け<span class="en">Chicken Breast and Eggplant Nanban-zuke</span></h1>
+
+        <div class="recipe-intro">
+          <p>
+            <span class="t-ja">いつもは魚で南蛮漬けを作るのですが、今回はお肉でやってみました。</span>
+            <span class="t-en">I usually make Nanban-zuke, a marinated fried dish, with fish, but this time I tried it with meat.</span>
+          </p>
+        </div>
+
+        <!-- TODO: 何人前と時間がキャプションに無かったため未確認。分かり次第ここを埋める -->
+        <dl class="recipe-meta">
+          <div>
+            <dt><span class="t-ja">分量</span><span class="t-en">Serves</span></dt>
+            <dd><span class="t-ja">要確認</span><span class="t-en">TBC</span></dd>
+          </div>
+          <div>
+            <dt><span class="t-ja">時間</span><span class="t-en">Time</span></dt>
+            <dd><span class="t-ja">要確認</span><span class="t-en">TBC</span></dd>
+          </div>
+        </dl>
+
+        <!-- TODO: リールなので静止画が別途必要。images/tori-mune-nasu-nanbanzuke.jpg を置いたら <img> に差し替える。alt を必ず書くこと -->
+
+        <div class="cook">
+
+          <div class="qty-bar" id="qty">
+            <h2 class="qty-title"><span class="t-ja">材料</span><span class="t-en">Ingredients</span></h2>
+            <button class="qty-toggle" type="button" aria-expanded="false" aria-controls="qty-body">
+              <span class="t-ja">材料 14品</span><span class="t-en">14 ingredients</span>
+              <span class="qty-step" aria-hidden="true"></span>
+              <span class="qty-peek"><span class="t-ja">茄子 1本 ／ 酢 50ml ／ 薄口醤油 大さじ2 …</span><span class="t-en">Eggplant 1 / Vinegar 50ml / Light soy 2 tbsp …</span></span>
+            </button>
+
+            <div class="qty-body" id="qty-body">
+              <dl>
+                <!-- TODO: 鶏むね肉の分量がキャプションに無かった -->
+                <dt>鶏むね肉<span class="en">Chicken breast</span></dt>
+                <dd><span class="t-ja">要確認</span><span class="t-en">TBC</span></dd>
+
+                <dt>黄パプリカ<span class="en">Yellow bell pepper</span></dt>
+                <dd><span class="t-ja">1/4個</span><span class="t-en">1/4</span></dd>
+
+                <dt>赤パプリカ<span class="en">Red bell pepper</span></dt>
+                <dd><span class="t-ja">1/4個</span><span class="t-en">1/4</span></dd>
+
+                <dt>ピーマン<span class="en">Green bell pepper</span></dt>
+                <dd><span class="t-ja">1/2個</span><span class="t-en">1/2</span></dd>
+
+                <dt>茄子<span class="en">Eggplant</span></dt>
+                <dd><span class="t-ja">1本</span><span class="t-en">1</span></dd>
+              </dl>
+
+              <h3 class="qty-sub"><span class="t-ja">出汁</span><span class="t-en">Dashi</span></h3>
+
+              <dl>
+                <dt>昆布<span class="en">Kombu (dried kelp)</span></dt>
+                <dd><span class="t-ja">1枚</span><span class="t-en">1 sheet</span></dd>
+
+                <dt>水<span class="en">Water</span></dt>
+                <dd>600ml</dd>
+
+                <dt>鰹節<span class="en">Bonito flakes</span></dt>
+                <dd>20g</dd>
+              </dl>
+
+              <h3 class="qty-sub"><span class="t-ja">南蛮のタレ</span><span class="t-en">Nanban sauce</span></h3>
+
+              <dl>
+                <dt>和風だし<span class="en">Japanese dashi stock</span></dt>
+                <dd>100ml</dd>
+
+                <dt>酢<span class="en">Vinegar</span></dt>
+                <dd>50ml</dd>
+
+                <dt>ザラメ糖<span class="en">Coarse sugar (zarame)</span></dt>
+                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+
+                <dt>みりん<span class="en">Mirin</span></dt>
+                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+
+                <dt>料理酒<span class="en">Cooking sake</span></dt>
+                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+
+                <dt>薄口醤油<span class="en">Light soy sauce</span></dt>
+                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+              </dl>
+            </div>
+          </div>
+
+          <div>
+            <!-- TODO: 手順が未入手。Instagram のキャプションに手順の記載がなかった。
+                 分かり次第、この場所に ol.steps を作る。data-uses には
+                 その手順の文章に実際に出てくる材料と分量だけを入れること。
+                 <ol class="steps">
+                   <li data-uses="…" data-uses-en="…"><span class="step-n">1</span>
+                     <p><span class="t-ja">…</span><span class="t-en">…</span></p>
+                     <p class="wait wait-long"><span class="t-ja">…分</span><span class="t-en">… min</span></p>
+                   </li>
+                 </ol>
+            -->
+            <div class="prose draft">
+              <p>
+                <span class="t-ja">手順はまだ入っていません。材料とコツだけ先に載せています。</span>
+                <span class="t-en">The steps are not written up yet. For now, only the ingredients and notes are here.</span>
+              </p>
+            </div>
+
+            <div class="tips">
+              <h2 class="tips-h"><span class="t-ja">コツ</span><span class="t-en">Notes</span></h2>
+              <ul>
+                <li><span class="t-ja">甘酢のタレは、しんなりした野菜を食べたければ温かいうちに。しゃきしゃきとした食感で食べたければ、タレの粗熱が取れてから入れてください。</span><span class="t-en">If you want the vegetables tender, add them to the sweet-and-sour sauce while it is still warm. If you want them crisp, wait until the sauce has cooled.</span></li>
+                <li><span class="t-ja">茄子のちょうどいい揚げ具合は、箸を刺してみてスッと刺されば引き上げ時です。</span><span class="t-en">The eggplant is fried just right when a chopstick slides through it easily. That is the moment to take it out.</span></li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<!-- フッターは全ページ共通 -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p class="foot-brand">みたもっちゃんねる<span class="en">Mitamo Kitchen</span></p>
+    <nav class="foot-nav" aria-label="フッター">
+      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
+      <a href="recipes.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+    <!-- TODO: YouTube / Instagram のリンクをここに置く -->
+    <p class="foot-note">© 2026 みたもっちゃんねる</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

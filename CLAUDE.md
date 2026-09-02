@@ -25,7 +25,9 @@
 
 ```
 index.html              トップ（見出し＋SNSボタン＋最新のレシピ＋プロフィール）
-tori-negi-meshi.html    レシピ詳細
+recipes.html            レシピ一覧
+tori-mune-nasu-nanbanzuke.html  レシピ詳細（鶏むね肉と茄子の南蛮漬け）
+tori-negi-meshi.html    レシピ詳細（鶏ネギ飯）
 work.html               お仕事のご依頼（Google フォーム）
 
 （about.html は 2026年9月にトップへ統合して削除した）
@@ -41,7 +43,8 @@ serve.ps1               開発用の簡易サーバー（サイト本体では�
 
 レシピを増やすときは `/add-recipe` スキルを使う（手順は `.claude/skills/add-recipe/SKILL.md`）。
 中身としては `tori-negi-meshi.html` を複製して差し替える作業になる。
-3件を超えたら一覧ページ `recipes.html` を作り、ナビの「レシピ」の行き先をそちらに変える。
+一覧は `recipes.html`。レシピを足したらこの一覧の先頭にも1行足す。
+ナビの「レシピ」は常に `recipes.html` を指す。
 
 表示を確認するときは、ターミナルで次を実行して http://localhost:8000/ を開く。
 

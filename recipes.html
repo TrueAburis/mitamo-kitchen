@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja" data-lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>レシピ一覧｜みたもっちゃんねる</title>
+<meta name="description" content="みたもっちゃんねるのレシピ一覧。分量を画面に残したまま作れる、日本語と英語のレシピです。">
+<!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+
+<script>
+  /* 表示前に言語を決める。ちらつき防止のため head で実行する */
+  (function () {
+    var lang = null;
+    try { lang = localStorage.getItem('mk-lang'); } catch (e) {}
+    if (lang !== 'ja' && lang !== 'en') {
+      lang = (navigator.language || 'ja').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en';
+    }
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.lang = lang;
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main"><span class="t-ja">本文へスキップ</span><span class="t-en">Skip to content</span></a>
+
+<!-- ヘッダーは全ページ共通。ここを直したら他のHTMLも同じように直すこと -->
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="brand" href="index.html">
+      <span class="brand-ja">みたもっちゃんねる</span>
+      <span class="brand-en">Mitamo Kitchen</span>
+    </a>
+
+    <nav class="nav" aria-label="サイト内">
+      <a href="recipes.html" aria-current="page"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+
+    <div class="lang" role="group" aria-label="言語 / Language">
+      <button type="button" data-set-lang="ja" aria-pressed="true">JA</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="plain" id="recipes">
+    <div class="wrap">
+      <h1 class="sec-h2"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></h1>
+
+      <ul class="recipe-list">
+        <li>
+          <a href="tori-mune-nasu-nanbanzuke.html">鶏むね肉と茄子の南蛮漬け<span class="en">Chicken Breast and Eggplant Nanban-zuke</span></a>
+        </li>
+        <li>
+          <a href="tori-negi-meshi.html">鶏ネギ飯<span class="en">Chicken and Green Onion Rice</span></a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<!-- フッターは全ページ共通 -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p class="foot-brand">みたもっちゃんねる<span class="en">Mitamo Kitchen</span></p>
+    <nav class="foot-nav" aria-label="フッター">
+      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
+      <a href="recipes.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+    <!-- TODO: YouTube / Instagram のリンクをここに置く -->
+    <p class="foot-note">© 2026 みたもっちゃんねる</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

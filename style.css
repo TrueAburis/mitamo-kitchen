@@ -309,3 +309,12 @@ main > section:first-child{border-top:0}
 
 /* トップに載せるレシピは1つだけ。パネルの幅を抑える */
 .dish-solo{max-width:366px;margin-top:18px}
+
+/* ---------- レシピ一覧 ---------- */
+.recipe-list{margin:20px 0 0;padding:0;list-style:none;max-width:34em}
+.recipe-list li{border-top:1px solid var(--rule)}
+.recipe-list li:last-child{border-bottom:1px solid var(--rule)}
+.recipe-list a{display:block;padding:15px 4px;text-decoration:none;font-size:17px;font-weight:700}
+.recipe-list .en{display:block;font-size:12px;font-weight:400;color:var(--ink-soft);line-height:1.7}
+.recipe-list a:hover{background:var(--kombu);color:var(--ground);padding-inline:12px}
+.recipe-list a:hover .en{color:inherit;opacity:.7}
