@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja" data-lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鶏ネギ飯｜みたもっちゃんねる</title>
+<meta name="description" content="鶏の脂と醤油だけで米を主役にする鶏ネギ飯。分量を画面に残したまま、手順を追えます。日本語・英語対応。">
+<!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+
+<script>
+  /* 表示前に言語を決める。ちらつき防止のため head で実行する */
+  (function () {
+    var lang = null;
+    try { lang = localStorage.getItem('mk-lang'); } catch (e) {}
+    if (lang !== 'ja' && lang !== 'en') {
+      lang = (navigator.language || 'ja').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en';
+    }
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.lang = lang;
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main"><span class="t-ja">本文へスキップ</span><span class="t-en">Skip to content</span></a>
+
+<!-- ヘッダーは全ページ共通。ここを直したら他のHTMLも同じように直すこと -->
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="brand" href="index.html">
+      <span class="brand-ja">みたもっちゃんねる</span>
+      <span class="brand-en">Mitamo Kitchen</span>
+    </a>
+
+    <nav class="nav" aria-label="サイト内">
+      <a href="tori-negi-meshi.html" aria-current="page"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+
+    <div class="lang" role="group" aria-label="言語 / Language">
+      <button type="button" data-set-lang="ja" aria-pressed="true">JA</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="recipes" id="recipes">
+    <div class="wrap">
+      <p class="sec-title"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></p>
+
+      <article id="tori-negi-meshi">
+        <h1 class="recipe-title">鶏ネギ飯<span class="en">Chicken and Green Onion Rice</span></h1>
+
+        <div class="recipe-intro">
+          <p>
+            <span class="t-ja">味付けはかなりシンプルにしています。濃い味が好きな方は、おろし生姜やにんにくを増やしてください。炊く前に塩を1〜2振りしてもいいと思います。</span>
+            <span class="t-en">The seasoning is quite simple. If you prefer a stronger flavour, add more grated ginger or garlic. You might also add 1–2 shakes of salt before cooking.</span>
+          </p>
+          <p>
+            <span class="t-ja">薬味に大葉やいりごまを載せたり混ぜたりしても、おいしいです。</span>
+            <span class="t-en">Adding or mixing in condiments such as perilla leaves and sesame seeds is also delicious.</span>
+          </p>
+        </div>
+
+        <dl class="recipe-meta">
+          <div>
+            <dt><span class="t-ja">分量</span><span class="t-en">Serves</span></dt>
+            <dd><span class="t-ja">2〜3人前</span><span class="t-en">2–3</span></dd>
+          </div>
+          <div>
+            <dt><span class="t-ja">時間</span><span class="t-en">Time</span></dt>
+            <dd><span class="t-ja">弱火 23分 + 蒸らし 3〜5分</span><span class="t-en">23 min low + 3–5 min rest</span></dd>
+          </div>
+        </dl>
+
+        <!-- TODO: images/tori-negi-meshi.jpg が入ったら、ここに完成写真を置く。枠は 1:1 / 4:5 / 9:16 どれでも入る作りにし、alt を必ず書くこと -->
+
+        <div class="cook">
+
+          <div class="qty-bar" id="qty">
+            <h2 class="qty-title"><span class="t-ja">材料</span><span class="t-en">Ingredients</span></h2>
+            <button class="qty-toggle" type="button" aria-expanded="false" aria-controls="qty-body">
+              <span class="t-ja">材料 12品</span><span class="t-en">12 ingredients</span>
+              <span class="qty-step" aria-hidden="true"></span>
+              <span class="qty-peek"><span class="t-ja">お米 2合 / 水 400ml / 醤油 大さじ2 …</span><span class="t-en">Rice 2 cups / Water 400ml / Soy 2 tbsp …</span></span>
+            </button>
+
+            <div class="qty-body" id="qty-body">
+              <dl>
+                <dt>鶏もも肉<span class="en">Chicken thigh</span></dt>
+                <dd><span class="t-ja">1枚</span><span class="t-en">1 piece</span></dd>
+
+                <dt>お米<span class="en">Rice</span></dt>
+                <dd><span class="t-ja">2合（300g）</span><span class="t-en">2 cups (300g)</span></dd>
+
+                <dt>水<span class="en">Water</span></dt>
+                <dd>400ml</dd>
+
+                <dt>濃口醤油<span class="en">Soy sauce</span></dt>
+                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+
+                <dt>おろし生姜<span class="en">Grated ginger</span></dt>
+                <dd><span class="t-ja">小さじ1</span><span class="t-en">1 tsp</span></dd>
+
+                <dt>おろしにんにく<span class="en">Grated garlic</span></dt>
+                <dd><span class="t-ja">小さじ1</span><span class="t-en">1 tsp</span></dd>
+
+                <dt>ごま油<span class="en">Sesame oil</span></dt>
+                <dd><span class="t-ja">大さじ1</span><span class="t-en">1 tbsp</span></dd>
+
+                <dt>長ネギの先の部分<span class="en">Tip of a leek</span></dt>
+                <dd><span class="t-ja">適量</span><span class="t-en">to taste</span></dd>
+              </dl>
+
+              <h3 class="qty-sub"><span class="t-ja">ネギダレ</span><span class="t-en">Leek sauce</span></h3>
+
+              <dl>
+                <dt>長ネギ<span class="en">Leek</span></dt>
+                <dd>1/2</dd>
+
+                <dt>濃口醤油<span class="en">Soy sauce</span></dt>
+                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+
+                <dt>酢<span class="en">Vinegar</span></dt>
+                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+
+                <dt>砂糖<span class="en">Sugar</span></dt>
+                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+              </dl>
+
+              <p class="qty-note">
+                <span class="t-ja">濃くしたい方は、おろしにんにく・生姜・ごま油をタレに足してください。</span>
+                <span class="t-en">For a stronger sauce, add more grated garlic, ginger and sesame oil.</span>
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <ol class="steps">
+              <li data-uses="お米 2合（300g）" data-uses-en="Rice 2 cups (300g)"><span class="step-n">1</span>
+                <p><span class="t-ja">お米2合を洗い、ざるに上げて水気を切ります。</span><span class="t-en">Rinse 2 cups of rice, drain in a sieve and let the water run off.</span></p>
+              </li>
+              <li data-uses="水 400ml ／ 醤油 大さじ2 ／ 生姜 小さじ1 ／ にんにく 小さじ1 ／ ごま油 大さじ1" data-uses-en="Water 400ml / Soy 2 tbsp / Ginger 1 tsp / Garlic 1 tsp / Sesame oil 1 tbsp"><span class="step-n">2</span>
+                <p><span class="t-ja">鍋にお米、水400ml、濃口醤油 大さじ2、おろし生姜 小さじ1、おろしにんにく 小さじ1、ごま油 大さじ1を入れて、軽く混ぜます。</span><span class="t-en">In a pot, combine the rice, 400ml water, 2 tbsp soy sauce, 1 tsp grated ginger, 1 tsp grated garlic and 1 tbsp sesame oil, then stir lightly.</span></p>
+              </li>
+              <li data-uses="鶏もも肉 1枚 ／ 長ネギの先 適量" data-uses-en="Chicken thigh 1 piece / Leek tip to taste"><span class="step-n">3</span>
+                <p><span class="t-ja">鶏もも肉をお米の上にのせ、長ネギの先の部分も一緒にのせます。</span><span class="t-en">Lay the chicken thigh on top of the rice and add the green tip of the leek.</span></p>
+              </li>
+              <li data-uses="中火 → 沸いたら弱火 23分" data-uses-en="Medium, then low for 23 min"><span class="step-n">4</span>
+                <p><span class="t-ja">蓋をして中火にかけ、沸いてきたら弱火で炊きます。</span><span class="t-en">Cover and bring to a boil over medium heat, then turn the heat down to low.</span></p>
+                <p class="wait wait-long"><span class="t-ja">弱火のまま 23分</span><span class="t-en">23 min on low</span></p>
+              </li>
+              <li data-uses="火を止めて 3〜5分" data-uses-en="Heat off, 3–5 min"><span class="step-n">5</span>
+                <p><span class="t-ja">火を止めて、蓋をしたまま蒸らします。</span><span class="t-en">Turn off the heat and let it steam with the lid on.</span></p>
+                <p class="wait wait-short"><span class="t-ja">蒸らし 3〜5分</span><span class="t-en">rest 3–5 min</span></p>
+              </li>
+              <li data-uses="長ネギ 1/2本 ／ 醤油・酢・砂糖 各大さじ2" data-uses-en="Leek 1/2 / Soy, vinegar, sugar 2 tbsp each"><span class="step-n">6</span>
+                <p><span class="t-ja">蒸らしている間にネギダレを作ります。長ネギ1/2本を細かく刻み、濃口醤油・酢・砂糖 各大さじ2と混ぜます。</span><span class="t-en">While it rests, make the sauce: finely chop 1/2 leek and mix with 2 tbsp each of soy sauce, vinegar and sugar.</span></p>
+              </li>
+              <li data-uses="盛り付け" data-uses-en="Serving"><span class="step-n">7</span>
+                <p><span class="t-ja">鶏肉を取り出して食べやすく切り、長ネギの先は取り除きます。ご飯をさっくり混ぜて盛り付け、鶏肉をのせてネギダレをかけます。</span><span class="t-en">Take out the chicken and cut it into bite-size pieces, remove the leek tip, fluff the rice, then serve with the chicken and the sauce.</span></p>
+              </li>
+            </ol>
+
+            <div class="tips">
+              <h2 class="tips-h"><span class="t-ja">コツ</span><span class="t-en">Notes</span></h2>
+              <ul>
+                <li><span class="t-ja">濃い味が好きな方は、おろし生姜・にんにくを増量。</span><span class="t-en">Want it bolder? Increase the grated ginger and garlic.</span></li>
+                <li><span class="t-ja">炊く前に塩を1〜2振りしても味が締まります。</span><span class="t-en">1–2 shakes of salt before cooking tightens the flavour.</span></li>
+                <li><span class="t-ja">大葉、いりごまなどの薬味は載せても混ぜてもおいしいです。</span><span class="t-en">Perilla leaves and toasted sesame work either on top or mixed in.</span></li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<!-- フッターは全ページ共通 -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p class="foot-brand">みたもっちゃんねる<span class="en">Mitamo Kitchen</span></p>
+    <nav class="foot-nav" aria-label="フッター">
+      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
+      <a href="tori-negi-meshi.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+    <!-- TODO: YouTube / Instagram のリンクをここに置く -->
+    <p class="foot-note">© 2026 みたもっちゃんねる</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

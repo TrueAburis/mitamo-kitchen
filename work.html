@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja" data-lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>お仕事のご依頼｜みたもっちゃんねる</title>
+<meta name="description" content="レシピ制作、料理写真・動画の撮影、メニュー監修などのご相談を受け付けています。">
+<!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+
+<script>
+  /* 表示前に言語を決める。ちらつき防止のため head で実行する */
+  (function () {
+    var lang = null;
+    try { lang = localStorage.getItem('mk-lang'); } catch (e) {}
+    if (lang !== 'ja' && lang !== 'en') {
+      lang = (navigator.language || 'ja').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en';
+    }
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.lang = lang;
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main"><span class="t-ja">本文へスキップ</span><span class="t-en">Skip to content</span></a>
+
+<!-- ヘッダーは全ページ共通。ここを直したら他のHTMLも同じように直すこと -->
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="brand" href="index.html">
+      <span class="brand-ja">みたもっちゃんねる</span>
+      <span class="brand-en">Mitamo Kitchen</span>
+    </a>
+
+    <nav class="nav" aria-label="サイト内">
+      <a href="tori-negi-meshi.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html" aria-current="page"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+
+    <div class="lang" role="group" aria-label="言語 / Language">
+      <button type="button" data-set-lang="ja" aria-pressed="true">JA</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="plain" id="work">
+    <div class="wrap">
+      <p class="sec-title"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></p>
+      <h1 class="sec-h2"><span class="t-ja">ご相談はこちらから</span><span class="t-en">Get in touch</span></h1>
+
+      <!-- ▼▼▼ ここから仮の文章 ▼▼▼ -->
+      <div class="prose draft">
+        <p>
+          <span class="t-ja">レシピの制作、料理写真・動画の撮影、メニューの監修などのご相談を受け付けています。ご予算や納期が決まっていない段階でも構いません。下のフォームからお送りください。</span>
+          <span class="t-en">We take on recipe development, food photography and video, and menu supervision. It is fine if the budget and schedule are not settled yet. Please use the form below.</span>
+        </p>
+      </div>
+      <!-- ▲▲▲ ここまで仮の文章 ▲▲▲ -->
+
+      <!-- このサイトで唯一の外部読み込み。フォームの差し替えはこの src を変える -->
+      <iframe
+        class="form-embed"
+        src="https://docs.google.com/forms/d/e/1FAIpQLScvpAUYr7rHcj1Zd4HJIZuWQ4K5wM25EXhhAolZa-DhHL3HpA/viewform?embedded=true"
+        title="お仕事のご依頼フォーム / Enquiry form"
+        loading="lazy">読み込んでいます…</iframe>
+
+      <p class="form-alt">
+        <span class="t-ja">うまく表示されないときは <a href="https://docs.google.com/forms/d/e/1FAIpQLScvpAUYr7rHcj1Zd4HJIZuWQ4K5wM25EXhhAolZa-DhHL3HpA/viewform" target="_blank" rel="noopener">フォームを別のタブで開く</a> こともできます。</span>
+        <span class="t-en">If the form does not load, you can <a href="https://docs.google.com/forms/d/e/1FAIpQLScvpAUYr7rHcj1Zd4HJIZuWQ4K5wM25EXhhAolZa-DhHL3HpA/viewform" target="_blank" rel="noopener">open it in a new tab</a>.</span>
+      </p>
+
+      <!-- TODO: 公開用の連絡先メールアドレスが決まったら、下の雛形を有効にして載せる。
+           いまは公開リポジトリに個人アドレスを置かないために外してある。
+           問い合わせ導線は上の Google フォームがあるので、無くても成立している。
+
+      <p class="contact">
+        <span class="t-ja">メールでも受け付けています：</span><span class="t-en">You can also email us:</span>
+        <a href="mailto:ここにアドレス">ここにアドレス</a>
+      </p>
+      -->
+    </div>
+  </section>
+</main>
+
+<!-- フッターは全ページ共通 -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p class="foot-brand">みたもっちゃんねる<span class="en">Mitamo Kitchen</span></p>
+    <nav class="foot-nav" aria-label="フッター">
+      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
+      <a href="tori-negi-meshi.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+    <!-- TODO: YouTube / Instagram のリンクをここに置く -->
+    <p class="foot-note">© 2026 みたもっちゃんねる</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

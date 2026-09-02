@@ -1,446 +1,194 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-lang="ja">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>mitamo kitchen ｜ 出汁から作る、日本の家庭料理</title>
-<meta name="description" content="出汁から作る日本の家庭料理を、日本語と英語で発信しています。レシピ、お仕事のご依頼はこちらから。">
-<meta property="og:title" content="mitamo kitchen ｜ 出汁から作る、日本の家庭料理">
-<meta property="og:description" content="出汁から作る日本の家庭料理を、日本語と英語で発信しています。">
-<meta property="og:type" content="website">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Cormorant:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
-
-<style>
-:root{
-  --kombu:#141A14; --kombu-up:#1D251C; --kombu-line:#2E3A2C;
-  --yuge:#F0EBDF;  --yuge-dim:#A8A79C;
-  --dashi:#C9A45C; --katsuo:#B5705C; --sage:#7C8A72;
-  --serif:"Shippori Mincho",serif;
-  --sans:"Zen Kaku Gothic New",system-ui,sans-serif;
-  --latin:"Cormorant",Georgia,serif;
-  --pad:clamp(20px,5vw,64px);
-  --bar-h:60px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;scroll-padding-top:var(--bar-h)}
-body{background:var(--kombu);color:var(--yuge);font-family:var(--sans);line-height:1.9;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
-:focus-visible{outline:2px solid var(--dashi);outline-offset:3px}
-.wrap{max-width:1120px;margin:0 auto}
-section{padding:clamp(56px,9vw,110px) var(--pad)}
-
-/* 出汁が引かれていく罫線 */
-.steep{height:1px;border:0;background:linear-gradient(90deg,transparent 0%,var(--kombu-line) 12%,var(--sage) 38%,var(--dashi) 62%,var(--katsuo) 82%,transparent 100%);opacity:.85}
-
-/* ========== ヘッダー ========== */
-.bar{position:sticky;top:0;z-index:60;height:var(--bar-h);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 var(--pad);background:rgba(20,26,20,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--kombu-line)}
-.brand{font-family:var(--serif);font-weight:700;font-size:16px;letter-spacing:.14em;line-height:1.2}
-.brand small{display:block;font-family:var(--latin);font-size:9px;font-style:italic;letter-spacing:.28em;color:var(--sage);margin-top:1px}
-.nav{display:none;gap:26px}
-.nav a{font-size:12px;letter-spacing:.16em;color:var(--yuge-dim);transition:color .2s}
-.nav a:hover{color:var(--dashi)}
-.bar__cta{display:none;font-size:12px;font-weight:700;letter-spacing:.08em;padding:9px 16px;border:1px solid var(--dashi);color:var(--dashi);border-radius:2px;transition:.25s}
-.bar__cta:hover{background:var(--dashi);color:var(--kombu)}
-.burger{width:38px;height:38px;border:1px solid var(--kombu-line);background:none;border-radius:2px;cursor:pointer;display:grid;place-items:center;gap:4px;padding:10px}
-.burger span{display:block;width:100%;height:1px;background:var(--yuge)}
-.sheet{position:fixed;inset:0;z-index:70;background:var(--kombu);padding:calc(var(--bar-h) + 24px) var(--pad) var(--pad);display:none;flex-direction:column;gap:2px}
-.sheet.on{display:flex}
-.sheet a{font-family:var(--serif);font-size:22px;letter-spacing:.08em;padding:14px 0;border-bottom:1px solid var(--kombu-line)}
-.sheet a span{font-family:var(--latin);font-style:italic;font-size:11px;letter-spacing:.24em;color:var(--sage);margin-left:12px}
-.sheet__close{position:absolute;top:11px;right:var(--pad);width:38px;height:38px;border:1px solid var(--kombu-line);background:none;color:var(--yuge);font-size:18px;border-radius:2px;cursor:pointer}
-
-/* ========== 見出し ========== */
-.head{margin-bottom:34px}
-.head__eyebrow{font-family:var(--latin);font-size:12px;font-style:italic;letter-spacing:.34em;text-transform:uppercase;color:var(--sage);margin-bottom:8px}
-.head__ja{font-family:var(--serif);font-weight:700;font-size:clamp(23px,4.2vw,34px);letter-spacing:.06em;line-height:1.5}
-.viewall{display:inline-block;margin-top:30px;font-family:var(--latin);font-size:14px;font-style:italic;letter-spacing:.22em;color:var(--dashi);border-bottom:1px solid var(--dashi);padding-bottom:3px}
-
-/* ========== ヒーロースライダー ========== */
-.hero{position:relative;height:clamp(460px,78vh,700px);overflow:hidden;border-bottom:1px solid var(--kombu-line)}
-.slide{position:absolute;inset:0;opacity:0;transition:opacity 1.1s ease;display:grid;place-items:center;text-align:center;padding:0 var(--pad)}
-.slide.on{opacity:1}
-.slide__bg{position:absolute;inset:0;background:var(--kombu-up);display:grid;place-items:center;color:var(--kombu-line);font-size:12px;letter-spacing:.2em}
-.slide__bg img{width:100%;height:100%;object-fit:cover;opacity:.55}
-.slide__inner{position:relative;z-index:2;max-width:720px}
-.slide__en{font-family:var(--latin);font-style:italic;font-size:13px;letter-spacing:.3em;color:var(--dashi);margin-bottom:14px}
-.slide__ttl{font-family:var(--serif);font-weight:700;font-size:clamp(30px,7vw,58px);line-height:1.32;letter-spacing:.05em}
-.slide__txt{margin-top:16px;font-size:14px;color:var(--yuge-dim)}
-.slide__btn{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:.14em;padding:12px 30px;border:1px solid var(--dashi);color:var(--dashi);border-radius:2px;transition:.25s}
-.slide__btn:hover{background:var(--dashi);color:var(--kombu)}
-.dots{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:10px}
-.dots button{width:26px;height:2px;border:0;background:var(--kombu-line);cursor:pointer;padding:0}
-.dots button[aria-current="true"]{background:var(--dashi)}
-
-/* ========== 流れる帯 ========== */
-.marquee{overflow:hidden;border-block:1px solid var(--kombu-line);padding:14px 0;background:var(--kombu-up)}
-.marquee__row{display:flex;width:max-content;animation:flow 38s linear infinite}
-.marquee__row span{font-family:var(--serif);font-size:15px;letter-spacing:.24em;color:var(--sage);padding:0 26px;white-space:nowrap}
-@keyframes flow{to{transform:translateX(-50%)}}
-
-/* ========== ステートメント ========== */
-.state{background:var(--kombu-up);text-align:center}
-.state__en{font-family:var(--latin);font-style:italic;font-size:14px;letter-spacing:.3em;color:var(--dashi);margin-bottom:16px}
-.state__ttl{font-family:var(--serif);font-weight:700;font-size:clamp(24px,5vw,40px);line-height:1.6;letter-spacing:.06em}
-.state__txt{margin:26px auto 0;max-width:36em;font-size:15px;color:var(--yuge-dim)}
-
-/* ========== カード（レシピ） ========== */
-.cards{display:grid;gap:26px;grid-template-columns:1fr}
-.card__ph{aspect-ratio:4/3;background:var(--kombu-up);border:1px dashed var(--kombu-line);border-radius:2px;display:grid;place-items:center;color:var(--sage);font-size:11px;letter-spacing:.16em;overflow:hidden;transition:.3s}
-.card:hover .card__ph{border-color:var(--dashi)}
-.card__ph img{width:100%;height:100%;object-fit:cover}
-.card__ttl{font-family:var(--serif);font-weight:700;font-size:18px;letter-spacing:.05em;margin-top:14px}
-.card__en{font-family:var(--latin);font-style:italic;font-size:13px;color:var(--yuge-dim);margin-top:3px}
-.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-.tags span{font-size:11px;letter-spacing:.08em;color:var(--sage);border:1px solid var(--kombu-line);border-radius:99px;padding:2px 11px}
-
-/* ========== 一覧（News / Media） ========== */
-.rows{border-top:1px solid var(--kombu-line)}
-.row{display:grid;gap:4px 20px;grid-template-columns:1fr;padding:20px 0;border-bottom:1px solid var(--kombu-line);transition:.25s}
-.row:hover{padding-left:8px}
-.row__date{font-family:var(--latin);font-size:14px;letter-spacing:.14em;color:var(--yuge-dim)}
-.row__cat{font-size:10px;letter-spacing:.14em;color:var(--katsuo);border:1px solid var(--kombu-line);border-radius:99px;padding:2px 10px;justify-self:start}
-.row__ttl{font-size:15px}
-
-/* ========== SNS ========== */
-.sns{display:grid;gap:1px;background:var(--kombu-line);border:1px solid var(--kombu-line)}
-.sns a{background:var(--kombu);padding:24px clamp(18px,3vw,30px);display:flex;align-items:center;justify-content:space-between;gap:14px;transition:background .25s}
-.sns a:hover{background:var(--kombu-up)}
-.sns__name{font-family:var(--serif);font-weight:700;font-size:17px;letter-spacing:.08em}
-.sns__sub{display:block;font-size:11px;letter-spacing:.1em;color:var(--yuge-dim);margin-top:2px;font-family:var(--sans);font-weight:400}
-.sns__arrow{color:var(--dashi)}
-
-/* ========== コンタクト ========== */
-.note{border:1px solid var(--dashi);border-radius:2px;padding:clamp(20px,4vw,30px);margin-bottom:30px;font-size:14px}
-.note strong{color:var(--dashi)}
-.note p+p{margin-top:10px;color:var(--yuge-dim)}
-.formbox{width:100%;min-height:900px;border:0;border-radius:2px;background:var(--yuge)}
-.fallback{display:inline-block;margin-top:18px;font-size:14px;color:var(--dashi);border-bottom:1px solid var(--dashi);padding-bottom:2px}
-
-/* ========== フッター ========== */
-footer{border-top:1px solid var(--kombu-line);padding:clamp(40px,7vw,70px) var(--pad) 34px}
-.fgrid{display:grid;gap:34px;grid-template-columns:1fr;max-width:1120px;margin:0 auto}
-.fnav{display:flex;flex-wrap:wrap;gap:10px 26px}
-.fnav a{font-size:12px;letter-spacing:.14em;color:var(--yuge-dim)}
-.fnav a:hover{color:var(--dashi)}
-.copy{max-width:1120px;margin:34px auto 0;padding-top:20px;border-top:1px solid var(--kombu-line);font-family:var(--latin);font-size:12px;letter-spacing:.18em;color:var(--yuge-dim)}
-
-/* ========== 画面が広いとき ========== */
-@media (min-width:820px){
-  .nav{display:flex}
-  .bar__cta{display:inline-block}
-  .burger{display:none}
-  .cards{grid-template-columns:repeat(3,1fr)}
-  .row{grid-template-columns:120px 110px 1fr;align-items:center}
-  .sns{grid-template-columns:repeat(2,1fr)}
-  .fgrid{grid-template-columns:1fr 1.4fr}
-}
-
-/* ========== 出現アニメ ========== */
-.rise{opacity:0;transform:translateY(18px);transition:opacity .8s ease,transform .8s ease}
-.rise.on{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .rise{opacity:1;transform:none;transition:none}
-  .marquee__row{animation:none}
-  .slide{transition:none}
-}
-</style>
-</head>
-<body id="top">
-
-<!-- ============ ヘッダー ============ -->
-<header class="bar">
-  <a class="brand" href="#top">mitamo kitchen<small>Dashi &amp; Home Cooking</small></a>
-  <nav class="nav">
-    <a href="#recipe">RECIPE</a>
-    <a href="#about">ABOUT</a>
-    <a href="#media">MEDIA</a>
-    <a href="#news">NEWS</a>
-    <a href="#sns">SNS</a>
-  </nav>
-  <a class="bar__cta" href="#contact">お仕事のご依頼</a>
-  <button class="burger" id="burger" aria-label="メニューを開く"><span></span><span></span><span></span></button>
-</header>
-
-<div class="sheet" id="sheet">
-  <button class="sheet__close" id="sheetClose" aria-label="メニューを閉じる">✕</button>
-  <a href="#recipe">レシピ<span>Recipe</span></a>
-  <a href="#about">つくっている人<span>About</span></a>
-  <a href="#media">掲載実績<span>Media</span></a>
-  <a href="#news">お知らせ<span>News</span></a>
-  <a href="#sns">発信している場所<span>SNS</span></a>
-  <a href="#contact">お仕事のご依頼<span>Contact</span></a>
-</div>
-
-<!-- ============ ヒーロースライダー ============ -->
-<div class="hero" id="hero">
-
-  <div class="slide on">
-    <!-- 写真を入れるとき：下の <img> のコメントを外し、上の文字を消す -->
-    <div class="slide__bg">SLIDE 1 の写真<!-- <img src="slide1.jpg" alt=""> --></div>
-    <div class="slide__inner">
-      <p class="slide__en">Everything begins with dashi.</p>
-      <h1 class="slide__ttl">出汁から、はじめる。</h1>
-      <p class="slide__txt">昆布と鰹節でとった出汁を土台に、日本の家庭料理をつくっています。</p>
-      <a class="slide__btn" href="#recipe">レシピを見る</a>
-    </div>
-  </div>
-
-  <div class="slide">
-    <div class="slide__bg">SLIDE 2 の写真<!-- <img src="slide2.jpg" alt=""> --></div>
-    <div class="slide__inner">
-      <p class="slide__en">In Japanese &amp; English.</p>
-      <h2 class="slide__ttl">日本語と英語で、<br>世界の台所へ。</h2>
-      <p class="slide__txt">すべてのレシピに英語字幕をつけています。</p>
-      <a class="slide__btn" href="#sns">発信している場所</a>
-    </div>
-  </div>
-
-  <div class="slide">
-    <div class="slide__bg">SLIDE 3 の写真<!-- <img src="slide3.jpg" alt=""> --></div>
-    <div class="slide__inner">
-      <p class="slide__en">Work with us.</p>
-      <h2 class="slide__ttl">お仕事のご依頼</h2>
-      <p class="slide__txt">レシピ開発、商品PR、監修、撮影素材のご提供。</p>
-      <a class="slide__btn" href="#contact">ご依頼フォームへ</a>
-    </div>
-  </div>
-
-  <div class="dots" id="dots"></div>
-</div>
-
-<!-- ============ 流れる帯 ============ -->
-<div class="marquee" aria-hidden="true">
-  <div class="marquee__row" id="mq">
-    <span>昆布</span><span>鰹節</span><span>煮干し</span><span>干し椎茸</span><span>一番出汁</span><span>二番出汁</span><span>味噌汁</span><span>煮物</span>
-    <span>昆布</span><span>鰹節</span><span>煮干し</span><span>干し椎茸</span><span>一番出汁</span><span>二番出汁</span><span>味噌汁</span><span>煮物</span>
-  </div>
-</div>
-
-<!-- ============ ステートメント ============ -->
-<section class="state" id="about">
-  <div class="wrap rise">
-    <p class="state__en">Everything begins with dashi.</p>
-    <h2 class="state__ttl">出汁をとる時間は、<br>省いてもいい時間じゃなかった。</h2>
-    <p class="state__txt">
-      （ここにあなたの話を書きます。前は何をしていたか、なぜ料理を撮りはじめたか、
-      最初にうまくいかなかったこと、なぜ出汁だったのか、これから何をしたいか。
-      400字ほどで十分です。）
-    </p>
-    <a class="viewall" href="#contact">MORE ABOUT ME</a>
-  </div>
-</section>
-
-<hr class="steep">
-
-<!-- ============ レシピ ============ -->
-<section id="recipe">
-  <div class="wrap">
-    <div class="head rise">
-      <p class="head__eyebrow">Recipe</p>
-      <h2 class="head__ja">レシピ</h2>
-    </div>
-
-    <div class="cards rise">
-      <a class="card" href="#">
-        <div class="card__ph">RECIPE 01 の写真<!-- <img src="r1.jpg" alt=""> --></div>
-        <h3 class="card__ttl">基本の一番出汁</h3>
-        <p class="card__en">Ichiban Dashi</p>
-        <div class="tags"><span>#15分</span><span>#昆布</span><span>#鰹節</span><span>#基本</span></div>
-      </a>
-      <a class="card" href="#">
-        <div class="card__ph">RECIPE 02 の写真<!-- <img src="r2.jpg" alt=""> --></div>
-        <h3 class="card__ttl">なすの煮浸し</h3>
-        <p class="card__en">Simmered Eggplant</p>
-        <div class="tags"><span>#20分</span><span>#なす</span><span>#作り置き</span></div>
-      </a>
-      <a class="card" href="#">
-        <div class="card__ph">RECIPE 03 の写真<!-- <img src="r3.jpg" alt=""> --></div>
-        <h3 class="card__ttl">鶏と根菜の煮物</h3>
-        <p class="card__en">Chicken &amp; Root Vegetables</p>
-        <div class="tags"><span>#40分</span><span>#鶏肉</span><span>#煮物</span></div>
-      </a>
-    </div>
-
-    <a class="viewall" href="#">VIEW ALL RECIPES</a>
-  </div>
-</section>
-
-<hr class="steep">
-
-<!-- ============ 掲載実績 ============ -->
-<section id="media">
-  <div class="wrap">
-    <div class="head rise">
-      <p class="head__eyebrow">Media</p>
-      <h2 class="head__ja">掲載・出演</h2>
-    </div>
-
-    <div class="rows rise">
-      <a class="row" href="#">
-        <span class="row__date">2026.08.20</span>
-        <span class="row__cat">WEBメディア</span>
-        <span class="row__ttl">◯◯に出汁のとり方の記事が掲載されました</span>
-      </a>
-      <a class="row" href="#">
-        <span class="row__date">2026.06.11</span>
-        <span class="row__cat">タイアップ</span>
-        <span class="row__ttl">◯◯株式会社様とレシピ動画を制作しました</span>
-      </a>
-      <a class="row" href="#">
-        <span class="row__date">2026.03.02</span>
-        <span class="row__cat">イベント</span>
-        <span class="row__ttl">◯◯にて出汁の料理教室を開催しました</span>
-      </a>
-    </div>
-
-    <a class="viewall" href="#">VIEW ALL</a>
-  </div>
-</section>
-
-<hr class="steep">
-
-<!-- ============ お知らせ ============ -->
-<section id="news">
-  <div class="wrap">
-    <div class="head rise">
-      <p class="head__eyebrow">News</p>
-      <h2 class="head__ja">お知らせ</h2>
-    </div>
-
-    <div class="rows rise">
-      <a class="row" href="#">
-        <span class="row__date">2026.09.01</span>
-        <span class="row__cat">topics</span>
-        <span class="row__ttl">公式サイトを公開しました</span>
-      </a>
-      <a class="row" href="#">
-        <span class="row__date">2026.08.15</span>
-        <span class="row__cat">topics</span>
-        <span class="row__ttl">Instagramのフォロワーが27万人になりました</span>
-      </a>
-    </div>
-  </div>
-</section>
-
-<hr class="steep">
-
-<!-- ============ SNS ============ -->
-<section id="sns">
-  <div class="wrap">
-    <div class="head rise">
-      <p class="head__eyebrow">Where to find me</p>
-      <h2 class="head__ja">発信している場所</h2>
-    </div>
-
-    <div class="sns rise">
-      <a href="https://www.instagram.com/mitamo.kitchen" target="_blank" rel="noopener">
-        <span class="sns__name">Instagram<span class="sns__sub">レシピと日々の料理</span></span>
-        <span class="sns__arrow">→</span>
-      </a>
-      <a href="#" target="_blank" rel="noopener">
-        <span class="sns__name">TikTok<span class="sns__sub">短い動画</span></span>
-        <span class="sns__arrow">→</span>
-      </a>
-      <a href="#" target="_blank" rel="noopener">
-        <span class="sns__name">YouTube<span class="sns__sub">つくり方をじっくり</span></span>
-        <span class="sns__arrow">→</span>
-      </a>
-      <a href="#" target="_blank" rel="noopener">
-        <span class="sns__name">使っている道具<span class="sns__sub">Amazon ストアフロント</span></span>
-        <span class="sns__arrow">→</span>
-      </a>
-    </div>
-  </div>
-</section>
-
-<hr class="steep">
-
-<!-- ============ お仕事のご依頼 ============ -->
-<section id="contact">
-  <div class="wrap">
-    <div class="head rise">
-      <p class="head__eyebrow">Contact</p>
-      <h2 class="head__ja">お仕事のご依頼</h2>
-    </div>
-
-    <div class="note rise">
-      <p><strong>ご依頼はこちらのフォームからお願いします。</strong></p>
-      <p>SNSのDMは数が多く、お返事が遅れたり届かないことがあります。確実にお受けできるのはこのフォームです。3営業日以内にご返信します。料金表と媒体資料（PDF）もこちらからお送りします。</p>
-    </div>
-
-    <!-- ▼ Googleフォームのアドレスに差し替える -->
-    <iframe class="formbox rise" src="https://docs.google.com/forms/d/e/1FAIpQLScvpAUYr7rHcj1Zd4HJIZuWQ4K5wM25EXhhAolZa-DhHL3HpA/viewform?embedded=true" title="お仕事のご依頼フォーム" loading="lazy">読み込んでいます…</iframe>
-
-    <a class="fallback" href="mailto:aburisu3@gmail.com">フォームが開かない場合はメールでどうぞ</a>
-  </div>
-</section>
-
-<!-- ============ フッター ============ -->
-<footer>
-  <div class="fgrid">
-    <div>
-      <p class="brand" style="font-size:19px">mitamo kitchen<small>Dashi &amp; Home Cooking</small></p>
-    </div>
-    <nav class="fnav">
-      <a href="#top">TOP</a>
-      <a href="#recipe">RECIPE</a>
-      <a href="#about">ABOUT</a>
-      <a href="#media">MEDIA</a>
-      <a href="#news">NEWS</a>
-      <a href="#sns">SNS</a>
-      <a href="#contact">CONTACT</a>
-    </nav>
-  </div>
-  <p class="copy">© 2026 mitamo kitchen</p>
-</footer>
+<title>みたもっちゃんねる｜出汁からはじめる和食レシピ</title>
+<meta name="description" content="出汁からはじめる和食のレシピを、日本語と英語で。分量を画面に残したまま、作りながら読めるレシピサイトです。">
+<!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
 
 <script>
-// --- ハンバーガーメニュー ---
-var burger=document.getElementById('burger'),sheet=document.getElementById('sheet'),sheetClose=document.getElementById('sheetClose');
-function closeSheet(){sheet.classList.remove('on');document.body.style.overflow='';}
-burger.addEventListener('click',function(){sheet.classList.add('on');document.body.style.overflow='hidden';});
-sheetClose.addEventListener('click',closeSheet);
-sheet.querySelectorAll('a').forEach(function(a){a.addEventListener('click',closeSheet);});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
-
-// --- ヒーロースライダー ---
-(function(){
-  var slides=document.querySelectorAll('#hero .slide'),dots=document.getElementById('dots'),i=0,timer;
-  if(!slides.length)return;
-  slides.forEach(function(_,n){
-    var b=document.createElement('button');
-    b.setAttribute('aria-label',(n+1)+'枚目');
-    b.addEventListener('click',function(){go(n);reset();});
-    dots.appendChild(b);
-  });
-  function go(n){
-    i=n;
-    slides.forEach(function(s,k){s.classList.toggle('on',k===n);});
-    dots.querySelectorAll('button').forEach(function(b,k){b.setAttribute('aria-current',k===n?'true':'false');});
-  }
-  function next(){go((i+1)%slides.length);}
-  function reset(){clearInterval(timer);start();}
-  function start(){
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-    timer=setInterval(next,6000);
-  }
-  go(0);start();
-})();
-
-// --- スクロールで出現 ---
-(function(){
-  var t=document.querySelectorAll('.rise');
-  if(!('IntersectionObserver' in window)){t.forEach(function(e){e.classList.add('on');});return;}
-  var io=new IntersectionObserver(function(es){
-    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}});
-  },{threshold:.1});
-  t.forEach(function(e){io.observe(e);});
-})();
+  /* 表示前に言語を決める。ちらつき防止のため head で実行する */
+  (function () {
+    var lang = null;
+    try { lang = localStorage.getItem('mk-lang'); } catch (e) {}
+    if (lang !== 'ja' && lang !== 'en') {
+      lang = (navigator.language || 'ja').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en';
+    }
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.lang = lang;
+  })();
 </script>
+</head>
+<body>
+
+<a class="skip" href="#main"><span class="t-ja">本文へスキップ</span><span class="t-en">Skip to content</span></a>
+
+<!-- ヘッダーは全ページ共通。ここを直したら他のHTMLも同じように直すこと -->
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="brand" href="index.html">
+      <span class="brand-ja">みたもっちゃんねる</span>
+      <span class="brand-en">Mitamo Kitchen</span>
+    </a>
+
+    <nav class="nav" aria-label="サイト内">
+      <a href="tori-negi-meshi.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+
+    <div class="lang" role="group" aria-label="言語 / Language">
+      <button type="button" data-set-lang="ja" aria-pressed="true">JA</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hub" id="top">
+    <div class="wrap">
+      <h1 class="hub-name">
+        <span class="t-ja">出汁からはじめる、<br>家庭の和食。</span>
+        <span class="t-en">Japanese home cooking,<br>starting with dashi.</span>
+      </h1>
+
+      <figure class="shot hub-shot">
+        <!-- TODO: 本人の写真か動画のサムネイルを images/ に置いたら <img> に差し替える。alt を必ず書くこと -->
+        写真がまだありません<br>images/profile.jpg
+      </figure>
+
+      <nav class="sns" aria-label="SNS">
+        <a class="sns-btn" href="https://www.instagram.com/mitamo.kitchen/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5"/>
+            <circle cx="12" cy="12" r="4.2"/>
+            <circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/>
+          </svg>
+          <span>Instagram</span>
+        </a>
+        <a class="sns-btn" href="https://www.tiktok.com/@mitamokitchen" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14.6 3v10.7a3.7 3.7 0 1 1-3.2-3.66"/>
+            <path d="M14.6 3.1c.35 2.2 1.95 3.8 4.15 4.15"/>
+          </svg>
+          <span>TikTok</span>
+        </a>
+        <a class="sns-btn" href="https://www.youtube.com/channel/UCY5Py2DIsgdurOYtN0ayV3A" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <rect x="2" y="5" width="20" height="14" rx="4.2"/>
+            <path d="M10.2 9.1l5 2.9-5 2.9z" fill="currentColor" stroke="none"/>
+          </svg>
+          <span>YouTube</span>
+        </a>
+      </nav>
+
+      <p class="hub-acts">
+        <a class="btn" href="work.html"><span class="t-ja">お仕事のご依頼はこちら</span><span class="t-en">Work with us</span></a>
+      </p>
+    </div>
+  </section>
+
+  <section class="plain" id="recipes">
+    <div class="wrap">
+      <div class="dish dish-solo">
+        <div class="dish-head">
+          <h2><span class="t-ja">最新のレシピ</span><span class="t-en">Latest recipe</span></h2>
+          <p class="dish-name">鶏ネギ飯<span class="en">Chicken and Green Onion Rice</span></p>
+        </div>
+
+        <figure class="shot">
+          <!-- TODO: Instagram の投稿画像を images/tori-negi-meshi.jpg として置いたら <img> に差し替える。alt を必ず書くこと -->
+          写真がまだありません<br>images/tori-negi-meshi.jpg
+        </figure>
+
+        <dl class="dish-meta">
+          <dt><span class="t-ja">分量</span><span class="t-en">Serves</span></dt>
+          <dd><span class="t-ja">2〜3人前</span><span class="t-en">2–3</span></dd>
+          <dt><span class="t-ja">時間</span><span class="t-en">Time</span></dt>
+          <dd><span class="t-ja">弱火 23分 + 蒸らし 3〜5分</span><span class="t-en">23 min low + 3–5 min rest</span></dd>
+        </dl>
+
+        <dl class="qty-list">
+          <dt>鶏もも肉<span class="en">Chicken thigh</span></dt>
+          <dd><span class="t-ja">1枚</span><span class="t-en">1 piece</span></dd>
+
+          <dt>お米<span class="en">Rice</span></dt>
+          <dd><span class="t-ja">2合（300g）</span><span class="t-en">2 cups (300g)</span></dd>
+
+          <dt>水<span class="en">Water</span></dt>
+          <dd>400ml</dd>
+
+          <dt>濃口醤油<span class="en">Soy sauce</span></dt>
+          <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tbsp</span></dd>
+
+          <dt>おろし生姜<span class="en">Grated ginger</span></dt>
+          <dd><span class="t-ja">小さじ1</span><span class="t-en">1 tsp</span></dd>
+
+          <dt>おろしにんにく<span class="en">Grated garlic</span></dt>
+          <dd><span class="t-ja">小さじ1</span><span class="t-en">1 tsp</span></dd>
+
+          <dt>ごま油<span class="en">Sesame oil</span></dt>
+          <dd><span class="t-ja">大さじ1</span><span class="t-en">1 tbsp</span></dd>
+
+          <dt>長ネギの先の部分<span class="en">Tip of a leek</span></dt>
+          <dd><span class="t-ja">適量</span><span class="t-en">to taste</span></dd>
+
+        </dl>
+
+        <a class="dish-more" href="tori-negi-meshi.html">
+          <span class="t-ja">作り方を見る</span><span class="t-en">See how it is made</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="plain" id="profile">
+    <div class="wrap">
+      <h2 class="sec-h2"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></h2>
+
+      <!-- ▼▼▼ ここから仮の文章。本番の文章に差し替えたら class="draft" を外す ▼▼▼ -->
+      <div class="prose draft">
+        <p>
+          <span class="t-ja">出汁を引くところから始める、家庭向けの和食を紹介しています。特別な道具や、手に入りにくい材料は使いません。動画で流れを見て、このページで分量を確かめながら作ってもらう、という使い方を想定しています。</span>
+          <span class="t-en">We cook everyday Japanese food, starting from the dashi. No special equipment, no hard-to-find ingredients. Watch the video for the rhythm of it, then use this page to check the measurements while you cook.</span>
+        </p>
+        <p>
+          <span class="t-ja">レシピはすべて日本語と英語で用意しています。海外の方が店頭で材料を探せるように、材料名は言語を切り替えても両方を表示したままにしています。</span>
+          <span class="t-en">Every recipe is written in both Japanese and English. Ingredient names stay in both languages even after you switch, so you can match them against what is on the shelf.</span>
+        </p>
+      </div>
+
+      <ul class="facts">
+        <li><b><span class="t-ja">はじめた年</span><span class="t-en">Started</span></b><span>TODO</span></li>
+        <li><b><span class="t-ja">更新</span><span class="t-en">Updates</span></b><span>TODO</span></li>
+        <li><b><span class="t-ja">拠点</span><span class="t-en">Based in</span></b><span>TODO</span></li>
+      </ul>
+      <!-- TODO: 上の3項目に実際の値を入れる -->
+      <!-- ▲▲▲ ここまで仮の文章 ▲▲▲ -->
+    </div>
+  </section>
+
+</main>
+
+<!-- フッターは全ページ共通 -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p class="foot-brand">みたもっちゃんねる<span class="en">Mitamo Kitchen</span></p>
+    <nav class="foot-nav" aria-label="フッター">
+      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
+      <a href="tori-negi-meshi.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </nav>
+    <!-- TODO: YouTube / Instagram のリンクをここに置く -->
+    <p class="foot-note">© 2026 みたもっちゃんねる</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
