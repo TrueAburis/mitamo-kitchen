@@ -114,6 +114,60 @@
 
   function tagName(key, lg) { return TAGS[key] ? TAGS[key][lg] : key; }
 
+  var AXES = window.TAG_AXES || {};
+  var TAG_MIN = window.TAG_MIN || 1;
+
+  function tagCounts() {
+    var c = {};
+    DATA.forEach(function (r) {
+      r.tags.forEach(function (t) { c[t] = (c[t] || 0) + 1; });
+    });
+    return c;
+  }
+
+  /* タグのボタンを軸ごとに並べ直す。
+     件数がそろっていないタグは出さない。1件しか出ないタグを押させると、
+     押した人をがっかりさせるだけなので。件数は表に出して期待値を先に見せる。 */
+  function buildChips(host, activeTag, onPick) {
+    var lg = lang();
+    var counts = tagCounts();
+    host.innerHTML = '';
+
+    var keys = Object.keys(TAGS).filter(function (k) { return (counts[k] || 0) >= TAG_MIN; });
+
+    if (!keys.length) {
+      host.appendChild(el('p', 'chips-empty', lg === 'ja'
+        ? 'タグは、同じタグのレシピが ' + TAG_MIN + ' 件そろってから表示します。いまはまだ足りていません。'
+        : 'A tag appears once ' + TAG_MIN + ' recipes share it. Not there yet.'));
+      return;
+    }
+
+    var mk = function (key, label) {
+      var b = el('button', 'chip');
+      b.type = 'button';
+      b.dataset.tag = key;
+      b.textContent = label;
+      b.setAttribute('aria-pressed', key === activeTag ? 'true' : 'false');
+      b.addEventListener('click', function () { onPick(key === activeTag ? '' : key); });
+      return b;
+    };
+
+    var first = el('div', 'chip-axis');
+    first.appendChild(mk('', lg === 'ja' ? 'すべて' : 'All'));
+    host.appendChild(first);
+
+    Object.keys(AXES).forEach(function (axis) {
+      var inAxis = keys.filter(function (k) { return TAGS[k].axis === axis; });
+      if (!inAxis.length) { return; }
+      var row = el('div', 'chip-axis');
+      row.appendChild(el('span', 'chip-axis-label', AXES[axis][lg]));
+      inAxis.forEach(function (k) {
+        row.appendChild(mk(k, tagName(k, lg) + ' ' + counts[k]));
+      });
+      host.appendChild(row);
+    });
+  }
+
   /* レシピ1件のカード */
   function card(r, lg) {
     var li = el('li', 'card');
@@ -201,10 +255,10 @@
       var empty = document.getElementById('empty');
       if (empty) { empty.hidden = rows.length > 0; }
 
-      document.querySelectorAll('[data-tag]').forEach(function (b) {
-        b.setAttribute('aria-pressed', b.dataset.tag === state.tag ? 'true' : 'false');
-        b.textContent = b.dataset.tag ? tagName(b.dataset.tag, lg) : (lg === 'ja' ? 'すべて' : 'All');
-      });
+      var chipsHost = document.getElementById('chips');
+      if (chipsHost) {
+        buildChips(chipsHost, state.tag, function (k) { state.tag = k; render(); });
+      }
       document.querySelectorAll('[data-sort]').forEach(function (b) {
         b.setAttribute('aria-pressed', b.dataset.sort === state.sort ? 'true' : 'false');
         b.textContent = b.dataset.sort === 'popular'
@@ -212,21 +266,6 @@
           : (lg === 'ja' ? '新しい順' : 'Newest');
       });
     };
-
-    /* タグは recipes.js の TAGS の順。「すべて」を先頭に置く */
-    var chips = document.getElementById('chips');
-    if (chips) {
-      [''].concat(Object.keys(TAGS)).forEach(function (key) {
-        var b = el('button', 'chip');
-        b.type = 'button';
-        b.dataset.tag = key;
-        b.addEventListener('click', function () {
-          state.tag = (state.tag === key) ? '' : key;
-          render();
-        });
-        chips.appendChild(b);
-      });
-    }
 
     document.querySelectorAll('[data-sort]').forEach(function (b) {
       b.addEventListener('click', function () { state.sort = b.dataset.sort; render(); });
@@ -306,21 +345,6 @@
       drawn = true;
     };
 
-    var chipsG = document.getElementById('chips');
-    if (chipsG) {
-      [''].concat(Object.keys(TAGS)).forEach(function (key) {
-        var b = el('button', 'chip');
-        b.type = 'button';
-        b.dataset.tag = key;
-        b.addEventListener('click', function () {
-          gState.tag = (gState.tag === key) ? '' : key;
-          paintGacha();
-          if (drawn) { drawNow(); }
-        });
-        chipsG.appendChild(b);
-      });
-    }
-
     document.querySelectorAll('[data-pull]').forEach(function (b) {
       b.addEventListener('click', function () {
         gState.pull = parseInt(b.dataset.pull, 10);
@@ -329,11 +353,14 @@
     });
 
     function paintGacha() {
-      var lg = lang();
-      document.querySelectorAll('[data-tag]').forEach(function (b) {
-        b.setAttribute('aria-pressed', b.dataset.tag === gState.tag ? 'true' : 'false');
-        b.textContent = b.dataset.tag ? tagName(b.dataset.tag, lg) : (lg === 'ja' ? 'すべて' : 'All');
-      });
+      var chipsG = document.getElementById('chips');
+      if (chipsG) {
+        buildChips(chipsG, gState.tag, function (k) {
+          gState.tag = k;
+          paintGacha();
+          if (drawn) { drawNow(); }
+        });
+      }
       document.querySelectorAll('[data-pull]').forEach(function (b) {
         b.setAttribute('aria-pressed', parseInt(b.dataset.pull, 10) === gState.pull ? 'true' : 'false');
       });
@@ -376,6 +403,31 @@
       };
       document.addEventListener('langchange', renderFigs);
       renderFigs();
+    }
+
+    /* 関連レシピ。タグの重なりが多い順に3件まで。
+       重なりが無いものは出さない（無関係なものを並べても押されない） */
+    var rel = document.getElementById('related');
+    if (rec && rel) {
+      var renderRel = function () {
+        var lg = lang();
+        var rows = DATA
+          .filter(function (r) { return r.slug !== rec.slug; })
+          .map(function (r) {
+            var shared = r.tags.filter(function (t) { return rec.tags.indexOf(t) > -1; }).length;
+            return { r: r, shared: shared };
+          })
+          .filter(function (x) { return x.shared > 0; })
+          .sort(function (a, b) { return b.shared - a.shared || b.r.posted.localeCompare(a.r.posted); })
+          .slice(0, 3);
+
+        rel.innerHTML = '';
+        var wrap = rel.closest('.related-wrap');
+        if (wrap) { wrap.hidden = rows.length === 0; }
+        rows.forEach(function (x) { rel.appendChild(card(x.r, lg)); });
+      };
+      document.addEventListener('langchange', renderRel);
+      renderRel();
     }
 
     var slot = document.getElementById('video');

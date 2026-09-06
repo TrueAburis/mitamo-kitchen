@@ -33,6 +33,7 @@
 <div id="out"></div>
 
 <script src="parse-caption.js"></script>
+<script src="ingredients-ja-en.js"></script>
 <script>
 var FILES = [
   ['南蛮漬け（英語あり・グループあり）', 'fixtures/nanbanzuke.txt'],
@@ -42,6 +43,15 @@ var FILES = [
 
 function esc(s){ var d=document.createElement('div'); d.textContent=s==null?'':s; return d.innerHTML; }
 function val(v){ return v==null ? '<span class="null">null（取れなかった）</span>' : esc(v); }
+
+function dictHtml(groups){
+  var names=[]; groups.forEach(function(g){ g.items.forEach(function(it){ names.push(it.name); }); });
+  var cov = IngredientDict.coverage(names);
+  var h = '<div class="grp"><h3>辞書で英語にできる材料（英語が無い回のため）</h3>';
+  h += '<p style="margin:0 0 6px;font-size:13px">'+cov.known+' / '+cov.total+' 件</p>';
+  if(cov.missing.length) h += '<p class="null" style="font-size:12.5px;margin:0">辞書に無い: '+esc(cov.missing.join(' / '))+'</p>';
+  return h+'</div>';
+}
 
 function groupsHtml(groups, label){
   if(!groups.length) return '<div class="grp"><h3>'+label+'</h3><span class="null">なし</span></div>';
@@ -79,6 +89,7 @@ Promise.all(FILES.map(function(f){
       '</table>'+
       groupsHtml(r.groupsJa, '材料（日本語）')+
       groupsHtml(r.groupsEn, '材料（英語）')+
+      dictHtml(r.groupsJa)+
       (r.warnings.length ? '<div class="warn">'+r.warnings.map(function(w){return '<div>・'+esc(w)+'</div>';}).join('')+'</div>' : '')+
       '</div>';
     out.appendChild(el);
