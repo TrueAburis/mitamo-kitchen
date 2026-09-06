@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>みたもっちゃんねる｜出汁からはじめる和食レシピ</title>
-<meta name="description" content="出汁からはじめる和食のレシピを、日本語と英語で。分量を画面に残したまま、作りながら読めるレシピサイトです。">
+<title>Mitamo Kitchen｜Japanese home cooking from dashi</title>
+<meta name="description" content="Japanese home cooking that starts with dashi. The measurements stay on screen while you cook.">
 <!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../style.css">
 
-<link rel="canonical" href="https://mitamo-kitchen.example/index.html">
+<link rel="canonical" href="https://mitamo-kitchen.example/en/index.html">
 <!-- 日本語版と英語版の対応。絶対URLでないと効かない -->
 <link rel="alternate" hreflang="ja" href="https://mitamo-kitchen.example/index.html">
 <link rel="alternate" hreflang="en" href="https://mitamo-kitchen.example/en/index.html">
@@ -17,16 +17,16 @@
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="みたもっちゃんねる">
-<meta property="og:locale" content="ja_JP">
-<meta property="og:url" content="https://mitamo-kitchen.example/index.html">
-<meta property="og:title" content="みたもっちゃんねる｜出汁からはじめる和食レシピ">
-<meta property="og:description" content="出汁からはじめる和食のレシピを、日本語と英語で。分量を画面に残したまま、作りながら読めるレシピサイトです。">
+<meta property="og:locale" content="en_US">
+<meta property="og:url" content="https://mitamo-kitchen.example/en/index.html">
+<meta property="og:title" content="Mitamo Kitchen｜Japanese home cooking from dashi">
+<meta property="og:description" content="Japanese home cooking that starts with dashi. The measurements stay on screen while you cook.">
 <meta name="twitter:card" content="summary_large_image">
 <!-- TODO: 写真が入ったら og:image を絶対URLで足す -->
 </head>
 <body>
 
-<a class="skip" href="#main">本文へスキップ</a>
+<a class="skip" href="#main">Skip to content</a>
 <!-- ヘッダーは全ページ共通。tools/build.js が作っている。手で直さないこと -->
 <header class="masthead">
   <div class="bar-top">
@@ -40,24 +40,24 @@
         <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
       </svg>
       <input type="search" name="q" autocomplete="off" data-search
-             aria-label="レシピを検索" placeholder="レシピを検索">
+             aria-label="Search recipes" placeholder="Search recipes">
     </form>
 
     <div class="lang">
-      <span class="lang-on">JA</span>
-      <a href="en/index.html" lang="en" hreflang="en">EN</a>
+      <span class="lang-on">EN</span>
+      <a href="../index.html" lang="ja" hreflang="ja">JA</a>
     </div>
   </div>
 
-  <nav class="bar-nav" aria-label="サイト内">
+  <nav class="bar-nav" aria-label="Site">
     <div class="bar-nav-in">
-      <a href="index.html" aria-current="page">トップ</a>
-      <a href="recipes.html">レシピ</a>
-      <a href="recipes.html?sort=popular">人気のレシピ</a>
-      <a href="recipes.html#tags">タグから探す</a>
-      <a href="gacha.html">レシピガチャ</a>
-      <a href="index.html#profile">みたもっちゃんねるとは</a>
-      <a href="work.html">お仕事のご依頼</a>
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="recipes.html">Recipes</a>
+      <a href="recipes.html?sort=popular">Popular</a>
+      <a href="recipes.html#tags">Tags</a>
+      <a href="gacha.html">Recipe gacha</a>
+      <a href="index.html#profile">Profile</a>
+      <a href="work.html">Work with us</a>
     </div>
   </nav>
 </header>
@@ -66,11 +66,11 @@
 
   <section class="hub" id="top">
     <div class="wrap">
-      <h1 class="hub-name">出汁からはじめる、<br>家庭の和食。</h1>
+      <h1 class="hub-name">Japanese home cooking,<br>starting with dashi.</h1>
 
       <figure class="shot hub-shot">
         <!-- TODO: 本人の写真か動画のサムネイルを images/ に置いたら <img> に差し替える。alt を必ず書くこと -->
-        写真がまだありません<br>images/profile.jpg
+        No photo yet<br>images/profile.jpg
       </figure>
 
       <nav class="sns" aria-label="SNS">
@@ -89,41 +89,41 @@
       </nav>
 
       <p class="hub-acts">
-        <a class="btn" href="work.html">お仕事のご依頼はこちら</a>
+        <a class="btn" href="work.html">Work with us</a>
       </p>
     </div>
   </section>
 
   <section class="plain" id="popular-section">
     <div class="wrap">
-      <p class="sec-title">人気のレシピ</p>
-      <h2 class="sec-h2">よく見られているもの</h2>
+      <p class="sec-title">Popular</p>
+      <h2 class="sec-h2">Most viewed</h2>
 
       <!-- カードは recipes.js のデータから作る。いいねが多い順の上位3件 -->
       <ul class="cards" id="popular"></ul>
 
-      <p class="figures-note">いいね数は Instagram の投稿から取り込んだ数値です。「—」はまだ取り込めていないものです。</p>
+      <p class="figures-note">Like counts come from Instagram. A dash means the number has not been fetched yet.</p>
 
       <p class="form-alt" style="margin-top:16px">
-        <a href="recipes.html?sort=popular">レシピをすべて見る</a>
+        <a href="recipes.html?sort=popular">See all recipes</a>
       </p>
     </div>
   </section>
 
   <section class="plain" id="profile">
     <div class="wrap">
-      <h2 class="sec-h2">みたもっちゃんねるとは</h2>
+      <h2 class="sec-h2">Profile</h2>
 
       <!-- ▼▼▼ ここから仮の文章。本番の文章に差し替えたら class="draft" を外す ▼▼▼ -->
       <div class="prose draft">
-        <p>出汁を引くところから始める、家庭向けの和食を紹介しています。特別な道具や、手に入りにくい材料は使いません。動画で流れを見て、このページで分量を確かめながら作ってもらう、という使い方を想定しています。</p>
-        <p>レシピはすべて日本語と英語で用意しています。海外の方が店頭で材料を探せるように、材料名は英語のページでも日本語を併記しています。</p>
+        <p>We cook everyday Japanese food, starting from the dashi. No special equipment, no hard-to-find ingredients. Watch the video for the rhythm of it, then use this page to check the measurements while you cook.</p>
+        <p>Every recipe is written in both Japanese and English. Ingredient names keep their Japanese alongside the English, so you can match them against what is on the shelf.</p>
       </div>
 
       <ul class="facts">
-        <li><b>はじめた年</b><span>TODO</span></li>
-        <li><b>更新</b><span>TODO</span></li>
-        <li><b>拠点</b><span>TODO</span></li>
+        <li><b>Started</b><span>TODO</span></li>
+        <li><b>Updates</b><span>TODO</span></li>
+        <li><b>Based in</b><span>TODO</span></li>
       </ul>
       <!-- TODO: 上の3項目に実際の値を入れる -->
       <!-- ▲▲▲ ここまで仮の文章 ▲▲▲ -->
@@ -135,19 +135,19 @@
 <footer class="foot">
   <div class="wrap foot-in">
     <p class="foot-brand">みたもっちゃんねる<span class="en" lang="en">Mitamo Kitchen</span></p>
-    <nav class="foot-nav" aria-label="フッター">
-      <a href="index.html">トップ</a>
-      <a href="recipes.html">レシピ</a>
-      <a href="gacha.html">レシピガチャ</a>
-      <a href="index.html#profile">みたもっちゃんねるとは</a>
-      <a href="work.html">お仕事のご依頼</a>
+    <nav class="foot-nav" aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="recipes.html">Recipes</a>
+      <a href="gacha.html">Recipe gacha</a>
+      <a href="index.html#profile">Profile</a>
+      <a href="work.html">Work with us</a>
     </nav>
     <!-- TODO: YouTube / Instagram のリンクをここに置く -->
     <p class="foot-note">© 2026 みたもっちゃんねる</p>
   </div>
 </footer>
 
-<script src="recipes.js"></script>
-<script src="script.js"></script>
+<script src="../recipes.js"></script>
+<script src="../script.js"></script>
 </body>
 </html>

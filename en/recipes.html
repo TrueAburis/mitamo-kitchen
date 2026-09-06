@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>レシピ一覧｜みたもっちゃんねる</title>
-<meta name="description" content="みたもっちゃんねるのレシピ一覧。分量を画面に残したまま作れる、日本語と英語のレシピです。">
+<title>Recipes｜Mitamo Kitchen</title>
+<meta name="description" content="All recipes from Mitamo Kitchen. The measurements stay on screen while you cook.">
 <!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../style.css">
 
-<link rel="canonical" href="https://mitamo-kitchen.example/recipes.html">
+<link rel="canonical" href="https://mitamo-kitchen.example/en/recipes.html">
 <!-- 日本語版と英語版の対応。絶対URLでないと効かない -->
 <link rel="alternate" hreflang="ja" href="https://mitamo-kitchen.example/recipes.html">
 <link rel="alternate" hreflang="en" href="https://mitamo-kitchen.example/en/recipes.html">
@@ -17,16 +17,16 @@
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="みたもっちゃんねる">
-<meta property="og:locale" content="ja_JP">
-<meta property="og:url" content="https://mitamo-kitchen.example/recipes.html">
-<meta property="og:title" content="レシピ一覧｜みたもっちゃんねる">
-<meta property="og:description" content="みたもっちゃんねるのレシピ一覧。分量を画面に残したまま作れる、日本語と英語のレシピです。">
+<meta property="og:locale" content="en_US">
+<meta property="og:url" content="https://mitamo-kitchen.example/en/recipes.html">
+<meta property="og:title" content="Recipes｜Mitamo Kitchen">
+<meta property="og:description" content="All recipes from Mitamo Kitchen. The measurements stay on screen while you cook.">
 <meta name="twitter:card" content="summary_large_image">
 <!-- TODO: 写真が入ったら og:image を絶対URLで足す -->
 </head>
 <body>
 
-<a class="skip" href="#main">本文へスキップ</a>
+<a class="skip" href="#main">Skip to content</a>
 <!-- ヘッダーは全ページ共通。tools/build.js が作っている。手で直さないこと -->
 <header class="masthead">
   <div class="bar-top">
@@ -40,24 +40,24 @@
         <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
       </svg>
       <input type="search" name="q" autocomplete="off" data-search
-             aria-label="レシピを検索" placeholder="レシピを検索">
+             aria-label="Search recipes" placeholder="Search recipes">
     </form>
 
     <div class="lang">
-      <span class="lang-on">JA</span>
-      <a href="en/recipes.html" lang="en" hreflang="en">EN</a>
+      <span class="lang-on">EN</span>
+      <a href="../recipes.html" lang="ja" hreflang="ja">JA</a>
     </div>
   </div>
 
-  <nav class="bar-nav" aria-label="サイト内">
+  <nav class="bar-nav" aria-label="Site">
     <div class="bar-nav-in">
-      <a href="index.html">トップ</a>
-      <a href="recipes.html" aria-current="page">レシピ</a>
-      <a href="recipes.html?sort=popular">人気のレシピ</a>
-      <a href="recipes.html#tags">タグから探す</a>
-      <a href="gacha.html">レシピガチャ</a>
-      <a href="index.html#profile">みたもっちゃんねるとは</a>
-      <a href="work.html">お仕事のご依頼</a>
+      <a href="index.html">Home</a>
+      <a href="recipes.html" aria-current="page">Recipes</a>
+      <a href="recipes.html?sort=popular">Popular</a>
+      <a href="recipes.html#tags">Tags</a>
+      <a href="gacha.html">Recipe gacha</a>
+      <a href="index.html#profile">Profile</a>
+      <a href="work.html">Work with us</a>
     </div>
   </nav>
 </header>
@@ -66,16 +66,16 @@
 
   <section class="plain" id="recipes">
     <div class="wrap">
-      <h1 class="sec-h2">レシピ</h1>
+      <h1 class="sec-h2">Recipes</h1>
 
-      <p class="prose" style="margin-top:10px">上の検索欄に材料や料理名を入れると絞り込めます。</p>
+      <p class="prose" style="margin-top:10px">Use the search box above to filter by ingredient or dish name.</p>
 
-      <h2 class="sec-title" id="tags" style="margin-top:24px">タグから探す</h2>
+      <h2 class="sec-title" id="tags" style="margin-top:24px">Browse by tag</h2>
       <!-- タグのボタンは recipes.js の TAGS から作る -->
       <div class="filters" id="chips"></div>
 
       <div class="sort">
-        <span>並び順</span>
+        <span>Sort</span>
         <button class="chip" type="button" data-sort="new" aria-pressed="true"></button>
         <button class="chip" type="button" data-sort="popular" aria-pressed="false"></button>
       </div>
@@ -84,7 +84,7 @@
 
       <ul class="cards" id="cards"></ul>
 
-      <p class="empty" id="empty" hidden>条件に合うレシピがありませんでした。検索の言葉を短くするか、タグを外してみてください。</p>
+      <p class="empty" id="empty" hidden>No recipes matched. Try a shorter search term, or clear the tag.</p>
     </div>
   </section>
 </main>
@@ -93,19 +93,19 @@
 <footer class="foot">
   <div class="wrap foot-in">
     <p class="foot-brand">みたもっちゃんねる<span class="en" lang="en">Mitamo Kitchen</span></p>
-    <nav class="foot-nav" aria-label="フッター">
-      <a href="index.html">トップ</a>
-      <a href="recipes.html">レシピ</a>
-      <a href="gacha.html">レシピガチャ</a>
-      <a href="index.html#profile">みたもっちゃんねるとは</a>
-      <a href="work.html">お仕事のご依頼</a>
+    <nav class="foot-nav" aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="recipes.html">Recipes</a>
+      <a href="gacha.html">Recipe gacha</a>
+      <a href="index.html#profile">Profile</a>
+      <a href="work.html">Work with us</a>
     </nav>
     <!-- TODO: YouTube / Instagram のリンクをここに置く -->
     <p class="foot-note">© 2026 みたもっちゃんねる</p>
   </div>
 </footer>
 
-<script src="recipes.js"></script>
-<script src="script.js"></script>
+<script src="../recipes.js"></script>
+<script src="../script.js"></script>
 </body>
 </html>

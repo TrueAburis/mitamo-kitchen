@@ -45,10 +45,6 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
 .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad)}
 [id]{scroll-margin-top:calc(var(--headh) + 14px)}
 
-/* 言語切り替え。材料名の併記はこのクラスを使わないので常に両方出る */
-[data-lang="ja"] .t-en{display:none}
-[data-lang="en"] .t-ja{display:none}
-
 .skip{
   position:absolute;left:-9999px;top:0;
   background:var(--ink);color:var(--ground);
@@ -70,14 +66,12 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
   letter-spacing:.02em;white-space:nowrap;
 }
 
+/* 言語の切り替え。いまいる言語を示し、もう一方はリンクで別URLへ飛ぶ */
 .lang{display:flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden;flex:0 0 auto}
-.lang button{
-  font-family:var(--mono);font-size:11px;letter-spacing:.06em;
-  padding:6px 9px;border:0;background:transparent;color:var(--ink-soft);
-  cursor:pointer;line-height:1.6;
-}
-.lang button+button{border-left:1px solid var(--rule)}
-.lang button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.lang > *{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:6px 9px;line-height:1.6}
+.lang .lang-on{background:var(--ink);color:var(--ground)}
+.lang a{color:var(--ink-soft);text-decoration:none;border-left:1px solid var(--rule)}
+.lang a:hover{color:var(--ink)}
 
 @media (max-width:640px){
   :root{--headh:130px}
@@ -155,7 +149,7 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
 }
 .qty-toggle::after{content:"＋";margin-left:auto;font-family:var(--mono);opacity:.8}
 .qty-toggle[aria-expanded="true"]::after{content:"−"}
-.qty-toggle > .t-ja,.qty-toggle > .t-en{flex:0 0 auto;white-space:nowrap}
+.qty-toggle > span:first-child{flex:0 0 auto;white-space:nowrap}
 .qty-step{font-family:var(--mono);font-size:12px;opacity:.68;flex:0 0 auto}
 .qty-step:empty{display:none}
 .qty-peek{
@@ -222,7 +216,7 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
   content:"仮の文章";display:block;margin-bottom:6px;
   font-family:var(--mono);font-size:11px;color:var(--mark);
 }
-[data-lang="en"] .draft::before{content:"placeholder text"}
+html[lang="en"] .draft::before{content:"placeholder text"}
 
 /* Google フォーム。このサイトで唯一の外部読み込み */
 /* 高さは実測値。Google が案内する 2141px では中身が収まらず、

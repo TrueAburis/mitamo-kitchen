@@ -1,57 +1,26 @@
-/* 全ページ共通。読み込み順は recipes.js → script.js */
+/* 全ページ共通。読み込み順は recipes.js → script.js
+
+   言語はページごとに固定されている（/ が日本語、/en/ が英語）。
+   切り替えはヘッダーのリンクで、別のURLへ移動する。
+   以前のようにJSで表示を切り替えることはしない。 */
 
 (function () {
   var root = document.documentElement;
-
-  /* ---------- 言語 ---------- */
-  var langButtons = document.querySelectorAll('[data-set-lang]');
-
-  function lang() { return root.getAttribute('data-lang') === 'en' ? 'en' : 'ja'; }
-
-  function applyLang(next) {
-    root.setAttribute('data-lang', next);
-    root.lang = next;
-    for (var i = 0; i < langButtons.length; i++) {
-      langButtons[i].setAttribute('aria-pressed', langButtons[i].dataset.setLang === next ? 'true' : 'false');
-    }
-    /* 検索欄の説明文はCSSで切り替えられないのでここで入れ替える */
-    var boxes = document.querySelectorAll('[data-search]');
-    for (var j = 0; j < boxes.length; j++) {
-      boxes[j].placeholder = next === 'en' ? boxes[j].dataset.phEn : boxes[j].dataset.phJa;
-    }
-    try { localStorage.setItem('mk-lang', next); } catch (e) {}
-    /* JSで作った部分は自分で描き直してもらう */
-    document.dispatchEvent(new CustomEvent('langchange', { detail: next }));
-  }
-
-  for (var k = 0; k < langButtons.length; k++) {
-    langButtons[k].addEventListener('click', function () { applyLang(this.dataset.setLang); });
-  }
+  var LG = root.lang === 'en' ? 'en' : 'ja';
+  var ja = LG === 'ja';
 
   /* ---------- ヘッダーの高さ。分量バーがこの真下に貼り付く ---------- */
   var head = document.querySelector('.masthead');
   if (head) {
     var setH = function () {
       /* header を貼り付けていない画面幅では、分量バーは画面の一番上でよい */
-      var sticky = getComputedStyle(head).position === "sticky";
-      var h = sticky ? Math.round(head.getBoundingClientRect().height) : 0;
-      root.style.setProperty("--headh", h + "px");
+      var sticky = getComputedStyle(head).position === 'sticky';
+      root.style.setProperty('--headh', (sticky ? Math.round(head.getBoundingClientRect().height) : 0) + 'px');
     };
     setH();
     if (window.ResizeObserver) { new ResizeObserver(setH).observe(head); }
     else { window.addEventListener('resize', setH); }
   }
-
-  /* ---------- メニューの現在地 ---------- */
-  var here = location.pathname.split('/').pop() || 'index.html';
-  var onRecipePage = !!document.querySelector('article[id]');
-  document.querySelectorAll('.bar-nav a').forEach(function (a) {
-    var href = a.getAttribute('href');
-    if (href.indexOf('?') > -1 || href.indexOf('#') > -1) return;   /* 人気・タグは別扱い */
-    if (href === here || (onRecipePage && href === 'recipes.html')) {
-      a.setAttribute('aria-current', 'page');
-    }
-  });
 
   /* ---------- 材料の開閉 ---------- */
   var bar = document.getElementById('qty');
@@ -65,14 +34,13 @@
 
   /* ---------- いま読んでいる手順の分量をバーに出し続ける。このサイトの核 ---------- */
   (function () {
-    if (!bar) return;
-    var peekJa = bar.querySelector('.qty-peek .t-ja');
-    var peekEn = bar.querySelector('.qty-peek .t-en');
+    if (!bar) { return; }
+    var peek = bar.querySelector('.qty-peek');
     var stepTag = bar.querySelector('.qty-step');
     var steps = [].slice.call(document.querySelectorAll('.steps li'));
-    if (!steps.length || !peekJa) return;
+    if (!steps.length || !peek) { return; }
 
-    var defJa = peekJa.textContent, defEn = peekEn.textContent, queued = false;
+    var def = peek.textContent, queued = false;
 
     function update() {
       queued = false;
@@ -82,12 +50,12 @@
         var box = steps[i].getBoundingClientRect();
         if (box.top <= line && box.bottom > 0) { cur = steps[i]; idx = i + 1; }
       }
-      if (cur) {
-        peekJa.textContent = cur.getAttribute('data-uses');
-        peekEn.textContent = cur.getAttribute('data-uses-en');
+      if (cur && cur.getAttribute('data-uses')) {
+        peek.textContent = cur.getAttribute('data-uses');
         stepTag.textContent = idx;
       } else {
-        peekJa.textContent = defJa; peekEn.textContent = defEn; stepTag.textContent = '';
+        peek.textContent = def;
+        stepTag.textContent = '';
       }
     }
     window.addEventListener('scroll', function () {
@@ -99,6 +67,8 @@
   /* ============ ここから下は recipes.js のデータを使う ============ */
   var DATA = window.RECIPES || [];
   var TAGS = window.TAGS || {};
+  var AXES = window.TAG_AXES || {};
+  var TAG_MIN = window.TAG_MIN || 1;
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -108,35 +78,71 @@
   }
 
   function num(v) { return v == null ? '—' : Number(v).toLocaleString('en-US'); }
-
-  /* 英語は1件のとき recipe、それ以外は recipes */
   function plural(n) { return n === 1 ? 'recipe' : 'recipes'; }
-
-  function tagName(key, lg) { return TAGS[key] ? TAGS[key][lg] : key; }
-
-  var AXES = window.TAG_AXES || {};
-  var TAG_MIN = window.TAG_MIN || 1;
+  function tagName(key) { return TAGS[key] ? TAGS[key][LG] : key; }
 
   function tagCounts() {
     var c = {};
-    DATA.forEach(function (r) {
-      r.tags.forEach(function (t) { c[t] = (c[t] || 0) + 1; });
-    });
+    DATA.forEach(function (r) { r.tags.forEach(function (t) { c[t] = (c[t] || 0) + 1; }); });
     return c;
   }
 
-  /* タグのボタンを軸ごとに並べ直す。
+  /* レシピ1件のカード。リンクは同じ階層を指すので、
+     英語ページのカードは英語ページへ、日本語は日本語へつながる */
+  function card(r) {
+    var li = el('li', 'card');
+    var a = el('a');
+    a.href = r.slug + '.html';
+
+    /* TODO: images/ に写真が入ったら figure の中を <img alt="..."> に差し替える */
+    var shot = el('figure', 'card-shot');
+    shot.appendChild(el('span', null, r.image));
+    a.appendChild(shot);
+
+    var h = el('h3', 'card-title', r[LG].title);
+    if (ja && r.en.title !== r.ja.title) {
+      var sub = el('span', 'en', r.en.title);
+      sub.lang = 'en';
+      h.appendChild(sub);
+    }
+    a.appendChild(h);
+    a.appendChild(el('p', 'card-lead', r[LG].lead));
+
+    var meta = el('div', 'card-meta');
+    meta.appendChild(el('span', null, (ja ? 'いいね ' : 'Likes ') + num(r.likes)));
+    meta.appendChild(el('span', null, r.posted));
+    a.appendChild(meta);
+
+    var tags = el('div', 'card-tags');
+    r.tags.forEach(function (t) { tags.appendChild(el('span', null, tagName(t))); });
+    a.appendChild(tags);
+
+    if (!r.ready) {
+      a.appendChild(el('span', 'card-draft', ja ? '手順は準備中' : 'Steps coming'));
+    }
+    li.appendChild(a);
+    return li;
+  }
+
+  function byPopular(a, b) {
+    /* いいね数が未取得のものは、数値のあるものより後ろに置く */
+    if (a.likes == null && b.likes == null) { return b.posted.localeCompare(a.posted); }
+    if (a.likes == null) { return 1; }
+    if (b.likes == null) { return -1; }
+    return b.likes - a.likes;
+  }
+  function byNewest(a, b) { return b.posted.localeCompare(a.posted); }
+
+  /* タグのボタンを軸ごとに並べる。
      件数がそろっていないタグは出さない。1件しか出ないタグを押させると、
      押した人をがっかりさせるだけなので。件数は表に出して期待値を先に見せる。 */
   function buildChips(host, activeTag, onPick) {
-    var lg = lang();
     var counts = tagCounts();
     host.innerHTML = '';
-
     var keys = Object.keys(TAGS).filter(function (k) { return (counts[k] || 0) >= TAG_MIN; });
 
     if (!keys.length) {
-      host.appendChild(el('p', 'chips-empty', lg === 'ja'
+      host.appendChild(el('p', 'chips-empty', ja
         ? 'タグは、同じタグのレシピが ' + TAG_MIN + ' 件そろってから表示します。いまはまだ足りていません。'
         : 'A tag appears once ' + TAG_MIN + ' recipes share it. Not there yet.'));
       return;
@@ -153,66 +159,18 @@
     };
 
     var first = el('div', 'chip-axis');
-    first.appendChild(mk('', lg === 'ja' ? 'すべて' : 'All'));
+    first.appendChild(mk('', ja ? 'すべて' : 'All'));
     host.appendChild(first);
 
     Object.keys(AXES).forEach(function (axis) {
       var inAxis = keys.filter(function (k) { return TAGS[k].axis === axis; });
       if (!inAxis.length) { return; }
       var row = el('div', 'chip-axis');
-      row.appendChild(el('span', 'chip-axis-label', AXES[axis][lg]));
-      inAxis.forEach(function (k) {
-        row.appendChild(mk(k, tagName(k, lg) + ' ' + counts[k]));
-      });
+      row.appendChild(el('span', 'chip-axis-label', AXES[axis][LG]));
+      inAxis.forEach(function (k) { row.appendChild(mk(k, tagName(k) + ' ' + counts[k])); });
       host.appendChild(row);
     });
   }
-
-  /* レシピ1件のカード */
-  function card(r, lg) {
-    var li = el('li', 'card');
-    var a = el('a');
-    a.href = r.slug + '.html';
-
-    /* TODO: images/ に写真が入ったら figure の中を <img alt="..."> に差し替える */
-    var shot = el('figure', 'card-shot');
-    shot.appendChild(el('span', null, r.image));
-    a.appendChild(shot);
-
-    var h = el('h3', 'card-title', r[lg].title);
-    if (lg === 'ja') {
-      var sub = el('span', 'en', r.en.title);
-      sub.lang = 'en';
-      h.appendChild(sub);
-    }
-    a.appendChild(h);
-    a.appendChild(el('p', 'card-lead', r[lg].lead));
-
-    var meta = el('div', 'card-meta');
-    meta.appendChild(el('span', null, (lg === 'ja' ? 'いいね ' : 'Likes ') + num(r.likes)));
-    meta.appendChild(el('span', null, r.posted));
-    a.appendChild(meta);
-
-    var tags = el('div', 'card-tags');
-    r.tags.forEach(function (t) { tags.appendChild(el('span', null, tagName(t, lg))); });
-    a.appendChild(tags);
-
-    if (!r.ready) {
-      a.appendChild(el('span', 'card-draft', lg === 'ja' ? '手順は準備中' : 'Steps coming'));
-    }
-    li.appendChild(a);
-    return li;
-  }
-
-  function byPopular(a, b) {
-    /* いいね数が未取得のものは、数値のあるものより後ろに置く */
-    if (a.likes == null && b.likes == null) { return b.posted.localeCompare(a.posted); }
-    if (a.likes == null) { return 1; }
-    if (b.likes == null) { return -1; }
-    return b.likes - a.likes;
-  }
-
-  function byNewest(a, b) { return b.posted.localeCompare(a.posted); }
 
   /* ---------- レシピ一覧ページ ---------- */
   var list = document.getElementById('cards');
@@ -232,24 +190,23 @@
       if (!state.q) { return true; }
       var q = state.q.toLowerCase();
       var hay = [r.ja.title, r.en.title, r.ja.lead, r.en.lead]
-        .concat(r.tags.map(function (t) { return tagName(t, 'ja') + ' ' + tagName(t, 'en'); }))
+        .concat(r.tags.map(function (t) { return TAGS[t] ? TAGS[t].ja + ' ' + TAGS[t].en : t; }))
         .join(' ').toLowerCase();
       return hay.indexOf(q) > -1;
     };
 
     var render = function () {
-      var lg = lang();
       var rows = DATA.filter(matches).sort(state.sort === 'popular' ? byPopular : byNewest);
 
       list.innerHTML = '';
-      rows.forEach(function (r) { list.appendChild(card(r, lg)); });
+      rows.forEach(function (r) { list.appendChild(card(r)); });
 
       var count = document.getElementById('count');
       if (count) {
         count.innerHTML = '';
-        count.appendChild(document.createTextNode(lg === 'ja' ? '該当 ' : 'Showing '));
+        count.appendChild(document.createTextNode(ja ? '該当 ' : 'Showing '));
         count.appendChild(el('b', null, rows.length));
-        count.appendChild(document.createTextNode(lg === 'ja' ? ' 件' : ' ' + plural(rows.length)));
+        count.appendChild(document.createTextNode(ja ? ' 件' : ' ' + plural(rows.length)));
       }
 
       var empty = document.getElementById('empty');
@@ -262,8 +219,8 @@
       document.querySelectorAll('[data-sort]').forEach(function (b) {
         b.setAttribute('aria-pressed', b.dataset.sort === state.sort ? 'true' : 'false');
         b.textContent = b.dataset.sort === 'popular'
-          ? (lg === 'ja' ? 'いいねが多い順' : 'Most liked')
-          : (lg === 'ja' ? '新しい順' : 'Newest');
+          ? (ja ? 'いいねが多い順' : 'Most liked')
+          : (ja ? '新しい順' : 'Newest');
       });
     };
 
@@ -276,22 +233,13 @@
       search.addEventListener('input', function () { state.q = search.value.trim(); render(); });
     }
 
-    document.addEventListener('langchange', render);
     render();
   }
 
   /* ---------- トップの人気のレシピ ---------- */
   var pop = document.getElementById('popular');
   if (pop) {
-    var renderPop = function () {
-      var lg = lang();
-      pop.innerHTML = '';
-      DATA.slice().sort(byPopular).slice(0, 3).forEach(function (r) {
-        pop.appendChild(card(r, lg));
-      });
-    };
-    document.addEventListener('langchange', renderPop);
-    renderPop();
+    DATA.slice().sort(byPopular).slice(0, 3).forEach(function (r) { pop.appendChild(card(r)); });
   }
 
   /* ---------- レシピガチャ ----------
@@ -301,6 +249,7 @@
   if (gachaList) {
     var gState = { tag: '', pull: 1 };
     var note = document.getElementById('gacha-note');
+    var drawn = false;
 
     var gPool = function () {
       return DATA.filter(function (r) { return !gState.tag || r.tags.indexOf(gState.tag) > -1; });
@@ -315,42 +264,30 @@
       return a;
     };
 
-    var drawn = false;
-
     var drawNow = function () {
-      var lg = lang();
       var p = gPool();
       var n = Math.min(gState.pull, p.length);
-      var picked = shuffle(p).slice(0, n);
-
       gachaList.innerHTML = '';
-      picked.forEach(function (r, i) {
-        var li = card(r, lg);
+      shuffle(p).slice(0, n).forEach(function (r, i) {
+        var li = card(r);
         li.classList.add('reveal');
         li.style.animationDelay = (i * 90) + 'ms';
         gachaList.appendChild(li);
       });
 
       if (!p.length) {
-        note.textContent = lg === 'ja'
+        note.textContent = ja
           ? 'このタグに当てはまるレシピがまだありません。タグを外して引いてみてください。'
           : 'No recipes carry this tag yet. Try clearing the tag.';
       } else if (n < gState.pull) {
-        note.textContent = lg === 'ja'
+        note.textContent = ja
           ? gState.pull + '連を引きましたが、いま引ける対象は ' + p.length + ' 件です。同じ料理は重ねないので ' + n + ' 件だけ出しています。'
           : 'You drew ' + gState.pull + ', but only ' + p.length + ' ' + plural(p.length) + ' available. No duplicates, so here are ' + n + '.';
       } else {
-        note.textContent = lg === 'ja' ? n + ' 件出ました。' : n + ' ' + plural(n) + ' drawn.';
+        note.textContent = ja ? n + ' 件出ました。' : n + ' ' + plural(n) + ' drawn.';
       }
       drawn = true;
     };
-
-    document.querySelectorAll('[data-pull]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        gState.pull = parseInt(b.dataset.pull, 10);
-        paintGacha();
-      });
-    });
 
     function paintGacha() {
       var chipsG = document.getElementById('chips');
@@ -366,68 +303,54 @@
       });
     }
 
-    document.getElementById('draw').addEventListener('click', drawNow);
-    document.addEventListener('langchange', function () {
-      paintGacha();
-      if (drawn) { drawNow(); }
+    document.querySelectorAll('[data-pull]').forEach(function (b) {
+      b.addEventListener('click', function () { gState.pull = parseInt(b.dataset.pull, 10); paintGacha(); });
     });
+    document.getElementById('draw').addEventListener('click', drawNow);
     paintGacha();
   }
 
-  /* ---------- レシピページの数値・タグ・動画 ---------- */
+  /* ---------- レシピページの数値・タグ・関連・動画 ---------- */
   var article = document.querySelector('article[id]');
   if (article) {
     var rec = DATA.filter(function (r) { return r.slug === article.id; })[0];
 
     var figs = document.getElementById('figures');
     if (rec && figs) {
-      var renderFigs = function () {
-        var lg = lang();
-        figs.innerHTML = '';
-        [[lg === 'ja' ? 'いいね' : 'Likes', rec.likes],
-         [lg === 'ja' ? 'コメント' : 'Comments', rec.comments],
-         [lg === 'ja' ? '再生' : 'Views', rec.views]].forEach(function (pair) {
-          var s = el('span', null, pair[0] + ' ');
-          s.appendChild(el('b', null, num(pair[1])));
-          figs.appendChild(s);
-        });
-        var tg = el('div', 'card-tags');
-        rec.tags.forEach(function (t) {
-          var link = el('a', null, tagName(t, lg));
-          link.href = 'recipes.html?tag=' + encodeURIComponent(t);
-          var w = el('span');
-          w.appendChild(link);
-          tg.appendChild(w);
-        });
-        figs.appendChild(tg);
-      };
-      document.addEventListener('langchange', renderFigs);
-      renderFigs();
+      [[ja ? 'いいね' : 'Likes', rec.likes],
+       [ja ? 'コメント' : 'Comments', rec.comments],
+       [ja ? '再生' : 'Views', rec.views]].forEach(function (pair) {
+        var s = el('span', null, pair[0] + ' ');
+        s.appendChild(el('b', null, num(pair[1])));
+        figs.appendChild(s);
+      });
+      var tg = el('div', 'card-tags');
+      rec.tags.forEach(function (t) {
+        var link = el('a', null, tagName(t));
+        link.href = 'recipes.html?tag=' + encodeURIComponent(t);
+        var w = el('span');
+        w.appendChild(link);
+        tg.appendChild(w);
+      });
+      figs.appendChild(tg);
     }
 
     /* 関連レシピ。タグの重なりが多い順に3件まで。
        重なりが無いものは出さない（無関係なものを並べても押されない） */
     var rel = document.getElementById('related');
     if (rec && rel) {
-      var renderRel = function () {
-        var lg = lang();
-        var rows = DATA
-          .filter(function (r) { return r.slug !== rec.slug; })
-          .map(function (r) {
-            var shared = r.tags.filter(function (t) { return rec.tags.indexOf(t) > -1; }).length;
-            return { r: r, shared: shared };
-          })
-          .filter(function (x) { return x.shared > 0; })
-          .sort(function (a, b) { return b.shared - a.shared || b.r.posted.localeCompare(a.r.posted); })
-          .slice(0, 3);
+      var rows = DATA
+        .filter(function (r) { return r.slug !== rec.slug; })
+        .map(function (r) {
+          return { r: r, shared: r.tags.filter(function (t) { return rec.tags.indexOf(t) > -1; }).length };
+        })
+        .filter(function (x) { return x.shared > 0; })
+        .sort(function (a, b) { return b.shared - a.shared || b.r.posted.localeCompare(a.r.posted); })
+        .slice(0, 3);
 
-        rel.innerHTML = '';
-        var wrap = rel.closest('.related-wrap');
-        if (wrap) { wrap.hidden = rows.length === 0; }
-        rows.forEach(function (x) { rel.appendChild(card(x.r, lg)); });
-      };
-      document.addEventListener('langchange', renderRel);
-      renderRel();
+      var wrap = rel.closest('.related-wrap');
+      if (wrap) { wrap.hidden = rows.length === 0; }
+      rows.forEach(function (x) { rel.appendChild(card(x.r)); });
     }
 
     var slot = document.getElementById('video');
@@ -435,12 +358,10 @@
       var f = document.createElement('iframe');
       f.className = 'ig-embed';
       f.src = rec.instagram.replace(/\/?$/, '/') + 'embed/captioned';
-      f.title = rec.ja.title + ' / Instagram';
+      f.title = rec[LG].title + ' / Instagram';
       f.loading = 'lazy';
       f.allowFullscreen = true;
       slot.appendChild(f);
     }
   }
-
-  applyLang(root.getAttribute('data-lang'));
 })();

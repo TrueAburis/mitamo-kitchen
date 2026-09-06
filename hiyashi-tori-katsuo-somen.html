@@ -1,45 +1,33 @@
 <!DOCTYPE html>
-<html lang="ja" data-lang="ja">
+<html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>冷やし鶏鰹出汁さっぱり素麺｜みたもっちゃんねる</title>
-<meta name="description" content="熱くなってきたので、冷たくてさっぱりした優しい味の冷やし素麺作りました！ 少し薄味なので、もしもっと味が欲しいなって人は、濃口醤油を追加するといいかもです">
+<meta name="description" content="冷たくてさっぱりした、優しい味の冷やし素麺。鶏と鰹で出汁を取ります。">
 <!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 
-<!-- SNSで共有されたときの表示。TODO: 独自ドメインが決まったら og:url を、
-     写真が入ったら og:image を足す。どちらも絶対URLでないと効かない -->
+<link rel="canonical" href="https://mitamo-kitchen.example/hiyashi-tori-katsuo-somen.html">
+<!-- 日本語版と英語版の対応。絶対URLでないと効かない -->
+<link rel="alternate" hreflang="ja" href="https://mitamo-kitchen.example/hiyashi-tori-katsuo-somen.html">
+<link rel="alternate" hreflang="en" href="https://mitamo-kitchen.example/en/hiyashi-tori-katsuo-somen.html">
+<link rel="alternate" hreflang="x-default" href="https://mitamo-kitchen.example/hiyashi-tori-katsuo-somen.html">
+
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="みたもっちゃんねる">
 <meta property="og:locale" content="ja_JP">
+<meta property="og:url" content="https://mitamo-kitchen.example/hiyashi-tori-katsuo-somen.html">
 <meta property="og:title" content="冷やし鶏鰹出汁さっぱり素麺｜みたもっちゃんねる">
-<meta property="og:description" content="熱くなってきたので、冷たくてさっぱりした優しい味の冷やし素麺作りました！ 少し薄味なので、もしもっと味が欲しいなって人は、濃口醤油を追加するといいかもです">
+<meta property="og:description" content="冷たくてさっぱりした、優しい味の冷やし素麺。鶏と鰹で出汁を取ります。">
 <meta name="twitter:card" content="summary_large_image">
-
-<!-- 手順がキャプションに無いため JSON-LD は書いていない。
-     手順の無いレシピに構造化データを入れても検索結果には出ないうえ、
-     それらしい手順で埋めるのは論外なので。手順が入った時点で足すこと。 -->
-
-<script>
-  /* 表示前に言語を決める。ちらつき防止のため head で実行する */
-  (function () {
-    var lang = null;
-    try { lang = localStorage.getItem('mk-lang'); } catch (e) {}
-    if (lang !== 'ja' && lang !== 'en') {
-      lang = (navigator.language || 'ja').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en';
-    }
-    document.documentElement.setAttribute('data-lang', lang);
-    document.documentElement.lang = lang;
-  })();
-</script>
+<!-- TODO: 写真が入ったら og:image を絶対URLで足す -->
 </head>
 <body>
 
-<a class="skip" href="#main"><span class="t-ja">本文へスキップ</span><span class="t-en">Skip to content</span></a>
-
-<!-- ヘッダーは全ページ共通。ここを直したら他のHTMLも同じように直すこと -->
+<a class="skip" href="#main">本文へスキップ</a>
+<!-- ヘッダーは全ページ共通。tools/build.js が作っている。手で直さないこと -->
 <header class="masthead">
   <div class="bar-top">
     <a class="brand" href="index.html">
@@ -52,25 +40,24 @@
         <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
       </svg>
       <input type="search" name="q" autocomplete="off" data-search
-             aria-label="レシピを検索 / Search recipes"
-             data-ph-ja="レシピを検索" data-ph-en="Search recipes">
+             aria-label="レシピを検索" placeholder="レシピを検索">
     </form>
 
-    <div class="lang" role="group" aria-label="言語 / Language">
-      <button type="button" data-set-lang="ja" aria-pressed="true">JA</button>
-      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    <div class="lang">
+      <span class="lang-on">JA</span>
+      <a href="en/hiyashi-tori-katsuo-somen.html" lang="en" hreflang="en">EN</a>
     </div>
   </div>
 
   <nav class="bar-nav" aria-label="サイト内">
     <div class="bar-nav-in">
-      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
-      <a href="recipes.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
-      <a href="recipes.html?sort=popular"><span class="t-ja">人気のレシピ</span><span class="t-en">Popular</span></a>
-      <a href="recipes.html#tags"><span class="t-ja">タグから探す</span><span class="t-en">Tags</span></a>
-      <a href="gacha.html"><span class="t-ja">レシピガチャ</span><span class="t-en">Recipe gacha</span></a>
-      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
-      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+      <a href="index.html">トップ</a>
+      <a href="recipes.html">レシピ</a>
+      <a href="recipes.html?sort=popular">人気のレシピ</a>
+      <a href="recipes.html#tags">タグから探す</a>
+      <a href="gacha.html">レシピガチャ</a>
+      <a href="index.html#profile">みたもっちゃんねるとは</a>
+      <a href="work.html">お仕事のご依頼</a>
     </div>
   </nav>
 </header>
@@ -79,36 +66,29 @@
 
   <section class="recipes" id="recipes">
     <div class="wrap">
-      <p class="sec-title"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></p>
+      <p class="sec-title">レシピ</p>
 
       <article id="hiyashi-tori-katsuo-somen">
         <h1 class="recipe-title">冷やし鶏鰹出汁さっぱり素麺<span class="en" lang="en">Chilled Chicken and Bonito Broth Somen Noodles</span></h1>
 
         <div class="recipe-intro">
-          <p>
-            <span class="t-ja">熱くなってきたので、冷たくてさっぱりした優しい味の冷やし素麺作りました！ 少し薄味なので、もしもっと味が欲しいなって人は、濃口醤油を追加するといいかもです</span>
-            <span class="t-en">It's getting hot, so I made chilled somen noodles with a refreshing and gentle flavor! It's a little lightly seasoned, so if you want more flavor, you might want to add some dark soy sauce.</span>
-          </p>
+          <p>熱くなってきたので、冷たくてさっぱりした優しい味の冷やし素麺作りました！ 少し薄味なので、もしもっと味が欲しいなって人は、濃口醤油を追加するといいかもです</p>
         </div>
 
-        <!-- TODO: 何人前と時間がキャプションに無かったため未確認。分かり次第ここを埋める -->
         <dl class="recipe-meta">
           <div>
-            <dt><span class="t-ja">分量</span><span class="t-en">Serves</span></dt>
-            <dd><span class="t-ja">要確認</span><span class="t-en">TBC</span></dd>
+            <dt>分量</dt>
+            <dd>要確認</dd>
           </div>
           <div>
-            <dt><span class="t-ja">時間</span><span class="t-en">Time</span></dt>
-            <dd><span class="t-ja">要確認</span><span class="t-en">TBC</span></dd>
+            <dt>時間</dt>
+            <dd>要確認</dd>
           </div>
         </dl>
 
         <!-- いいね数・コメント数・タグは recipes.js から入る -->
         <div class="figures" id="figures"></div>
-        <p class="figures-note">
-          <span class="t-ja">数値は Instagram の投稿から取り込んだものです。「—」はまだ取り込めていません。</span>
-          <span class="t-en">Figures come from Instagram. A dash means it has not been fetched yet.</span>
-        </p>
+        <p class="figures-note">数値は Instagram の投稿から取り込んだものです。「—」はまだ取り込めていません。</p>
 
         <!-- Instagram の動画。permalink があるレシピにだけ入る -->
         <div id="video"></div>
@@ -118,17 +98,17 @@
         <div class="cook">
 
           <div class="qty-bar" id="qty">
-            <h2 class="qty-title"><span class="t-ja">材料</span><span class="t-en">Ingredients</span></h2>
+            <h2 class="qty-title">材料</h2>
             <button class="qty-toggle" type="button" aria-expanded="false" aria-controls="qty-body">
-              <span class="t-ja">材料 11品</span><span class="t-en">11 ingredients</span>
+              <span>材料 11品</span>
               <span class="qty-step" aria-hidden="true"></span>
-              <span class="qty-peek"><span class="t-ja">鶏もも肉 1枚 ／ 水 700ml ／ 薄口醤油 50ml …</span><span class="t-en">鶏もも肉 1枚 ／ 水 700ml ／ 薄口醤油 50ml …</span></span>
+              <span class="qty-peek">鶏もも肉 1枚 ／ 水 700ml ／ 薄口醤油 50ml …</span>
             </button>
 
             <div class="qty-body" id="qty-body">
               <dl>
                 <dt>鶏もも肉<span class="en" lang="en">chicken thigh</span></dt>
-                <dd><span class="t-ja">1枚</span><span class="t-en">1</span></dd>
+                <dd>1枚</dd>
                 <dt>水<span class="en" lang="en">water</span></dt>
                 <dd>700ml</dd>
                 <dt>薄口醤油<span class="en" lang="en">light soy sauce</span></dt>
@@ -136,7 +116,7 @@
                 <dt>料理酒<span class="en" lang="en">cooking sake</span></dt>
                 <dd>100ml</dd>
                 <dt>みりん<span class="en" lang="en">mirin</span></dt>
-                <dd><span class="t-ja">大さじ2</span><span class="t-en">2 tablespoons</span></dd>
+                <dd>大さじ2</dd>
                 <dt>昆布<span class="en" lang="en">kombu seaweed</span></dt>
                 <dd>10g</dd>
                 <dt>鰹節<span class="en" lang="en">bonito flakes</span></dt>
@@ -144,38 +124,32 @@
               </dl>
               <p class="qty-note">出汁ガラを引き上げ後</p>
 
-              <h3 class="qty-sub"><span class="t-ja">みょうがの甘酢漬け</span><span class="t-en">Sweet and sour pickled myoga ginger</span></h3>
+              <h3 class="qty-sub">みょうがの甘酢漬け</h3>
 
               <dl>
                 <dt>水(理想は昆布出汁)<span class="en" lang="en">water (ideally kombu dashi)</span></dt>
                 <dd>100ml</dd>
                 <dt>砂糖<span class="en" lang="en">sugar</span></dt>
-                <dd><span class="t-ja">大さじ１</span><span class="t-en">1 tablespoon</span></dd>
+                <dd>大さじ１</dd>
                 <dt>酢<span class="en" lang="en">vinegar</span></dt>
-                <dd><span class="t-ja">大さじ４</span><span class="t-en">4 tablespoons</span></dd>
+                <dd>大さじ４</dd>
                 <dt>塩<span class="en" lang="en">salt</span></dt>
-                <dd><span class="t-ja">二つまみ</span><span class="t-en">2 pinches</span></dd>
+                <dd>二つまみ</dd>
               </dl>
             </div>
           </div>
 
           <div>
-            <!-- TODO: 手順が未入手。キャプションに【作り方】が書かれていれば自動で入る。
-                 分かり次第、ol.steps を作る。data-uses には
-                 その手順の文章に実際に出てくる材料と分量だけを入れること。 -->
             <div class="prose draft">
-              <p>
-                <span class="t-ja">手順はまだ入っていません。材料とコツだけ先に載せています。</span>
-                <span class="t-en">The steps are not written up yet. For now, only the ingredients and notes are here.</span>
-              </p>
+              <p>手順はまだ入っていません。材料とコツだけ先に載せています。</p>
             </div>
 
             <div class="tips">
-              <h2 class="tips-h"><span class="t-ja">コツ</span><span class="t-en">Notes</span></h2>
+              <h2 class="tips-h">コツ</h2>
               <ul>
-                <li><span class="t-ja">鶏でも出汁を取るので心配な人も多いですが、鶏の脂はそこまで固まらないと思います</span><span class="t-en">Many people are worried because the broth is made with chicken, but I don't think the chicken fat will solidify that much.</span></li>
-                <li><span class="t-ja">素麺は表記されている時間よりも短く茹でてます！茹で具合はお好みで！</span><span class="t-en">I boiled the somen noodles for less time than indicated on the package! Adjust the cooking time to your liking!</span></li>
-                <li><span class="t-ja">オクラは生でも食べられます。 ですが大きく育っていて固いものは、茹でて柔らかくしたほうが食べやすいです</span><span class="t-en">Okra can be eaten raw. However, if it has grown large and become tough, it is easier to eat after boiling it until tender.</span></li>
+                <li>鶏でも出汁を取るので心配な人も多いですが、鶏の脂はそこまで固まらないと思います</li>
+                <li>素麺は表記されている時間よりも短く茹でてます！茹で具合はお好みで！</li>
+                <li>オクラは生でも食べられます。 ですが大きく育っていて固いものは、茹でて柔らかくしたほうが食べやすいです</li>
               </ul>
             </div>
           </div>
@@ -183,7 +157,7 @@
         </div>
 
         <div class="related-wrap" hidden>
-          <h2><span class="t-ja">似ているレシピ</span><span class="t-en">Similar recipes</span></h2>
+          <h2>似ているレシピ</h2>
           <ul class="cards" id="related"></ul>
         </div>
       </article>
@@ -191,15 +165,16 @@
   </section>
 </main>
 
-<!-- フッターは全ページ共通 -->
+<!-- フッターは全ページ共通。tools/build.js が作っている。手で直さないこと -->
 <footer class="foot">
   <div class="wrap foot-in">
     <p class="foot-brand">みたもっちゃんねる<span class="en" lang="en">Mitamo Kitchen</span></p>
     <nav class="foot-nav" aria-label="フッター">
-      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
-      <a href="recipes.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
-      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
-      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+      <a href="index.html">トップ</a>
+      <a href="recipes.html">レシピ</a>
+      <a href="gacha.html">レシピガチャ</a>
+      <a href="index.html#profile">みたもっちゃんねるとは</a>
+      <a href="work.html">お仕事のご依頼</a>
     </nav>
     <!-- TODO: YouTube / Instagram のリンクをここに置く -->
     <p class="foot-note">© 2026 みたもっちゃんねる</p>
