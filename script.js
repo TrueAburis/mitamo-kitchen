@@ -109,6 +109,9 @@
 
   function num(v) { return v == null ? '—' : Number(v).toLocaleString('en-US'); }
 
+  /* 英語は1件のとき recipe、それ以外は recipes */
+  function plural(n) { return n === 1 ? 'recipe' : 'recipes'; }
+
   function tagName(key, lg) { return TAGS[key] ? TAGS[key][lg] : key; }
 
   /* レシピ1件のカード */
@@ -192,7 +195,7 @@
         count.innerHTML = '';
         count.appendChild(document.createTextNode(lg === 'ja' ? '該当 ' : 'Showing '));
         count.appendChild(el('b', null, rows.length));
-        count.appendChild(document.createTextNode(lg === 'ja' ? ' 件' : ' recipes'));
+        count.appendChild(document.createTextNode(lg === 'ja' ? ' 件' : ' ' + plural(rows.length)));
       }
 
       var empty = document.getElementById('empty');
@@ -250,6 +253,98 @@
     };
     document.addEventListener('langchange', renderPop);
     renderPop();
+  }
+
+  /* ---------- レシピガチャ ----------
+     重複しないように引く。同じ料理が並んでも献立にならないため。
+     そのぶん、引ける数はレシピの数が上限になる。足りないときは正直にそう出す。 */
+  var gachaList = document.getElementById('gacha-cards');
+  if (gachaList) {
+    var gState = { tag: '', pull: 1 };
+    var note = document.getElementById('gacha-note');
+
+    var gPool = function () {
+      return DATA.filter(function (r) { return !gState.tag || r.tags.indexOf(gState.tag) > -1; });
+    };
+
+    var shuffle = function (arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = a[i]; a[i] = a[j]; a[j] = t;
+      }
+      return a;
+    };
+
+    var drawn = false;
+
+    var drawNow = function () {
+      var lg = lang();
+      var p = gPool();
+      var n = Math.min(gState.pull, p.length);
+      var picked = shuffle(p).slice(0, n);
+
+      gachaList.innerHTML = '';
+      picked.forEach(function (r, i) {
+        var li = card(r, lg);
+        li.classList.add('reveal');
+        li.style.animationDelay = (i * 90) + 'ms';
+        gachaList.appendChild(li);
+      });
+
+      if (!p.length) {
+        note.textContent = lg === 'ja'
+          ? 'このタグに当てはまるレシピがまだありません。タグを外して引いてみてください。'
+          : 'No recipes carry this tag yet. Try clearing the tag.';
+      } else if (n < gState.pull) {
+        note.textContent = lg === 'ja'
+          ? gState.pull + '連を引きましたが、いま引ける対象は ' + p.length + ' 件です。同じ料理は重ねないので ' + n + ' 件だけ出しています。'
+          : 'You drew ' + gState.pull + ', but only ' + p.length + ' ' + plural(p.length) + ' available. No duplicates, so here are ' + n + '.';
+      } else {
+        note.textContent = lg === 'ja' ? n + ' 件出ました。' : n + ' ' + plural(n) + ' drawn.';
+      }
+      drawn = true;
+    };
+
+    var chipsG = document.getElementById('chips');
+    if (chipsG) {
+      [''].concat(Object.keys(TAGS)).forEach(function (key) {
+        var b = el('button', 'chip');
+        b.type = 'button';
+        b.dataset.tag = key;
+        b.addEventListener('click', function () {
+          gState.tag = (gState.tag === key) ? '' : key;
+          paintGacha();
+          if (drawn) { drawNow(); }
+        });
+        chipsG.appendChild(b);
+      });
+    }
+
+    document.querySelectorAll('[data-pull]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        gState.pull = parseInt(b.dataset.pull, 10);
+        paintGacha();
+      });
+    });
+
+    function paintGacha() {
+      var lg = lang();
+      document.querySelectorAll('[data-tag]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.tag === gState.tag ? 'true' : 'false');
+        b.textContent = b.dataset.tag ? tagName(b.dataset.tag, lg) : (lg === 'ja' ? 'すべて' : 'All');
+      });
+      document.querySelectorAll('[data-pull]').forEach(function (b) {
+        b.setAttribute('aria-pressed', parseInt(b.dataset.pull, 10) === gState.pull ? 'true' : 'false');
+      });
+    }
+
+    document.getElementById('draw').addEventListener('click', drawNow);
+    document.addEventListener('langchange', function () {
+      paintGacha();
+      if (drawn) { drawNow(); }
+    });
+    paintGacha();
   }
 
   /* ---------- レシピページの数値・タグ・動画 ---------- */

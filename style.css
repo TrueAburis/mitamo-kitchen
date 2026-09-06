@@ -364,3 +364,11 @@ main > section:first-child{border-top:0}
 .ig-embed{width:100%;max-width:400px;height:640px;margin-top:20px;border:1px solid var(--rule);display:block}
 .ig-alt{margin:10px 0 0;font-size:13px}
 .ig-alt a{text-decoration:underline}
+
+/* ---------- レシピガチャ ----------
+   このサイトで動きを使う唯一の場所。引いた結果が1枚ずつ出てくることに意味があるため。
+   動きを減らす設定の人には、上の prefers-reduced-motion の指定でそのまま出る。 */
+@keyframes reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.reveal{animation:reveal .32s ease-out both}
+#draw{font-size:15px;padding:13px 32px;cursor:pointer}
+[data-pull][aria-pressed="true"]{background:var(--kombu);border-color:var(--kombu);color:var(--ground)}
