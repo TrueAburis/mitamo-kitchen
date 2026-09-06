@@ -1,0 +1,8 @@
+{
+  "name": "mitamo-kitchen-tools",
+  "private": true,
+  "description": "サイトの開発用の道具だけ。サイト本体はビルド不要の素のHTMLで、ここには依存しない。",
+  "scripts": {
+    "test": "node tools/test.js"
+  }
+}
