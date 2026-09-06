@@ -448,3 +448,47 @@ hreflang と og:url は絶対URLでないと効かないので、
 **写真と手順が揃うまでは止めておく**。揃ったら `true` にして組み立て直すだけ。
 
 robots.txt では止めない。止めると noindex を読みに来てもらえなくなる。
+
+## 公開用インフラ（infra/）
+
+AWS の構成をコードで持っている。クリックで作らず、コードで再現できる状態にしてある。
+
+```
+S3（非公開）  ←  CloudFront（配信・HTTPS・セキュリティヘッダー）  ←  閲覧者
+```
+
+```
+cd infra
+npm install
+npx cdk deploy                        ドメイン無しで公開（CloudFront のURLになる）
+npx cdk deploy -c domain=example.com  ドメインを付けて公開
+```
+
+### 設計で意識したこと
+
+- **S3 バケットは一切公開しない。** CloudFront からだけ読める（OAC）。
+  「バケットを公開設定にして事故る」が静的サイトで最も多い失敗なので、構造で防ぐ
+- **GitHub にアクセスキーを保存しない。** OIDC で、その場限りの資格情報を受け取る。
+  main ブランチからのみ引き受けられるよう絞ってある
+- **セキュリティヘッダーを配信側で付ける。**
+  サイトにインラインの `<script>` が1つも無いので、`script-src` を `'self'` だけに絞れている。
+  素のHTMLで組んできた副産物
+- 証明書（ACM）は CloudFront の仕様で **us-east-1 にしか置けない**ため、スタックごとそこに置いた。
+  オリジンの位置は体感に影響しない（CloudFront が各地にキャッシュするため）
+- `/en/` のようにディレクトリで来たら `index.html` を返す。
+  S3 は「ディレクトリ」を知らないので CloudFront Functions で補う。
+  **`serve.ps1` にも同じ処理を入れて、手元と本番の挙動を合わせてある**
+
+### デプロイ
+
+`.github/workflows/deploy.yml` が main への push で動く。
+**型検査とキャプション解析の検証を通ってからでないと公開されない。**
+
+`cdk deploy` の出力（DeployRoleArn / BucketName / DistributionId）を
+リポジトリの Variables に入れると動き出す。秘密ではないので Secrets ではなく Variables でよい。
+
+### 実行前に必要なもの
+
+- AWSアカウント（**ルートに多要素認証**、予算アラート）
+- AWS CLI（`winget install Amazon.AWSCLI`）
+- `npx cdk bootstrap`（そのアカウント・リージョンで初回だけ）

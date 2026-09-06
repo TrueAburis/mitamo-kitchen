@@ -1,0 +1,81 @@
+# サイトを組み立てて AWS に置く。
+#
+# アクセスキーは保存していない。OIDC で「このリポジトリの main から来た」ことを
+# AWS 側が確認し、その場限りの資格情報を渡す。鍵がどこにも無いので漏れようがない。
+#
+# 動かすには、先に infra/ を1度デプロイして、下の2つを
+# リポジトリの Variables（Secrets ではない。秘密ではないので）に入れる。
+#   AWS_DEPLOY_ROLE_ARN   … cdk deploy の出力 DeployRoleArn
+#   AWS_S3_BUCKET         … 同 BucketName
+#   AWS_CLOUDFRONT_ID     … 同 DistributionId
+
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# OIDC のトークンを受け取るために必要
+permissions:
+  contents: read
+  id-token: write
+
+# 同時に走らせない。後から来たものを優先する
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: 道具を入れる
+        run: npm ci
+
+      # 壊れたものを公開しないよう、組み立てる前に必ず通す
+      - name: 型を検査する
+        run: npm run check
+
+      - name: キャプション解析を検証する
+        run: npm test
+
+      - name: ページを組み立てる
+        run: npm run build
+
+      - name: AWS の資格情報を受け取る
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # HTML は毎回変わるのでキャッシュを短く、
+      # CSS と JS は変わったら消せばよいので長めに持たせる
+      - name: 画像・CSS・JS を送る
+        run: |
+          aws s3 sync . "s3://${{ vars.AWS_S3_BUCKET }}" \
+            --delete \
+            --exclude "*" \
+            --include "style.css" --include "script.js" --include "recipes.js" \
+            --include "images/*" \
+            --cache-control "public,max-age=86400"
+
+      - name: HTML を送る
+        run: |
+          aws s3 sync . "s3://${{ vars.AWS_S3_BUCKET }}" \
+            --delete \
+            --exclude "*" \
+            --include "*.html" --include "en/*.html" \
+            --cache-control "public,max-age=300"
+
+      - name: キャッシュを消す
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.AWS_CLOUDFRONT_ID }}" \
+            --paths "/*"

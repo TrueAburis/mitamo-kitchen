@@ -2,3 +2,5 @@
 使わないほう/
 claude-html-workflow.md
 node_modules/
+infra/node_modules/
+infra/cdk.out/
