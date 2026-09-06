@@ -1,6 +1,9 @@
-# 開発用の簡易サーバー。サイト本体ではない。
+﻿# 開発用の簡易サーバー。サイト本体ではない。
 # 使い方: powershell -ExecutionPolicy Bypass -File serve.ps1
 # 止めるとき: Ctrl + C
+# 日本語を正しく表示するため、出力の文字コードを UTF-8 にする
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 $root = (Get-Location).Path
 $port = 8000
 $listener = New-Object System.Net.HttpListener

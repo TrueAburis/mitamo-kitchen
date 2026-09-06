@@ -38,7 +38,7 @@ a{color:inherit}
 h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
 
 /* 数字・分量・時間はすべて等幅。このサイトの中心 */
-.num,time,.qty{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:0}
+/* 実際の指定は各所で var(--mono) を直接使っている。ここに共通クラスは置かない */
 
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 
@@ -107,8 +107,6 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
   padding:11px 20px;border:1px solid var(--ink);background:var(--ink);color:var(--ground);
 }
 .btn:hover{background:var(--kombu);border-color:var(--kombu)}
-.btn-quiet{background:transparent;color:var(--ink);border-color:var(--rule)}
-.btn-quiet:hover{background:transparent;color:var(--ink);border-color:var(--ink)}
 
 /* 今週の一品：分量表そのものを最初に見せる */
 .dish{border:1px solid var(--rule)}
@@ -136,16 +134,11 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
   margin:0;text-align:right;white-space:nowrap;
   font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px;
 }
-.qty-group{
-  margin:0;padding:13px 16px 0;border-top:1px solid var(--rule);
-  font-size:13px;font-weight:700;
-}
 .dish-more{
   display:block;padding:13px 16px;border-top:1px solid var(--rule);
   font-size:14px;text-decoration:none;
 }
 .dish-more:hover{background:var(--kombu);color:var(--ground)}
-.qty-list-cont{padding-top:10px}
 
 /* ---------- レシピ詳細 ---------- */
 .recipes{border-top:1px solid var(--rule);padding-block:clamp(30px,6vw,58px)}
@@ -250,9 +243,15 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
 [data-lang="en"] .draft::before{content:"placeholder text"}
 
 /* Google フォーム。このサイトで唯一の外部読み込み */
+/* 高さは実測値。Google が案内する 2141px では中身が収まらず、
+   iframe の中に別のスクロールが生まれてスマホで操作しづらくなる。
+   フォームの質問を増減したら、内側にスクロールバーが出ないか必ず見直すこと。 */
 .form-embed{
-  width:100%;height:2141px;max-width:640px;margin-top:22px;
+  width:100%;height:2750px;max-width:640px;margin-top:22px;
   border:1px solid var(--rule);display:block;
+}
+@media (min-width:720px){
+  .form-embed{height:2450px}
 }
 .form-alt{margin:14px 0 0;font-size:14px}
 .form-alt a{text-decoration:underline}
@@ -290,7 +289,6 @@ main > section:first-child{border-top:0}
   font-family:var(--mono);font-size:clamp(12px,1.5vw,14px);font-weight:400;
   color:var(--ink-soft);line-height:1.9;
 }
-.hub-tag{margin:14px 0 0;font-size:clamp(15px,1.8vw,18px);max-width:30em}
 
 /* TODO: 本人の写真か、動画のサムネイルが入ったら <img> に差し替える */
 .hub-shot{max-width:340px;margin-top:24px}
