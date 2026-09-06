@@ -157,9 +157,24 @@
       return out.length ? out.join(' ') : null;
     }
 
+    /* 2段落目以降。実際の投稿では、ここに「茄子は箸がスッと刺されば引き上げ時」
+       のようなコツが書かれている。1段落目（リード文）と分けて拾う。 */
+    function restParagraphs(arr) {
+      var paras = [], cur = [];
+      arr.forEach(function (line) {
+        var t = line.trim();
+        if (!t) { if (cur.length) { paras.push(cur.join(' ')); cur = []; } }
+        else { cur.push(t); }
+      });
+      if (cur.length) { paras.push(cur.join(' ')); }
+      return paras.slice(1);
+    }
+
     var leadJaEnd = iTitleEn >= 0 ? iTitleEn : iRecipeJa;
     var leadJa = firstParagraph(slice(iTitleJa + 1, leadJaEnd));
     var leadEn = iTitleEn >= 0 ? firstParagraph(slice(iTitleEn + 1, iRecipeJa)) : null;
+    var notesJa = restParagraphs(slice(iTitleJa + 1, leadJaEnd));
+    var notesEn = iTitleEn >= 0 ? restParagraphs(slice(iTitleEn + 1, iRecipeJa)) : [];
 
     var ingJaEnd = iRecipeEn >= 0 ? iRecipeEn : -1;
     var groupsJa = iRecipeJa >= 0 ? parseIngredientBlock(slice(iRecipeJa + 1, ingJaEnd)) : [];
@@ -197,6 +212,8 @@
       titleEn: titleEn,
       leadJa: leadJa,
       leadEn: leadEn,
+      notesJa: notesJa,
+      notesEn: notesEn,
       groupsJa: groupsJa,
       groupsEn: groupsEn,
       steps: steps,

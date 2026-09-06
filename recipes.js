@@ -9,6 +9,19 @@
 
 window.RECIPES = [
   {
+    slug: "hiyashi-tori-katsuo-somen",
+    ja: { title: "冷やし鶏鰹出汁さっぱり素麺", lead: "冷たくてさっぱりした、優しい味の冷やし素麺。鶏と鰹で出汁を取ります。" },
+    en: { title: "Chilled Chicken and Bonito Broth Somen Noodles", lead: "Chilled somen with a refreshing, gentle broth made from chicken and bonito." },
+    tags: ["chicken", "noodle"],
+    image: "images/hiyashi-tori-katsuo-somen.jpg",
+    posted: "2026-09-06",
+    instagram: null,
+    likes: null,
+    comments: null,
+    views: null,
+    ready: false          // 手順がまだ入っていない
+  },
+  {
     slug: "tori-mune-nasu-nanbanzuke",
     ja: { title: "鶏むね肉と茄子の南蛮漬け", lead: "いつもは魚で作る南蛮漬けを、鶏むね肉で。" },
     en: { title: "Chicken Breast and Eggplant Nanban-zuke", lead: "Nanban-zuke, usually made with fish, made with chicken instead." },
