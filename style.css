@@ -1,13 +1,19 @@
 :root{
-  /* ---- 色（CLAUDE.md の表と対応。--kombu と --mark は写真が入るまで仮） ---- */
-  --ground:#FCFBF8;
-  --ink:#1E2320;
-  --ink-soft:#5C6360;
-  --rule:#DCD8CF;
-  --kombu:#24443A;
-  --mark:#B4472E;
+  /* ---- 色 ----
+     藍を面に使う。深緑をやめたのは、料理写真が暖色なので
+     同系色だと互いを弱め合うため。寒色にすると写真が前に出る。
+     写真が入ったら濃さだけ調整する。色の出どころはここだけ。 */
+  --ground:#FCFBF8;   /* 紙色 */
+  --ink:#1F2328;      /* 本文。わずかに青みの墨 */
+  --ink-soft:#5E6670; /* 補助文 */
+  --rule:#DCD6CC;     /* 罫線 */
+  --indigo:#33465A;   /* 藍鼠。フッターと分量バーの面 */
+  --mark:#9E5A63;     /* 蘇芳。時間の目盛りと注意 */
 
-  /* ---- 書体 ---- */
+  /* ---- 書体 ----
+     見出しだけ明朝を読み込む。本文はOS標準のままにして即表示させる。
+     Google Fonts は使われている文字だけを配るので、見出しの数十字なら数KB。 */
+  --serif:"Zen Old Mincho",serif;
   --sans:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic UI","Noto Sans JP","Meiryo",sans-serif;
   --mono:ui-monospace,"SFMono-Regular","Menlo","Consolas","Noto Sans Mono",monospace;
 
@@ -82,11 +88,11 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
   display:inline-block;text-decoration:none;font-size:14px;line-height:1.5;
   padding:11px 20px;border:1px solid var(--ink);background:var(--ink);color:var(--ground);
 }
-.btn:hover{background:var(--kombu);border-color:var(--kombu)}
+.btn:hover{background:var(--indigo);border-color:var(--indigo)}
 
 /* 今週の一品：分量表そのものを最初に見せる */
 .dish{border:1px solid var(--rule)}
-.dish-head{background:var(--kombu);color:var(--ground);padding:13px 16px}
+.dish-head{background:var(--indigo);color:var(--ground);padding:13px 16px}
 .dish-head h2{font-size:13px;font-weight:500;opacity:.82}
 .dish-name{margin:3px 0 0;font-size:19px;font-weight:700}
 .dish-name .en{display:block;font-size:12px;font-weight:400;opacity:.72;line-height:1.6}
@@ -114,7 +120,7 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
   display:block;padding:13px 16px;border-top:1px solid var(--rule);
   font-size:14px;text-decoration:none;
 }
-.dish-more:hover{background:var(--kombu);color:var(--ground)}
+.dish-more:hover{background:var(--indigo);color:var(--ground)}
 
 /* ---------- レシピ詳細 ---------- */
 .recipes{border-top:1px solid var(--rule);padding-block:clamp(30px,6vw,58px)}
@@ -139,7 +145,7 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
 /* 分量。スマホでは画面上端に貼り付き、広い画面では左列に貼り付く */
 .qty-bar{
   position:sticky;top:var(--headh);z-index:40;
-  background:var(--kombu);color:var(--ground);
+  background:var(--indigo);color:var(--ground);
   margin-inline:calc(var(--pad) * -1);
 }
 .qty-toggle{
@@ -244,7 +250,7 @@ html[lang="en"] .draft::before{content:"placeholder text"}
 /* 骨組み確認用の仮の高さ。セクションを足したら消す（第3章 3-3） */
 
 /* ---------- フッター ---------- */
-.foot{margin-top:clamp(40px,8vw,80px);background:var(--kombu);color:var(--ground)}
+.foot{margin-top:clamp(40px,8vw,80px);background:var(--indigo);color:var(--ground)}
 .foot-in{display:flex;flex-wrap:wrap;gap:18px 40px;padding-block:clamp(26px,4vw,38px)}
 .foot-brand{margin:0;font-size:16px;font-weight:700;flex:1 1 200px}
 .foot-brand .en{display:block;font-family:var(--mono);font-size:11px;font-weight:400;opacity:.66;line-height:1.8}
@@ -276,7 +282,7 @@ main > section:first-child{border-top:0}
 }
 .sns-btn svg{width:26px;height:26px;display:block}
 .sns-btn span{font-size:12.5px;line-height:1.4}
-.sns-btn:hover{background:var(--kombu);border-color:var(--kombu);color:var(--ground)}
+.sns-btn:hover{background:var(--indigo);border-color:var(--indigo);color:var(--ground)}
 
 .hub-acts{max-width:520px;margin-top:10px}
 .hub-acts .btn{display:block;text-align:center;padding-block:14px}
@@ -290,7 +296,7 @@ main > section:first-child{border-top:0}
 .recipe-list li:last-child{border-bottom:1px solid var(--rule)}
 .recipe-list a{display:block;padding:15px 4px;text-decoration:none;font-size:17px;font-weight:700}
 .recipe-list .en{display:block;font-size:12px;font-weight:400;color:var(--ink-soft);line-height:1.7}
-.recipe-list a:hover{background:var(--kombu);color:var(--ground);padding-inline:12px}
+.recipe-list a:hover{background:var(--indigo);color:var(--ground);padding-inline:12px}
 .recipe-list a:hover .en{color:inherit;opacity:.7}
 
 /* ---------- 上段：ロゴ・検索・言語 ---------- */
@@ -309,7 +315,7 @@ main > section:first-child{border-top:0}
 .bar-nav a{font-size:14px;text-decoration:none;color:var(--ink-soft);padding:11px 0;
   border-bottom:2px solid transparent;white-space:nowrap}
 .bar-nav a:hover{color:var(--ink)}
-.bar-nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--kombu)}
+.bar-nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--indigo)}
 @media (max-width:640px){
   .bar-top{flex-wrap:wrap;row-gap:10px;padding-bottom:10px}
   .searchbox{order:3;flex-basis:100%}
@@ -326,7 +332,7 @@ main > section:first-child{border-top:0}
 .chip{font:inherit;font-size:13px;line-height:1.5;padding:6px 13px;cursor:pointer;
   border:1px solid var(--rule);background:transparent;color:var(--ink)}
 .chip:hover{border-color:var(--ink)}
-.chip[aria-pressed="true"]{background:var(--kombu);border-color:var(--kombu);color:var(--ground)}
+.chip[aria-pressed="true"]{background:var(--indigo);border-color:var(--indigo);color:var(--ground)}
 .filters-sep{flex-basis:100%;height:0}
 .sort{display:flex;align-items:center;gap:10px;margin:14px 0 0;font-size:13px;color:var(--ink-soft)}
 .result-count{margin:16px 0 0;font-size:13px;color:var(--ink-soft)}
@@ -365,7 +371,7 @@ main > section:first-child{border-top:0}
 @keyframes reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .reveal{animation:reveal .32s ease-out both}
 #draw{font-size:15px;padding:13px 32px;cursor:pointer}
-[data-pull][aria-pressed="true"]{background:var(--kombu);border-color:var(--kombu);color:var(--ground)}
+[data-pull][aria-pressed="true"]{background:var(--indigo);border-color:var(--indigo);color:var(--ground)}
 
 /* ---------- タグの軸ごとの並び ---------- */
 .chip-axis{display:flex;flex-wrap:wrap;align-items:center;gap:8px;flex-basis:100%}
@@ -378,3 +384,51 @@ main > section:first-child{border-top:0}
 /* ---------- 関連レシピ ---------- */
 .related-wrap{margin-top:clamp(30px,5vw,46px);padding-top:22px;border-top:1px solid var(--rule)}
 .related-wrap h2{font-size:15px;font-weight:700}
+
+/* ---------- 見出しの書体 ----------
+   明朝を使うのは見出しだけ。本文はOS標準のゴシックのままにして即表示させる。
+   禁止しているのは「クリーム色の背景＋明朝＋テラコッタ」という組み合わせであって、
+   明朝そのものではない。白い紙色＋藍なら別物になる。 */
+.hub-name,.sec-h2,.recipe-title,.dish-name,h1{
+  font-family:var(--serif);
+  font-weight:600;
+  letter-spacing:.02em;
+}
+.hub-name{font-weight:700}
+.brand-ja{font-family:var(--serif);font-weight:700}
+
+/* ---------- 手触り ----------
+   触ったものが反応する。状態が変わったことを伝えるためだけに使う。 */
+.chip,.btn,.sns-btn,.bar-nav a,.nav a,.foot-nav a,.card a,.dish-more,.lang a,.recipe-list a{
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease;
+}
+.card-shot{transition:border-color .16s ease}
+.chip:active,.btn:active{transform:translateY(1px)}
+.btn,.chip{transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .08s ease}
+
+/* ---------- ページの移動をなめらかにする ----------
+   対応していないブラウザでは、これまでどおり普通に切り替わるだけ。
+   JavaScript は使わないので、表示速度に影響しない。 */
+@view-transition{navigation:auto}
+
+/* ---------- 分量バーが貼り付いたとき ----------
+   装飾ではなく状態の合図。「固定されました」を伝えている。 */
+/* グリッドの列を占有しないよう、配置の流れから外す */
+.cook{position:relative}
+.qty-sentinel{position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none}
+.qty-bar{transition:box-shadow .18s ease}
+.qty-bar.is-stuck{box-shadow:0 6px 18px rgba(31,35,40,.13)}
+
+/* ---------- Instagram の動画は押されるまで読み込まない ----------
+   埋め込みは重く、こちらで軽くする手段がない。
+   レシピを読みに来ただけの人に、その重さを払わせない。 */
+.ig-facade{
+  width:100%;max-width:400px;margin-top:20px;
+  border:1px solid var(--rule);background:transparent;
+  display:flex;align-items:center;gap:14px;
+  padding:16px 18px;cursor:pointer;font:inherit;color:var(--ink);text-align:left;
+}
+.ig-facade:hover{border-color:var(--indigo);background:var(--indigo);color:var(--ground)}
+.ig-facade svg{width:26px;height:26px;flex:0 0 auto}
+.ig-facade b{display:block;font-size:14px;font-weight:700}
+.ig-facade span{display:block;font-size:12px;opacity:.72;line-height:1.7}

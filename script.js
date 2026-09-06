@@ -353,15 +353,40 @@
       rows.forEach(function (x) { rel.appendChild(card(x.r)); });
     }
 
+    /* 動画は押されるまで読み込まない。
+       Instagram の埋め込みは重く、こちらで軽くする手段がない。
+       レシピを読みに来ただけの人（大半）に、その重さを払わせない。 */
     var slot = document.getElementById('video');
     if (rec && slot && rec.instagram) {
-      var f = document.createElement('iframe');
-      f.className = 'ig-embed';
-      f.src = rec.instagram.replace(/\/?$/, '/') + 'embed/captioned';
-      f.title = rec[LG].title + ' / Instagram';
-      f.loading = 'lazy';
-      f.allowFullscreen = true;
-      slot.appendChild(f);
+      var btn2 = el('button', 'ig-facade');
+      btn2.type = 'button';
+      btn2.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">' +
+        '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/>' +
+        '<circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/></svg>';
+      var label = el('span');
+      label.appendChild(el('b', null, ja ? '動画を見る' : 'Watch the video'));
+      label.appendChild(el('span', null, ja
+        ? '押すと Instagram の投稿を読み込みます'
+        : 'Loads the Instagram post when you tap'));
+      btn2.appendChild(label);
+
+      btn2.addEventListener('click', function () {
+        var f = document.createElement('iframe');
+        f.className = 'ig-embed';
+        f.src = rec.instagram.replace(/\/?$/, '/') + 'embed/captioned';
+        f.title = rec[LG].title + ' / Instagram';
+        f.allowFullscreen = true;
+        slot.replaceChild(f, btn2);
+      });
+      slot.appendChild(btn2);
+    }
+
+    /* 分量バーが貼り付いた合図。装飾ではなく状態を伝えている */
+    var sentinel = document.querySelector('.qty-sentinel');
+    if (bar && sentinel && window.IntersectionObserver) {
+      new IntersectionObserver(function (entries) {
+        bar.classList.toggle('is-stuck', !entries[0].isIntersecting);
+      }, { rootMargin: '-' + (parseInt(getComputedStyle(root).getPropertyValue('--headh'), 10) + 24) + 'px 0px 0px 0px', threshold: 1 }).observe(sentinel);
     }
   }
 })();

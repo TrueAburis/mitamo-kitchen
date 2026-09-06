@@ -22,6 +22,13 @@ const ROOT = path.join(__dirname, '..');
    hreflang と og:url は絶対URLでないと効かないので、ここだけが出どころ。 */
 const SITE_URL = 'https://mitamo-kitchen.example';
 
+/* 検索エンジンに載せるかどうか。
+   写真と手順が揃うまでは false。手順が「準備中」のレシピが検索結果に出ると、
+   最初の印象が悪くなるため。中身が揃ったら true にして組み立て直すだけ。
+
+   robots.txt では止めない。止めると、この noindex を読みに来てもらえなくなる。 */
+const INDEXABLE = false;
+
 const LANGS = [
   { code: 'ja', dir: '', asset: '', other: 'en/', otherCode: 'en' },
   { code: 'en', dir: 'en', asset: '../', other: '../', otherCode: 'ja' }
@@ -88,8 +95,16 @@ function head(lang, o) {
 <meta name="description" content="${esc(o.desc)}">
 <!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="${L.asset}style.css">
 
+<!-- 見出しだけ明朝を読み込む。本文はOS標準のままなので、
+     フォントの到着を待たずに文章は表示される -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@600;700&display=swap">
+<link rel="stylesheet" href="${L.asset}style.css">
+${INDEXABLE ? '' : `<!-- 中身が揃うまで検索結果に出さない。tools/build.js の INDEXABLE を true にすると外れる -->
+<meta name="robots" content="noindex, nofollow">
+`}
 <link rel="canonical" href="${canonical}">${alt ? `
 <!-- 日本語版と英語版の対応。絶対URLでないと効かない -->
 <link rel="alternate" hreflang="ja" href="${SITE_URL}/${o.file}">
@@ -297,6 +312,8 @@ ${c.intro.map((p) => `          <p>${esc(pick(p, lg) || p.ja)}</p>`).join('\n')}
 
         <div class="cook">
 
+          <!-- バーが画面上端に貼り付いた瞬間を知るための目印 -->
+          <div class="qty-sentinel" aria-hidden="true"></div>
           <div class="qty-bar" id="qty">
             <h2 class="qty-title">${esc(pick(T.ingredients, lg))}</h2>
             <button class="qty-toggle" type="button" aria-expanded="false" aria-controls="qty-body">
