@@ -28,23 +28,37 @@
 
 <!-- ヘッダーは全ページ共通。ここを直したら他のHTMLも同じように直すこと -->
 <header class="masthead">
-  <div class="masthead-in">
+  <div class="bar-top">
     <a class="brand" href="index.html">
       <span class="brand-ja">みたもっちゃんねる</span>
       <span class="brand-en" lang="en">Mitamo Kitchen</span>
     </a>
 
-    <nav class="nav" aria-label="サイト内">
-      <a href="recipes.html" aria-current="page"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
-      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
-      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
-    </nav>
+    <form class="searchbox" role="search" action="recipes.html" method="get">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
+      </svg>
+      <input type="search" name="q" autocomplete="off" data-search
+             aria-label="レシピを検索 / Search recipes"
+             data-ph-ja="レシピを検索" data-ph-en="Search recipes">
+    </form>
 
     <div class="lang" role="group" aria-label="言語 / Language">
       <button type="button" data-set-lang="ja" aria-pressed="true">JA</button>
       <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
     </div>
   </div>
+
+  <nav class="bar-nav" aria-label="サイト内">
+    <div class="bar-nav-in">
+      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
+      <a href="recipes.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="recipes.html?sort=popular"><span class="t-ja">人気のレシピ</span><span class="t-en">Popular</span></a>
+      <a href="recipes.html#tags"><span class="t-ja">タグから探す</span><span class="t-en">Tags</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </div>
+  </nav>
 </header>
 
 <main id="main">
@@ -53,14 +67,31 @@
     <div class="wrap">
       <h1 class="sec-h2"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></h1>
 
-      <ul class="recipe-list">
-        <li>
-          <a href="tori-mune-nasu-nanbanzuke.html">鶏むね肉と茄子の南蛮漬け<span class="en" lang="en">Chicken Breast and Eggplant Nanban-zuke</span></a>
-        </li>
-        <li>
-          <a href="tori-negi-meshi.html">鶏ネギ飯<span class="en" lang="en">Chicken and Green Onion Rice</span></a>
-        </li>
-      </ul>
+      <p class="prose" style="margin-top:10px">
+        <span class="t-ja">上の検索欄に材料や料理名を入れると絞り込めます。</span>
+        <span class="t-en">Use the search box above to filter by ingredient or dish name.</span>
+      </p>
+
+      <h2 class="sec-title" id="tags" style="margin-top:24px">
+        <span class="t-ja">タグから探す</span><span class="t-en">Browse by tag</span>
+      </h2>
+      <!-- タグのボタンは recipes.js の TAGS から作る -->
+      <div class="filters" id="chips"></div>
+
+      <div class="sort">
+        <span class="t-ja">並び順</span><span class="t-en">Sort</span>
+        <button class="chip" type="button" data-sort="new" aria-pressed="true"></button>
+        <button class="chip" type="button" data-sort="popular" aria-pressed="false"></button>
+      </div>
+
+      <p class="result-count" id="count" aria-live="polite"></p>
+
+      <ul class="cards" id="cards"></ul>
+
+      <p class="empty" id="empty" hidden>
+        <span class="t-ja">条件に合うレシピがありませんでした。検索の言葉を短くするか、タグを外してみてください。</span>
+        <span class="t-en">No recipes matched. Try a shorter search term, or clear the tag.</span>
+      </p>
     </div>
   </section>
 </main>
@@ -80,6 +111,7 @@
   </div>
 </footer>
 
+<script src="recipes.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

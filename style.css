@@ -55,34 +55,20 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
   padding:10px 16px;z-index:100;
 }
 .skip:focus{left:0}
-
-/* ---------- ヘッダー ---------- */
+/* ---------- ヘッダー（上段＝ロゴ・検索・言語／下段＝メニュー帯） ---------- */
 .masthead{
   position:sticky;top:0;z-index:50;
   background:var(--ground);
   border-bottom:1px solid var(--rule);
 }
-.masthead-in{
-  display:flex;align-items:center;gap:clamp(14px,3vw,32px);
-  max-width:var(--maxw);margin:0 auto;
-  padding:14px var(--pad);
-}
 
 /* TODO: 正式なロゴが決まったら差し替える */
-.brand{display:flex;align-items:baseline;gap:9px;text-decoration:none;margin-right:auto}
+.brand{display:flex;align-items:baseline;gap:9px;text-decoration:none;flex:0 0 auto}
 .brand-ja{font-size:17px;font-weight:700;letter-spacing:.03em;white-space:nowrap}
 .brand-en{
   font-family:var(--mono);font-size:11px;color:var(--ink-soft);
   letter-spacing:.02em;white-space:nowrap;
 }
-
-.nav{display:flex;gap:clamp(14px,2.4vw,26px)}
-.nav a{
-  font-size:14px;text-decoration:none;color:var(--ink-soft);
-  padding-block:4px;border-bottom:1px solid transparent;white-space:nowrap;
-}
-.nav a:hover{color:var(--ink);border-bottom-color:var(--ink)}
-.nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
 
 .lang{display:flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden;flex:0 0 auto}
 .lang button{
@@ -93,12 +79,8 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
 .lang button+button{border-left:1px solid var(--rule)}
 .lang button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
 
-/* スマホは2段。1段目=ロゴ+言語、2段目=ナビ */
 @media (max-width:640px){
-  :root{--headh:97px}
-  .masthead-in{flex-wrap:wrap;row-gap:10px;padding-top:12px;padding-bottom:10px}
-  .nav{order:3;flex-basis:100%;gap:18px}
-  .nav a{font-size:13px}
+  :root{--headh:130px}
   .brand-ja{font-size:16px}
 }
 /* ---------- ボタン ---------- */
@@ -316,3 +298,69 @@ main > section:first-child{border-top:0}
 .recipe-list .en{display:block;font-size:12px;font-weight:400;color:var(--ink-soft);line-height:1.7}
 .recipe-list a:hover{background:var(--kombu);color:var(--ground);padding-inline:12px}
 .recipe-list a:hover .en{color:inherit;opacity:.7}
+
+/* ---------- 上段：ロゴ・検索・言語 ---------- */
+.bar-top{display:flex;align-items:center;gap:clamp(12px,2.5vw,28px);max-width:var(--maxw);margin:0 auto;padding:12px var(--pad)}
+.searchbox{flex:1 1 260px;min-width:0;display:flex;align-items:center;gap:8px;
+  border:1px solid var(--rule);background:var(--ground);padding:7px 12px}
+.searchbox:focus-within{border-color:var(--ink)}
+.searchbox svg{width:15px;height:15px;flex:0 0 auto;color:var(--ink-soft)}
+.searchbox input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:14px;color:var(--ink);padding:2px 0}
+.searchbox input:focus{outline:none}
+.searchbox input::placeholder{color:var(--ink-soft)}
+
+/* ---------- 下段：メニュー帯。全項目を畳まずに出す ---------- */
+.bar-nav{border-top:1px solid var(--rule);background:var(--ground)}
+.bar-nav-in{display:flex;flex-wrap:wrap;gap:0 clamp(16px,2.6vw,30px);max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+.bar-nav a{font-size:14px;text-decoration:none;color:var(--ink-soft);padding:11px 0;
+  border-bottom:2px solid transparent;white-space:nowrap}
+.bar-nav a:hover{color:var(--ink)}
+.bar-nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--kombu)}
+@media (max-width:640px){
+  .bar-top{flex-wrap:wrap;row-gap:10px;padding-bottom:10px}
+  .searchbox{order:3;flex-basis:100%}
+  /* メニューは畳まず折り返す。全項目が見えている状態を保つ */
+  .bar-nav-in{gap:0 18px}
+  .bar-nav a{font-size:13px;padding:9px 0}
+  /* スマホでは header を貼り付けない。画面の1/4を常時占有してしまうため。
+     分量バーは画面の一番上に貼り付く（--headh は script.js が 0 にする） */
+  .masthead{position:static}
+}
+
+/* ---------- 絞り込み ---------- */
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0 0}
+.chip{font:inherit;font-size:13px;line-height:1.5;padding:6px 13px;cursor:pointer;
+  border:1px solid var(--rule);background:transparent;color:var(--ink)}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--kombu);border-color:var(--kombu);color:var(--ground)}
+.filters-sep{flex-basis:100%;height:0}
+.sort{display:flex;align-items:center;gap:10px;margin:14px 0 0;font-size:13px;color:var(--ink-soft)}
+.result-count{margin:16px 0 0;font-size:13px;color:var(--ink-soft)}
+.result-count b{font-family:var(--mono);font-weight:400;color:var(--ink)}
+
+/* ---------- レシピカード。角丸と影で揃えず、罫線と写真で組む ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:clamp(18px,3vw,30px);margin:22px 0 0;padding:0;list-style:none}
+.card a{display:block;text-decoration:none;color:inherit}
+.card-shot{position:relative;aspect-ratio:4/5;background:#F2EFE8;border:1px solid var(--rule);
+  display:grid;place-items:center;text-align:center;padding:12px;color:var(--ink-soft);font-size:11px;line-height:1.7}
+.card-shot img{width:100%;height:100%;object-fit:cover}
+.card a:hover .card-shot{border-color:var(--ink)}
+.card-title{margin:11px 0 0;font-size:16px;font-weight:700;line-height:1.45}
+.card-title .en{display:block;font-size:11.5px;font-weight:400;color:var(--ink-soft);line-height:1.6}
+.card-lead{margin:6px 0 0;font-size:13px;color:var(--ink-soft);line-height:1.7}
+.card-meta{display:flex;flex-wrap:wrap;gap:4px 14px;margin:9px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
+.card-tags span{font-size:11px;color:var(--ink-soft);border:1px solid var(--rule);padding:2px 8px}
+.card-draft{display:inline-block;margin:9px 0 0;font-family:var(--mono);font-size:11px;color:var(--mark);border:1px solid var(--mark);padding:2px 8px}
+.empty{margin:26px 0 0;padding:22px;border:1px solid var(--rule);color:var(--ink-soft);font-size:14px}
+
+/* ---------- 数値の出典 ---------- */
+.figures{display:flex;flex-wrap:wrap;gap:6px 20px;margin:16px 0 0;font-family:var(--mono);font-size:13px}
+.figures span{color:var(--ink-soft)}
+.figures b{font-weight:400;color:var(--ink)}
+.figures-note{margin:6px 0 0;font-size:11.5px;color:var(--ink-soft)}
+
+/* ---------- Instagram の埋め込み ---------- */
+.ig-embed{width:100%;max-width:400px;height:640px;margin-top:20px;border:1px solid var(--rule);display:block}
+.ig-alt{margin:10px 0 0;font-size:13px}
+.ig-alt a{text-decoration:underline}

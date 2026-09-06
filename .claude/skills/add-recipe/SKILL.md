@@ -60,6 +60,8 @@ cp tori-negi-meshi.html <slug>.html
 | `.recipe-intro` | 紹介文。`t-ja` / `t-en` の対 |
 | `.recipe-meta` | 分量と時間 |
 | `.qty-toggle` の「材料 N品」 | 実際の品数に直す。忘れやすい |
+| `<div class="figures" id="figures">` | 中身は空のまま。recipes.js から数値とタグが入る |
+| `<div id="video">` | 中身は空のまま。recipes.js に instagram があれば動画が入る |
 | `.qty-peek` | 主な材料3つ程度。手順を読み始めると自動で上書きされる初期表示 |
 | `.qty-body` の `<dl>` | 材料。グループが2つ以上なら `h3.qty-sub` で区切る |
 | `.qty-note` | 補足。無ければ段落ごと消す |
@@ -83,22 +85,33 @@ cp tori-negi-meshi.html <slug>.html
 トップとレシピページを丸ごと同じ内容にしないこと。
 同じものが2回続くと、2回とも読み流される。トップは入口で、続きがページにある状態を保つ。
 
-### 5. 一覧ページに追加する
+### 5. recipes.js に1件足す
 
-`recipes.html` の `ul.recipe-list` の**先頭**に1行足す。新しい順に並べる。
+一覧・検索・タグ・人気順は `recipes.js` の `window.RECIPES` から作られる。
+**ページを作っただけでは一覧に出てこない。** 配列の先頭に足す（新しい順）。
 
-```html
-<li>
-  <a href="<slug>.html">料理名<span class="en">English name</span></a>
-</li>
+```js
+{
+  slug: "<slug>",
+  ja: { title: "料理名", lead: "一行の説明" },
+  en: { title: "English name", lead: "One line in English" },
+  tags: ["chicken", "vegetable"],
+  image: "images/<slug>.jpg",
+  posted: "YYYY-MM-DD",
+  instagram: "https://www.instagram.com/reel/xxxx/",
+  likes: null, comments: null, views: null,
+  ready: true
+}
 ```
 
-ヘッダーとフッターの「レシピ」は `recipes.html` を指しているので、そこは触らなくてよい。
+気をつけること。
 
-> 2件目を追加したときに分かったこと。
-> ナビが特定のレシピページを直接指していると、新しいレシピを足した瞬間に
-> 古いレシピがどこからも辿れないページになる。
-> だから一覧ページは「3件を超えたら」ではなく2件目の時点で作った。
+- `tags` は `window.TAGS` のキー。新しいタグを使うなら TAGS にも日英の表示名を足す
+- 数値が分からないうちは `null`。`0` と書かない（「いいねが0件」という別の意味になる）
+- 手順がまだ入っていないレシピは `ready: false`。一覧に「手順は準備中」と出る
+- `instagram` に投稿URLを入れると、レシピページに動画の埋め込みが自動で入る
+
+ヘッダーのメニューと `recipes.html` は触らなくてよい。どちらもデータから作られる。
 
 ### 6. 確認する
 

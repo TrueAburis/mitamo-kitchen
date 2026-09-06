@@ -28,23 +28,37 @@
 
 <!-- ヘッダーは全ページ共通。ここを直したら他のHTMLも同じように直すこと -->
 <header class="masthead">
-  <div class="masthead-in">
+  <div class="bar-top">
     <a class="brand" href="index.html">
       <span class="brand-ja">みたもっちゃんねる</span>
       <span class="brand-en" lang="en">Mitamo Kitchen</span>
     </a>
 
-    <nav class="nav" aria-label="サイト内">
-      <a href="recipes.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
-      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
-      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
-    </nav>
+    <form class="searchbox" role="search" action="recipes.html" method="get">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
+      </svg>
+      <input type="search" name="q" autocomplete="off" data-search
+             aria-label="レシピを検索 / Search recipes"
+             data-ph-ja="レシピを検索" data-ph-en="Search recipes">
+    </form>
 
     <div class="lang" role="group" aria-label="言語 / Language">
       <button type="button" data-set-lang="ja" aria-pressed="true">JA</button>
       <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
     </div>
   </div>
+
+  <nav class="bar-nav" aria-label="サイト内">
+    <div class="bar-nav-in">
+      <a href="index.html"><span class="t-ja">トップ</span><span class="t-en">Home</span></a>
+      <a href="recipes.html"><span class="t-ja">レシピ</span><span class="t-en">Recipes</span></a>
+      <a href="recipes.html?sort=popular"><span class="t-ja">人気のレシピ</span><span class="t-en">Popular</span></a>
+      <a href="recipes.html#tags"><span class="t-ja">タグから探す</span><span class="t-en">Tags</span></a>
+      <a href="index.html#profile"><span class="t-ja">みたもっちゃんねるとは</span><span class="t-en">Profile</span></a>
+      <a href="work.html"><span class="t-ja">お仕事のご依頼</span><span class="t-en">Work with us</span></a>
+    </div>
+  </nav>
 </header>
 
 <main id="main">
@@ -92,6 +106,25 @@
     </div>
   </section>
 
+
+  <section class="plain" id="popular-section">
+    <div class="wrap">
+      <p class="sec-title"><span class="t-ja">人気のレシピ</span><span class="t-en">Popular</span></p>
+      <h2 class="sec-h2"><span class="t-ja">よく見られているもの</span><span class="t-en">Most viewed</span></h2>
+
+      <!-- カードは recipes.js のデータから作る。いいねが多い順の上位3件 -->
+      <ul class="cards" id="popular"></ul>
+
+      <p class="figures-note">
+        <span class="t-ja">いいね数は Instagram の投稿から取り込んだ数値です。「—」はまだ取り込めていないものです。</span>
+        <span class="t-en">Like counts come from Instagram. A dash means the number has not been fetched yet.</span>
+      </p>
+
+      <p class="form-alt" style="margin-top:16px">
+        <a href="recipes.html?sort=popular"><span class="t-ja">レシピをすべて見る</span><span class="t-en">See all recipes</span></a>
+      </p>
+    </div>
+  </section>
   <section class="plain" id="recipes">
     <div class="wrap">
       <div class="dish dish-solo">
@@ -180,6 +213,7 @@
   </div>
 </footer>
 
+<script src="recipes.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
