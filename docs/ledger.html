@@ -116,10 +116,10 @@
   <header class="top">
     <h1>みたもキッチン 制作台帳</h1>
     <p class="sub">ここまでに決めたこと、作ったもの、残っていること、そしてみたもさんに聞かないと進まないこと。全部の一覧です。</p>
-    <p class="asof">最終更新 2026-09-06 ／ レシピ3件 ／ TrueAburis/mitamo-kitchen</p>
+    <p class="asof">最終更新 2026-09-07 ／ レシピ3件 ／ TrueAburis/mitamo-kitchen</p>
 
     <div class="tally">
-      <div><b>25</b><span>実装済みの機能</span></div>
+      <div><b>29</b><span>実装済みの機能</span></div>
       <div><b>1</b><span>次にやること</span></div>
       <div><b>15</b><span>確認・依頼待ち</span></div>
     </div>
@@ -137,15 +137,14 @@
 
   <section>
     <h2><span class="n">B</span>確定している制作ルール</h2>
-    <p class="note">やり取りの中で決まったもの。変えるときは先に相談する、という扱いです。</p>
+    <p class="note">やり取りの中で決まったもの。変えるときは先に相談する、という扱いです。2026年9月に、道具の禁止をやめて「速さの予算」で縛る形に見直しました。</p>
     <ul class="rows">
-      <li><span class="chip c-done">確定</span><div><strong>素のHTML・CSS・JavaScript だけ</strong><p>ビルドツール、外部ライブラリ、Webフォントを使わない。ネットが無くても表示できる状態を保つ。</p></div></li>
-      <li><span class="chip c-done">確定</span><div><strong>外部読み込みは2つだけ</strong><p>お仕事のご依頼の Google フォームと、レシピページの Instagram 動画。これ以上増やさない。</p></div></li>
-      <li><span class="chip c-done">確定</span><div><strong>日本語と英語を対で用意する</strong><p>材料名だけは切り替えても両方を表示したまま。海外の人が店頭でパッケージと照合できるようにするため。常時表示の英語には <code>lang="en"</code> を付ける。</p></div></li>
-      <li><span class="chip c-done">確定</span><div><strong>色は CSS変数だけ</strong><p>白に近い紙色を背景に、昆布の深緑を面で、朱を印として少量。写真が入った時点で深緑と朱を写真から決め直す。</p></div></li>
-      <li><span class="chip c-done">確定</span><div><strong>動きは1ページ1か所</strong><p>現在はレシピガチャで結果が1枚ずつ出る部分のみ。</p></div></li>
-      <li><span class="chip c-done">確定</span><div><strong>見慣れた型を使わない</strong><p>クリーム色＋明朝＋テラコッタ、同じ角丸と影のカードの反復、意味のない連番、末尾の矢印など9項目を禁止として明文化。</p></div></li>
-      <li><span class="chip c-done">確定</span><div><strong>推測で埋めない</strong><p>情報が無い箇所は <code>TODO</code> と書く。数値が未取得のときは <code>null</code>（「0件」という別の意味になるので <code>0</code> と書かない）。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>速さの予算を守る</strong><p>最初の表示に必要な JavaScript は 0KB、1ページの転送量は写真を除いて150KB以内、外部から読み込むものは押されるまで読み込まない。これを守れる限り、道具は自由に選ぶ。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>動きは、状態が変わったことを伝えるときだけ</strong><p>飾りで足さない。いま入っているのは、ガチャの結果が1枚ずつ出る／分量バーが貼り付いた合図／触ったものの反応、の3つだけ。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>日本語と英語を対で用意する</strong><p>材料名は英語ページでも日本語を併記する。主と従が入れ替わるだけ。海外の人が店頭でパッケージと照合するためであって、翻訳のためではない。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>色は変数だけ、書体は見出しだけ明朝</strong><p>白に近い紙色に、藍鼠を面で、蘇芳を印として少量。本文はOS標準の書体のままで、表示を待たせない。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>見慣れた型を使わない</strong><p>クリーム色＋明朝＋テラコッタ、同じ角丸と影のカードの反復、意味のない連番、末尾の矢印など10項目を禁止として明文化。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>推測で埋めない</strong><p>情報が無い箇所は「TODO」と書く。数値が未取得のときは空欄にする（「0件」という別の意味になるので 0 と書かない）。手順が無いレシピに、それらしい手順を書き足さない。</p></div></li>
       <li><span class="chip c-done">確定</span><div><strong>PR（タイアップ）投稿は自動投稿の対象外</strong><p>契約範囲が案件ごとに違うため。載せる回だけ手で追加し、PRである旨を明記する。</p></div></li>
     </ul>
   </section>
@@ -189,9 +188,13 @@
       <li><span class="chip c-done">済</span><div><strong>Google のレシピ検索対策（JSON-LD）</strong><p>手順・分量・時間がそろっているレシピにだけ記述。検索結果に調理時間や写真つきで出るための準備。写真が入るまでは写真つきでは出ない。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>SNSで共有したときの表示（OGP）</strong><p>全6ページ。タイトルと説明が出る。サムネイル画像は写真とドメインが決まってから。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>材料の日英対訳辞書</strong><p>英語が無い回でも材料表だけは英語にするためのもの。実際の投稿3本に対して 14/14・11/11・4/5 で変換できた（引けなかった1件は商品名で、訳さないのが正しい動き）。</p></div></li>
-      <li><span class="chip c-done">済</span><div><strong>解析の自動検証</strong><p>実際の投稿3本に対して32項目を自動でチェック。全角スペース、分量なし、英語の語順違い、材料欄に混ざった注意書きなどを見張っている。解析を触るたびに実行する。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>解析の自動検証</strong><p>実際の投稿3本に対して32項目を自動でチェック。全角スペース、分量なし、英語の語順違い、材料欄に混ざった注意書きなどを見張っている。あわせて型検査も入れており、公開前に必ず通る。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>ページの自動組み立て</strong><p>HTMLは手で書かない。本文をデータに置き、コマンド1つで14ページを書き出す。日本語版と英語版がズレないのはこのため。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>キャプションからレシピ本文を作る</strong><p>Instagram のキャプション1本から、材料・グループ分け・コツ・タグまでを自動で作る。PR案件は自動で除外する。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>配色と書体を整えた</strong><p>面の色を昆布の深緑から藍鼠に。料理写真は暖色なので、寒色にすることで写真が前に出る。見出しには明朝（Zen Old Mincho）を入れた。本文はOS標準のままなので、表示は速いまま。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>動きと手触り</strong><p>ページの移動がなめらかにつながる。触ったものが反応する。分量バーが画面に貼り付いたときに影で合図する。いずれも状態を伝えるためのもので、飾りでは足していない。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>動画を押されるまで読み込まない</strong><p>Instagram の埋め込みは重い。レシピを読みに来ただけの人（大半）に、その重さを払わせない作りにした。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>公開用インフラをコードで用意</strong><p>AWS（S3＋CloudFront）の構成をコードで持っている。バケットは非公開にして配信経由でのみ読める。GitHub にアクセスキーを保存しない方式。まだ実行はしていない。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>確認用サーバーと作業手順</strong><p><code>serve.ps1</code> で表示確認。レシピ追加は <code>/add-recipe</code>、この台帳の更新は <code>/ledger</code> として手順を登録済み。</p></div></li>
     </ul>
   </section>
@@ -210,7 +213,7 @@
       <li><span class="chip c-wait">待</span><div><strong>写真の差し替え</strong><p>いま全ページで写真の枠だけが置かれている。写真をもらえ次第、入れる。</p></div></li>
       <li><span class="chip c-wait">待</span><div><strong>ドメインを入れる</strong><p>hreflang（日本語版と英語版の対応を検索エンジンに伝える指定）は入っているが、いまは仮のドメインを指している。絶対URLでないと効かないので、<b>実際のドメインが決まったら1か所だけ直して組み立て直す</b>。</p></div></li>
       <li><span class="chip c-wait">待</span><div><strong>Instagram の自動取り込み</strong><p>いいね数の更新、新規投稿の取り込み、サムネイルの保存まで。<b>アクセストークンが要る</b>。仕組み側は組める状態。</p></div></li>
-      <li><span class="chip c-wait">待</span><div><strong>公開</strong><p>「中身が揃ってから公開する」と決めたため、写真と手順が入るまで待つ。いまはリポジトリに置いてあるだけで、まだ誰でも見られる状態ではない。</p></div></li>
+      <li><span class="chip c-wait">待</span><div><strong>公開</strong><p>「中身が揃ってから公開する」と決めたため、写真と手順が入るまで待つ。公開の仕組み（AWS）はコードで用意済みで、あとは実行するだけ。念のため、公開しても当面は検索結果に出ない設定にしてある。</p></div></li>
     </ul>
   </section>
 
@@ -300,6 +303,8 @@
       <table>
         <thead><tr><th>日付</th><th>やったこと</th></tr></thead>
         <tbody>
+          <tr><td class="num">2026-09-07</td><td><b>見た目を整えました。</b>面の色を深緑から藍に、見出しを明朝に。ページの移動がなめらかになり、動画は押されるまで読み込まないので表示も速くなりました</td></tr>
+          <tr><td class="num">2026-09-07</td><td>公開先（AWS）の構成をコードで用意。まだ実行はしていません</td></tr>
           <tr><td class="num">2026-09-06</td><td><b>日本語と英語を別々のURLに分けました。</b>英語で検索されたときに英語のページが出るようになります。あわせて、HTMLを手で書かずコマンド1つで組み立てる作りに変更</td></tr>
           <tr><td class="num">2026-09-06</td><td>Instagram のキャプションからレシピの本文を自動で作れるようにした。素麺の回を追加してレシピは3件に</td></tr>
           <tr><td class="num">2026-09-06</td><td>タグを4軸19個に拡張（時間・場面で探せるように）。Google のレシピ検索対策、SNS共有時の表示、関連レシピ、材料の対訳辞書を追加</td></tr>
