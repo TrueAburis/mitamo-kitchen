@@ -116,11 +116,11 @@
   <header class="top">
     <h1>みたもキッチン 制作台帳</h1>
     <p class="sub">ここまでに決めたこと、作ったもの、残っていること、そしてみたもさんに聞かないと進まないこと。全部の一覧です。</p>
-    <p class="asof">最終更新 2026-09-06 ／ TrueAburis/mitamo-kitchen</p>
+    <p class="asof">最終更新 2026-09-06 ／ レシピ3件 ／ TrueAburis/mitamo-kitchen</p>
 
     <div class="tally">
-      <div><b>22</b><span>実装済みの機能</span></div>
-      <div><b>3</b><span>次にやること</span></div>
+      <div><b>25</b><span>実装済みの機能</span></div>
+      <div><b>1</b><span>次にやること</span></div>
       <div><b>15</b><span>確認・依頼待ち</span></div>
     </div>
   </header>
@@ -156,9 +156,10 @@
 
     <h3>ページ構成</h3>
     <ul class="rows">
-      <li><span class="chip c-done">済</span><div><strong>6ページ</strong><p>トップ／レシピ一覧／レシピガチャ／レシピ詳細×2／お仕事のご依頼。CSS と JavaScript は全ページ共通。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>日本語7ページ・英語7ページ</strong><p>トップ／レシピ一覧／レシピガチャ／レシピ詳細×3／お仕事のご依頼を、日本語（<code>/</code>）と英語（<code>/en/</code>）で別々のURLに用意。CSS と JavaScript は全ページ共通。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>英語での検索対策</strong><p>日本語版と英語版の対応を検索エンジンに伝える指定（hreflang）と、正規URLの指定を出力。英語の本文が無いレシピは、英語ページを作らない。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>2段のヘッダー</strong><p>上段にロゴ・検索・言語切替、下段にメニュー帯。7項目すべてを畳まず表示。スマホでは折り返して全項目が見える。</p></div></li>
-      <li><span class="chip c-done">済</span><div><strong>日英切替</strong><p>右上のボタン。選択を記憶し、初回はブラウザの言語で開く（日本語以外なら英語）。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>日英の切り替え</strong><p>右上のリンクで、同じページの別言語版へ移動する。</p></div></li>
     </ul>
 
     <h3>レシピを読む部分</h3>
@@ -189,25 +190,25 @@
       <li><span class="chip c-done">済</span><div><strong>SNSで共有したときの表示（OGP）</strong><p>全6ページ。タイトルと説明が出る。サムネイル画像は写真とドメインが決まってから。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>材料の日英対訳辞書</strong><p>英語が無い回でも材料表だけは英語にするためのもの。実際の投稿3本に対して 14/14・11/11・4/5 で変換できた（引けなかった1件は商品名で、訳さないのが正しい動き）。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>解析の自動検証</strong><p>実際の投稿3本に対して32項目を自動でチェック。全角スペース、分量なし、英語の語順違い、材料欄に混ざった注意書きなどを見張っている。解析を触るたびに実行する。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>ページの自動組み立て</strong><p>HTMLは手で書かない。本文をデータに置き、コマンド1つで14ページを書き出す。日本語版と英語版がズレないのはこのため。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>キャプションからレシピ本文を作る</strong><p>Instagram のキャプション1本から、材料・グループ分け・コツ・タグまでを自動で作る。PR案件は自動で除外する。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>確認用サーバーと作業手順</strong><p><code>serve.ps1</code> で表示確認。レシピ追加は <code>/add-recipe</code>、この台帳の更新は <code>/ledger</code> として手順を登録済み。</p></div></li>
     </ul>
   </section>
 
   <section>
     <h2><span class="n">D</span>これからやること</h2>
-    <p class="note">段階ごとに並べています。第0段階は費用ゼロ・トークン不要で、決めごとさえ済めば今日から着手できます。</p>
+    <p class="note">着手できるものと、何かを待っているものに分けています。</p>
 
     <h3>すぐ次にやること（費用0円）</h3>
     <ul class="rows">
-      <li><span class="chip c-todo">未</span><div><strong>キャプションからレシピページを生成</strong><p>いちばん次。解析と辞書はできているので、あとはページを組み立てる部分。これができると、レシピを足す作業がほぼ自動になる。</p></div></li>
-      <li><span class="chip c-todo">未</span><div><strong>日本語ページと英語ページを別のURLに分ける</strong><p>英語での検索流入を本気で取るために決定。いまは同じURLでボタン切り替えなので、検索エンジンから見ると英語のページが存在しない状態になっている。<code>/en/</code> に分けることで、英語の記事として検索に出せるようになる。ページ数が倍になるため、上の生成の仕組みを作ってから着手する。</p></div></li>
       <li><span class="chip c-todo">未</span><div><strong>まとめページ</strong><p>「平日5日の晩ごはん」のように献立として束ねる。手作業だが、滞在時間と依頼獲得に効く。</p></div></li>
     </ul>
 
     <h3>止まっている（何か待ちの状態）</h3>
     <ul class="rows">
       <li><span class="chip c-wait">待</span><div><strong>写真の差し替え</strong><p>いま全ページで写真の枠だけが置かれている。写真をもらえ次第、入れる。</p></div></li>
-      <li><span class="chip c-wait">待</span><div><strong>hreflang</strong><p>日本語版と英語版の対応を検索エンジンに伝える指定。<b>独自ドメインが決まらないと書けない</b>（絶対URLでないと効かないため）。</p></div></li>
+      <li><span class="chip c-wait">待</span><div><strong>ドメインを入れる</strong><p>hreflang（日本語版と英語版の対応を検索エンジンに伝える指定）は入っているが、いまは仮のドメインを指している。絶対URLでないと効かないので、<b>実際のドメインが決まったら1か所だけ直して組み立て直す</b>。</p></div></li>
       <li><span class="chip c-wait">待</span><div><strong>Instagram の自動取り込み</strong><p>いいね数の更新、新規投稿の取り込み、サムネイルの保存まで。<b>アクセストークンが要る</b>。仕組み側は組める状態。</p></div></li>
       <li><span class="chip c-wait">待</span><div><strong>公開</strong><p>「中身が揃ってから公開する」と決めたため、写真と手順が入るまで待つ。いまはリポジトリに置いてあるだけで、まだ誰でも見られる状態ではない。</p></div></li>
     </ul>
@@ -299,6 +300,8 @@
       <table>
         <thead><tr><th>日付</th><th>やったこと</th></tr></thead>
         <tbody>
+          <tr><td class="num">2026-09-06</td><td><b>日本語と英語を別々のURLに分けました。</b>英語で検索されたときに英語のページが出るようになります。あわせて、HTMLを手で書かずコマンド1つで組み立てる作りに変更</td></tr>
+          <tr><td class="num">2026-09-06</td><td>Instagram のキャプションからレシピの本文を自動で作れるようにした。素麺の回を追加してレシピは3件に</td></tr>
           <tr><td class="num">2026-09-06</td><td>タグを4軸19個に拡張（時間・場面で探せるように）。Google のレシピ検索対策、SNS共有時の表示、関連レシピ、材料の対訳辞書を追加</td></tr>
           <tr><td class="num">2026-09-06</td><td>英語での検索流入を取るため、英語を別URLに分ける方針を決定</td></tr>
           <tr><td class="num">2026-09-06</td><td>キャプション解析を自動で検証できるようにした（実物3本・32項目）</td></tr>
