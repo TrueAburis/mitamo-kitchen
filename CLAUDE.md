@@ -20,41 +20,51 @@
 
 ## ファイル構成
 
-1枚のHTMLで始めたが、全部が1ページに乗っているのが読みづらいため、2026年9月にページを分けた。
-ビルドツールは使わない。HTMLを直接置くだけ。
+**HTMLファイルは手で直さないこと。組み立てで上書きされる。**
+直す場所は下の対応表を見ること。
 
 ```
-index.html              トップ（見出し＋SNSボタン＋最新のレシピ＋プロフィール）
-recipes.html            レシピ一覧（検索・タグ絞り込み・並び替え）
-tori-mune-nasu-nanbanzuke.html  レシピ詳細（鶏むね肉と茄子の南蛮漬け）
-tori-negi-meshi.html    レシピ詳細（鶏ネギ飯）
-work.html               お仕事のご依頼（Google フォーム）
-style.css               全ページ共通のCSS
-script.js               全ページ共通のJS
-recipes.js              レシピのメタデータ（一覧・検索・人気順の元データ）
-images/                 写真
-serve.ps1               開発用の簡易サーバー（サイト本体ではない）
-.claude/skills/         このプロジェクト専用のスキル
-docs/ledger.html        制作台帳の元ファイル（サイト本体ではない）
+data/recipes.ts       レシピの一覧情報（人が書く）
+data/collections.ts   献立（人が書く）
+data/instagram.json   いいね数など（機械が書く）
+content/<slug>.js     レシピ本文＝材料・手順・コツ（人が書く／生成もできる）
+
+tools/                組み立てと検証の道具（TypeScript）
+infra/                公開用インフラの定義（AWS CDK）
+style.css             全ページ共通のCSS（手で直してよい）
+script.js             全ページ共通のJS（手で直してよい）
+images/               写真
+
+*.html, en/*.html     ←【生成物】触らない
+recipes.js            ←【生成物】触らない
+
+serve.ps1             確認用サーバー（サイト本体ではない）
+docs/ledger.html      制作台帳の元ファイル（サイト本体ではない）
+.claude/skills/       このプロジェクト専用のスキル
 ```
 
-（about.html は 2026年9月にトップへ統合して削除した）
+### 直したいものと、直す場所
 
-**ヘッダーとフッターは各HTMLにコピーされている。**
-片方だけ直すとズレるので、直したら全HTMLに同じ変更を入れること。
+| 直したいもの | 直す場所 |
+|---|---|
+| ヘッダー・フッター・メニュー | `tools/build.ts` の `T` |
+| 各ページの文章 | `tools/build-pages.ts` の `C` |
+| レシピの材料・手順・コツ | `content/<slug>.js` |
+| レシピのタグ・投稿URL | `data/recipes.ts` |
+| 献立の組み合わせ | `data/collections.ts` |
+| 見た目 | `style.css` |
+| 画面の動き | `script.js` |
 
-レシピを増やすときは `/add-recipe` スキルを使う（手順は `.claude/skills/add-recipe/SKILL.md`）。
-中身としては `tori-negi-meshi.html` を複製して差し替える作業になる。
-一覧は `recipes.html`。レシピを足したらこの一覧の先頭にも1行足す。
-ナビの「レシピ」は常に `recipes.html` を指す。
-
-表示を確認するときは、ターミナルで次を実行して http://localhost:8000/ を開く。
+### よく使うコマンド
 
 ```
-powershell -ExecutionPolicy Bypass -File serve.ps1
+npm run build    全ページを日本語版と英語版で書き出す
+npm test         キャプション解析と取り込みの検証
+npm run check    型検査
+powershell -ExecutionPolicy Bypass -File serve.ps1    確認用サーバー
 ```
 
-（このパソコンには Python も Node も入っていないため、PowerShell で立てている）
+レシピを増やすときは `/add-recipe` スキルを使う。
 
 ## 守るルール
 
@@ -412,35 +422,14 @@ node tools/generate.ts tools/fixtures/somen.txt <slug>
 - 手順が取れなければ `ready:false`。画面に「手順は準備中」と出る。
   それらしい手順を書き足すことは絶対にしない
 
-## ページの組み立て（重要）
-
-**HTMLファイルを手で直さないこと。** 上書きされる。
-
-```
-npm run build              全ページを日本語版と英語版で書き出す（14ページ）
-npm test                   キャプション解析と材料辞書の検証
-```
-
-| 直したいもの | 直す場所 |
-|---|---|
-| ヘッダー・フッター・メニュー | `tools/build.ts` の `T` |
-| トップ・一覧・ガチャ・依頼ページの文章 | `tools/build-pages.ts` の `C` |
-| レシピの本文（材料・手順・コツ） | `content/<slug>.js` |
-| レシピの一覧情報（タグ・投稿URL） | `data/recipes.ts` |
-| 見た目 | `style.css` |
-| 画面の動き | `script.js` |
-
-`style.css` と `script.js` は生成の対象外。直接編集してよい。
-
-### 言語
+## 言語の扱い（組み立て）
 
 - 日本語は `/`、英語は `/en/` に出る
-- 言語切替はリンク。同じページの別言語版へ移動する（JSでの表示切替はもうしない）
+- 言語切替はリンク。同じページの別言語版へ移動する
 - リンクは相対パスなので、英語ページのリンクは英語ページ同士でつながる
 - **英語の本文が無いレシピは、英語ページを作らない。**
   中身が日本語のままのページを「英語です」と出すと評価を下げるため
-- **材料名は英語ページでも日本語を併記する。** 主と従が入れ替わるだけ。
-  店頭でパッケージと照合するためであって、翻訳のためではない
+- **材料名は英語ページでも日本語を併記する。** 主と従が入れ替わるだけ
 
 ### ドメイン
 

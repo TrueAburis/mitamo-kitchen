@@ -70,12 +70,19 @@ const C = {
   draws: { ja: '引く数', en: 'Draws' },
   draw: { ja: '引く', en: 'Draw' },
 
+  latestLabel2: { ja: '最新のレシピ', en: 'Latest recipe' },
+  serves: { ja: '分量', en: 'Serves' },
+  time: { ja: '時間', en: 'Time' },
+  tbc: { ja: '要確認', en: 'TBC' },
+  seeHow: { ja: '作り方を見る', en: 'See how it is made' },
+
   collectionsTitle: { ja: '献立', en: 'Menus' },
   collectionsIntro: {
     ja: 'レシピを組み合わせて、その日の食卓がそのまま決まるようにしたものです。',
     en: 'Recipes combined so that one page settles a whole meal.'
   },
   backToCollections: { ja: '献立の一覧へ', en: 'All menus' },
+  inThisMenu: { ja: 'この献立のレシピ', en: 'Recipes in this menu' },
 
   workLabel: { ja: 'お仕事のご依頼', en: 'Work with us' },
   workTitle: { ja: 'ご相談はこちらから', en: 'Get in touch' },
@@ -101,7 +108,57 @@ const SNS = [
 ];
 
 /* ---------- 各ページ ---------- */
-function indexPage(lang: B.Lang): string {
+/* トップに置く「最新のレシピ」の分量表。
+   このサイトの主張（分量が画面から消えない）を、1画面目で見せるための一枚。
+   **トップに載せるのは主な材料だけ。** レシピページと丸ごと同じ内容にすると、
+   2回とも読み流されるので、続きはレシピページにある状態を保つ。 */
+function latestDishHtml(lg: 'ja' | 'en', r: SiteRecipe, c: B.RecipeContent): string {
+  const first = c.groups[0];
+  if (!first) { return ''; }
+
+  const rows = first.items.map((it) => {
+    const primary = lg === 'en' ? B.cap(it.en || it.ja) : it.ja;
+    const gloss = lg === 'en' ? (it.en ? it.ja : null) : it.en;
+    const glossLang = lg === 'en' ? 'ja' : 'en';
+    const qty = lg === 'en' ? (it.qen || it.qja) : it.qja;
+    return `          <dt>${esc(primary)}${gloss ? `<span class="en" lang="${glossLang}">${esc(gloss)}</span>` : ''}</dt>
+          <dd>${qty ? esc(qty) : esc(pick(C.tbc, lg))}</dd>`;
+  }).join('\n');
+
+  const serves = pick(c.meta.servings, lg) || pick(C.tbc, lg);
+  const time = pick(c.meta.time, lg) || pick(C.tbc, lg);
+
+  return `
+  <section class="plain" id="latest">
+    <div class="wrap">
+      <div class="dish dish-solo">
+        <div class="dish-head">
+          <h2>${esc(pick(C.latestLabel2, lg))}</h2>
+          <p class="dish-name">${esc(r[lg].title)}${lg === 'ja' ? `<span class="en" lang="en">${esc(r.en.title)}</span>` : ''}</p>
+        </div>
+
+        <figure class="shot">
+          <!-- TODO: ${esc(r.image)} を置いたら <img> に差し替える。alt を必ず書くこと -->
+          ${esc(pick(C.photoMissing, lg))}<br>${esc(r.image)}
+        </figure>
+
+        <dl class="dish-meta">
+          <dt>${esc(pick(C.serves, lg))}</dt><dd>${esc(serves)}</dd>
+          <dt>${esc(pick(C.time, lg))}</dt><dd>${esc(time)}</dd>
+        </dl>
+
+        <dl class="qty-list">
+${rows}
+        </dl>
+
+        <a class="dish-more" href="${esc(r.slug)}.html">${esc(pick(C.seeHow, lg))}</a>
+      </div>
+    </div>
+  </section>
+`;
+}
+
+function indexPage(lang: B.Lang, latest?: { r: SiteRecipe; c: B.RecipeContent }): string {
   const lg = lang.code;
   const sns = SNS.map((s) => `        <a class="sns-btn" href="${s.url}" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${s.svg}</svg>
@@ -131,6 +188,7 @@ ${sns}
     </div>
   </section>
 
+${latest ? latestDishHtml(lg, latest.r, latest.c) : ''}
   <section class="plain" id="popular-section">
     <div class="wrap">
       <p class="sec-title">${esc(pick(C.popularLabel, lg))}</p>
@@ -341,6 +399,7 @@ function collectionPage(lang: B.Lang, col: Collection, recipes: SiteRecipe[], ta
         <p>${esc(col[lg].lead)}</p>
       </div>
 
+      <h2 class="sec-title" style="margin-top:26px">${esc(pick(C.inThisMenu, lg))}</h2>
       <p class="result-count"><b>${recipes.length}</b>${lg === 'ja' ? ' 品' : (recipes.length === 1 ? ' recipe' : ' recipes')}</p>
 
       <ul class="cards">
@@ -371,11 +430,21 @@ async function run() {
   const written = [];
   fs.mkdirSync(path.join(ROOT, 'en'), { recursive: true });
 
+  /* トップに出す「最新のレシピ」。投稿日がいちばん新しいもの */
+  const newest = RECIPES.slice().sort((a, b) => b.posted.localeCompare(a.posted))[0];
+  let latest: { r: SiteRecipe; c: B.RecipeContent } | undefined;
+  if (newest) {
+    const p = path.join(ROOT, 'content', newest.slug + '.js');
+    if (fs.existsSync(p)) {
+      latest = { r: newest, c: (await import(pathToFileURL(p).href + '?t=' + Date.now())).default };
+    }
+  }
+
   for (const lang of LANGS) {
     const dir = lang.dir ? path.join(ROOT, lang.dir) : ROOT;
 
     const statics = [
-      ['index.html', indexPage(lang)],
+      ['index.html', indexPage(lang, latest)],
       ['recipes.html', recipesPage(lang)],
       ['gacha.html', gachaPage(lang)],
       ['work.html', workPage(lang)],

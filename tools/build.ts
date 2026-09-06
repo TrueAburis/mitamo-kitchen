@@ -83,6 +83,10 @@ const LANGS: Lang[] = [
 const esc = (s: unknown) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+/* キャプションの英語は回によって大文字小文字がばらつく（Chicken breast / chicken thigh）。
+   材料名として並べたときに揃って見えるよう、先頭だけ大文字にする。 */
+const cap = (s: string): string => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
 const pick = (o: Partial<Bi> | null | undefined, lang: string): string => (o && (o as Record<string, string | null>)[lang] != null ? (o as Record<string, string | null>)[lang]! : (o && o.ja) || "");
 
 /* ---------- 画面に出る文言 ---------- */
@@ -111,7 +115,6 @@ const T = {
   time: { ja: '時間', en: 'Time' },
   tbc: { ja: '要確認', en: 'TBC' },
   ingredients: { ja: '材料', en: 'Ingredients' },
-  itemsSuffix: { ja: '品', en: ' ingredients' },
   stepsComing: {
     ja: '手順はまだ入っていません。材料とコツだけ先に載せています。',
     en: 'The steps are not written up yet. For now, only the ingredients and notes are here.'
@@ -123,7 +126,6 @@ const T = {
     ja: '数値は Instagram の投稿から取り込んだものです。「—」はまだ取り込めていません。',
     en: 'Figures come from Instagram. A dash means it has not been fetched yet.'
   },
-  photoMissing: { ja: '写真がまだありません', en: 'No photo yet' }
 };
 
 /* ---------- ページの外枠 ---------- */
@@ -252,7 +254,7 @@ function ingredientsHtml(c: RecipeContent, lg: 'ja' | 'en'): string {
     g.items.forEach((it) => {
       /* 材料名は日英を常に併記する。英語ページでも日本語名を残すのは、
          海外の人が店頭でパッケージと照合するため。翻訳のためではない。 */
-      const primary = lg === 'en' ? (it.en || it.ja) : it.ja;
+      const primary = lg === 'en' ? cap(it.en || it.ja) : it.ja;
       const gloss = lg === 'en' ? (it.en ? it.ja : null) : it.en;
       const glossLang = lg === 'en' ? 'ja' : 'en';
       const qty = lg === 'en' ? (it.qen || it.qja) : it.qja;
@@ -426,5 +428,5 @@ function recipeCardHtml(r: RecipeMeta & { likes: number | null }, lg: 'ja' | 'en
         </li>`;
 }
 
-export { T, page, esc, pick, LANGS, SITE_URL, recipePage, recipeCardHtml };
+export { T, page, esc, pick, cap, LANGS, SITE_URL, recipePage, recipeCardHtml };
 

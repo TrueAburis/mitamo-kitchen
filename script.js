@@ -317,9 +317,11 @@
 
     var figs = document.getElementById('figures');
     if (rec && figs) {
+      /* 再生数は insights の追加権限がまだ無く、取りようがない。
+         永久に「—」のままの欄を出すと、壊れているように見えるので出さない。
+         取れるようになったら戻す。 */
       [[ja ? 'いいね' : 'Likes', rec.likes],
-       [ja ? 'コメント' : 'Comments', rec.comments],
-       [ja ? '再生' : 'Views', rec.views]].forEach(function (pair) {
+       [ja ? 'コメント' : 'Comments', rec.comments]].forEach(function (pair) {
         var s = el('span', null, pair[0] + ' ');
         s.appendChild(el('b', null, num(pair[1])));
         figs.appendChild(s);
