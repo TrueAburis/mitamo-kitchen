@@ -432,3 +432,12 @@ main > section:first-child{border-top:0}
 .ig-facade svg{width:26px;height:26px;flex:0 0 auto}
 .ig-facade b{display:block;font-size:14px;font-weight:700}
 .ig-facade span{display:block;font-size:12px;opacity:.72;line-height:1.7}
+
+/* ---------- 献立の一覧 ---------- */
+.menu-list{margin:24px 0 0;padding:0;list-style:none;max-width:36em}
+.menu-list li{border-top:1px solid var(--rule);padding:16px 0}
+.menu-list li:last-child{border-bottom:1px solid var(--rule)}
+.menu-list a{display:block;font-family:var(--serif);font-size:19px;font-weight:600;text-decoration:none;line-height:1.45}
+.menu-list a .en{display:block;font-family:var(--sans);font-size:12px;font-weight:400;color:var(--ink-soft);line-height:1.7}
+.menu-list a:hover{color:var(--indigo)}
+.menu-list p{margin:7px 0 0;font-size:13.5px;color:var(--ink-soft);line-height:1.8}

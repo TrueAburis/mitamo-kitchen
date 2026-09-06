@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>お仕事のご依頼｜みたもっちゃんねる</title>
-<meta name="description" content="レシピ制作、料理写真・動画の撮影、メニュー監修などのご相談を受け付けています。">
+<title>献立｜みたもっちゃんねる</title>
+<meta name="description" content="その日の食卓がそのまま決まる、レシピの組み合わせです。">
 <!-- TODO: ロゴが決まったら差し替える。いまは仮の椀のかたち -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FCFBF8'/%3E%3Cpath d='M5 15h22a11 11 0 0 1-22 0z' fill='%231E2320'/%3E%3Crect x='3' y='26' width='26' height='2' fill='%231E2320'/%3E%3C/svg%3E">
 
@@ -17,18 +17,18 @@
 <!-- 中身が揃うまで検索結果に出さない。tools/build.js の INDEXABLE を true にすると外れる -->
 <meta name="robots" content="noindex, nofollow">
 
-<link rel="canonical" href="https://mitamo-kitchen.example/work.html">
+<link rel="canonical" href="https://mitamo-kitchen.example/collections.html">
 <!-- 日本語版と英語版の対応。絶対URLでないと効かない -->
-<link rel="alternate" hreflang="ja" href="https://mitamo-kitchen.example/work.html">
-<link rel="alternate" hreflang="en" href="https://mitamo-kitchen.example/en/work.html">
-<link rel="alternate" hreflang="x-default" href="https://mitamo-kitchen.example/work.html">
+<link rel="alternate" hreflang="ja" href="https://mitamo-kitchen.example/collections.html">
+<link rel="alternate" hreflang="en" href="https://mitamo-kitchen.example/en/collections.html">
+<link rel="alternate" hreflang="x-default" href="https://mitamo-kitchen.example/collections.html">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="みたもっちゃんねる">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:url" content="https://mitamo-kitchen.example/work.html">
-<meta property="og:title" content="お仕事のご依頼｜みたもっちゃんねる">
-<meta property="og:description" content="レシピ制作、料理写真・動画の撮影、メニュー監修などのご相談を受け付けています。">
+<meta property="og:url" content="https://mitamo-kitchen.example/collections.html">
+<meta property="og:title" content="献立｜みたもっちゃんねる">
+<meta property="og:description" content="その日の食卓がそのまま決まる、レシピの組み合わせです。">
 <meta name="twitter:card" content="summary_large_image">
 <!-- TODO: 写真が入ったら og:image を絶対URLで足す -->
 </head>
@@ -53,7 +53,7 @@
 
     <div class="lang">
       <span class="lang-on">JA</span>
-      <a href="en/work.html" lang="en" hreflang="en">EN</a>
+      <a href="en/collections.html" lang="en" hreflang="en">EN</a>
     </div>
   </div>
 
@@ -63,44 +63,27 @@
       <a href="recipes.html">レシピ</a>
       <a href="recipes.html?sort=popular">人気のレシピ</a>
       <a href="recipes.html#tags">タグから探す</a>
-      <a href="collections.html">献立</a>
+      <a href="collections.html" aria-current="page">献立</a>
       <a href="gacha.html">レシピガチャ</a>
       <a href="index.html#profile">みたもっちゃんねるとは</a>
-      <a href="work.html" aria-current="page">お仕事のご依頼</a>
+      <a href="work.html">お仕事のご依頼</a>
     </div>
   </nav>
 </header>
 
 <main id="main">
 
-  <section class="plain" id="work">
+  <section class="plain" id="collections">
     <div class="wrap">
-      <p class="sec-title">お仕事のご依頼</p>
-      <h1 class="sec-h2">ご相談はこちらから</h1>
+      <h1 class="sec-h2">献立</h1>
+      <p class="prose" style="margin-top:10px">レシピを組み合わせて、その日の食卓がそのまま決まるようにしたものです。</p>
 
-      <!-- ▼▼▼ ここから仮の文章 ▼▼▼ -->
-      <div class="prose draft">
-        <p>レシピの制作、料理写真・動画の撮影、メニューの監修などのご相談を受け付けています。ご予算や納期が決まっていない段階でも構いません。下のフォームからお送りください。</p>
-      </div>
-      <!-- ▲▲▲ ここまで仮の文章 ▲▲▲ -->
-
-      <!-- このサイトで唯一の外部読み込み（動画を除く）。フォームの差し替えはこの src を変える -->
-      <iframe
-        class="form-embed"
-        src="https://docs.google.com/forms/d/e/1FAIpQLScvpAUYr7rHcj1Zd4HJIZuWQ4K5wM25EXhhAolZa-DhHL3HpA/viewform?embedded=true"
-        title="お仕事のご依頼フォーム"
-        loading="lazy">読み込んでいます…</iframe>
-
-      <p class="form-alt">うまく表示されないときは <a href="https://docs.google.com/forms/d/e/1FAIpQLScvpAUYr7rHcj1Zd4HJIZuWQ4K5wM25EXhhAolZa-DhHL3HpA/viewform" target="_blank" rel="noopener">フォームを別のタブで開く</a> こともできます。</p>
-
-      <!-- TODO: 公開用の連絡先メールアドレスが決まったら、雛形を有効にして載せる。
-           いまは公開リポジトリに個人アドレスを置かないために外してある。
-           問い合わせ導線は上の Google フォームがあるので、無くても成立している。
-
-      <p class="contact">
-        <a href="mailto:ここにアドレス">ここにアドレス</a>
-      </p>
-      -->
+      <ul class="menu-list">
+        <li>
+          <a href="collection-atsui-hi.html">暑い日の献立<span class="en" lang="en">For a hot day</span></a>
+          <p>火の前に長く立ちたくない日に。さっぱりした主菜と、冷たい麺の組み合わせです。</p>
+        </li>
+      </ul>
     </div>
   </section>
 </main>

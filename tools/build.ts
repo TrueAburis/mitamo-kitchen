@@ -95,6 +95,7 @@ const T = {
     { href: 'recipes.html', ja: 'レシピ', en: 'Recipes' },
     { href: 'recipes.html?sort=popular', ja: '人気のレシピ', en: 'Popular' },
     { href: 'recipes.html#tags', ja: 'タグから探す', en: 'Tags' },
+    { href: 'collections.html', ja: '献立', en: 'Menus' },
     { href: 'gacha.html', ja: 'レシピガチャ', en: 'Recipe gacha' },
     { href: 'index.html#profile', ja: 'みたもっちゃんねるとは', en: 'Profile' },
     { href: 'work.html', ja: 'お仕事のご依頼', en: 'Work with us' }
@@ -401,5 +402,29 @@ ${c.tips.map((t) => `                <li>${esc(pick(t, lg) || t.ja)}</li>`).join
   }, body);
 }
 
-export { T, page, esc, pick, LANGS, SITE_URL, recipePage };
+/* ---------- レシピのカード ----------
+   一覧やガチャは画面側（script.js）で組み立てているが、
+   献立ページは**組み立て時にHTMLへ書き出す**。
+   検索エンジンに中身を読ませたいので、JavaScript 頼みにしない。 */
+function recipeCardHtml(r: RecipeMeta & { likes: number | null }, lg: 'ja' | 'en', tagNames: Record<string, string>): string {
+  const title = r[lg].title;
+  const sub = lg === 'ja' && r.en.title !== r.ja.title
+    ? `<span class="en" lang="en">${esc(r.en.title)}</span>` : '';
+  const likes = r.likes == null ? '—' : String(r.likes);
+  const tags = r.tags.map((t) => `<span>${esc(tagNames[t] ?? t)}</span>`).join('');
+  const draft = r.ready ? '' :
+    `<span class="card-draft">${lg === 'ja' ? '手順は準備中' : 'Steps coming'}</span>`;
+
+  return `        <li class="card">
+          <a href="${esc(r.slug)}.html">
+            <figure class="card-shot"><span>${esc(r.image)}</span></figure>
+            <h3 class="card-title">${esc(title)}${sub}</h3>
+            <p class="card-lead">${esc(r[lg].lead)}</p>
+            <div class="card-meta"><span>${lg === 'ja' ? 'いいね ' : 'Likes '}${likes}</span><span>${esc(r.posted)}</span></div>
+            <div class="card-tags">${tags}</div>${draft}
+          </a>
+        </li>`;
+}
+
+export { T, page, esc, pick, LANGS, SITE_URL, recipePage, recipeCardHtml };
 

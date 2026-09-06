@@ -8,7 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as B from './build.ts';
-import { siteRecipes, writeRecipesJs } from './site-data.ts';
+import { siteRecipes, writeRecipesJs, TAGS, type SiteRecipe } from './site-data.ts';
+import { COLLECTIONS, type Collection } from '../data/collections.ts';
 
 const ROOT = path.join(import.meta.dirname, '..');
 const { esc, pick, page, LANGS } = B;
@@ -68,6 +69,13 @@ const C = {
   narrow: { ja: '絞り込む', en: 'Narrow it down' },
   draws: { ja: '引く数', en: 'Draws' },
   draw: { ja: '引く', en: 'Draw' },
+
+  collectionsTitle: { ja: '献立', en: 'Menus' },
+  collectionsIntro: {
+    ja: 'レシピを組み合わせて、その日の食卓がそのまま決まるようにしたものです。',
+    en: 'Recipes combined so that one page settles a whole meal.'
+  },
+  backToCollections: { ja: '献立の一覧へ', en: 'All menus' },
 
   workLabel: { ja: 'お仕事のご依頼', en: 'Work with us' },
   workTitle: { ja: 'ご相談はこちらから', en: 'Get in touch' },
@@ -289,6 +297,69 @@ function workPage(lang: B.Lang): string {
   }, body);
 }
 
+
+/* ---------- 献立 ---------- */
+function collectionsPage(lang: B.Lang, cols: Collection[]): string {
+  const lg = lang.code;
+  const rows = cols.map((c) => `        <li>
+          <a href="collection-${esc(c.slug)}.html">${esc(c[lg].title)}<span class="en" lang="${lg === 'ja' ? 'en' : 'ja'}">${esc(lg === 'ja' ? c.en.title : c.ja.title)}</span></a>
+          <p>${esc(c[lg].lead)}</p>
+        </li>`).join('\n');
+
+  const body = `
+  <section class="plain" id="collections">
+    <div class="wrap">
+      <h1 class="sec-h2">${esc(pick(C.collectionsTitle, lg))}</h1>
+      <p class="prose" style="margin-top:10px">${esc(pick(C.collectionsIntro, lg))}</p>
+
+      <ul class="menu-list">
+${rows}
+      </ul>
+    </div>
+  </section>
+`;
+  return page(lang, {
+    file: 'collections.html',
+    title: lg === 'ja' ? '献立｜みたもっちゃんねる' : 'Menus｜Mitamo Kitchen',
+    desc: lg === 'ja'
+      ? 'その日の食卓がそのまま決まる、レシピの組み合わせです。'
+      : 'Recipe combinations that settle a whole meal at once.'
+  }, body);
+}
+
+function collectionPage(lang: B.Lang, col: Collection, recipes: SiteRecipe[], tagNames: Record<string, string>): string {
+  const lg = lang.code;
+  const cards = recipes.map((r) => B.recipeCardHtml(r, lg, tagNames)).join('\n');
+
+  const body = `
+  <section class="plain" id="collection">
+    <div class="wrap">
+      <p class="sec-title">${esc(pick(C.collectionsTitle, lg))}</p>
+      <h1 class="sec-h2">${esc(col[lg].title)}</h1>
+
+      <div class="prose${col.draft ? ' draft' : ''}" style="margin-top:14px">
+        <p>${esc(col[lg].lead)}</p>
+      </div>
+
+      <p class="result-count"><b>${recipes.length}</b>${lg === 'ja' ? ' 品' : (recipes.length === 1 ? ' recipe' : ' recipes')}</p>
+
+      <ul class="cards">
+${cards}
+      </ul>
+
+      <p class="form-alt" style="margin-top:22px">
+        <a href="collections.html">${esc(pick(C.backToCollections, lg))}</a>
+      </p>
+    </div>
+  </section>
+`;
+  return page(lang, {
+    file: `collection-${col.slug}.html`,
+    title: `${col[lg].title}｜${lg === 'ja' ? 'みたもっちゃんねる' : 'Mitamo Kitchen'}`,
+    desc: col[lg].lead
+  }, body);
+}
+
 /* ---------- 実行 ---------- */
 async function run() {
 
@@ -307,12 +378,33 @@ async function run() {
       ['index.html', indexPage(lang)],
       ['recipes.html', recipesPage(lang)],
       ['gacha.html', gachaPage(lang)],
-      ['work.html', workPage(lang)]
+      ['work.html', workPage(lang)],
+      ['collections.html', collectionsPage(lang, COLLECTIONS)]
     ];
     statics.forEach(([file, html]) => {
       fs.writeFileSync(path.join(dir, file), html, 'utf8');
       written.push(path.join(lang.dir || '.', file));
     });
+
+
+    /* 献立ページ。中身のカードは組み立て時にHTMLへ書き出す（検索エンジンに読ませるため） */
+    for (const col of COLLECTIONS) {
+      const picked = col.recipes.map((slug) => {
+        const found = RECIPES.find((r) => r.slug === slug);
+        if (!found) {
+          throw new Error(`data/collections.ts の「${col.slug}」に、存在しないレシピ「${slug}」が入っています`);
+        }
+        return found;
+      });
+      const tagNames: Record<string, string> = {};
+      Object.keys(TAGS).forEach((k) => { tagNames[k] = TAGS[k]![lang.code]; });
+
+      fs.writeFileSync(
+        path.join(dir, `collection-${col.slug}.html`),
+        collectionPage(lang, col, picked, tagNames), 'utf8'
+      );
+      written.push(path.join(lang.dir || '.', `collection-${col.slug}.html`));
+    }
 
     for (const r of RECIPES) {
       const cPath = path.join(ROOT, 'content', r.slug + '.js');
