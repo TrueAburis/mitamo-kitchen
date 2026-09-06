@@ -7,18 +7,19 @@
 
    失敗すると終了コード 1 を返すので、あとで GitHub Actions からも同じものを回せる。 */
 
-const fs = require('fs');
-const path = require('path');
-const CaptionParser = require('./parse-caption.js');
-const IngredientDict = require('./ingredients-ja-en.js');
+import fs from 'node:fs';
+import path from 'node:path';
+import * as CaptionParser from './parse-caption.ts';
+import * as IngredientDict from './ingredients-ja-en.ts';
+import type { Group } from './parse-caption.ts';
 
-const dir = path.join(__dirname, 'fixtures');
-const read = (f) => fs.readFileSync(path.join(dir, f), 'utf8');
+const dir = path.join(import.meta.dirname, 'fixtures');
+const read = (f: string) => fs.readFileSync(path.join(dir, f), 'utf8');
 
 let failed = 0;
 let checked = 0;
 
-function check(label, actual, expected) {
+function check(label: string, actual: unknown, expected: unknown): void {
   checked++;
   const ok = JSON.stringify(actual) === JSON.stringify(expected);
   if (!ok) {
@@ -31,16 +32,16 @@ function check(label, actual, expected) {
   }
 }
 
-function itemCount(groups) {
+function itemCount(groups: Group[]): number {
   return groups.reduce((n, g) => n + g.items.length, 0);
 }
 
-function groupNames(groups) {
-  return groups.map((g) => g.name).filter(Boolean);
+function groupNames(groups: Group[]): string[] {
+  return groups.map((g) => g.name).filter((n): n is string => Boolean(n));
 }
 
-function allNames(groups) {
-  const out = [];
+function allNames(groups: Group[]): string[] {
+  const out: string[] = [];
   groups.forEach((g) => g.items.forEach((it) => out.push(it.name)));
   return out;
 }
@@ -72,7 +73,7 @@ console.log('\n素麺（注意書きの混入・英語の語順が逆）');
   check('グループ名（日）', groupNames(r.groupsJa), ['みょうがの甘酢漬け']);
 
   /* 「出汁ガラを引き上げ後」は材料ではない。材料として数えてはいけない */
-  const notes = r.groupsJa.reduce((a, g) => a.concat(g.notes), []);
+  const notes = r.groupsJa.reduce((a: string[], g) => a.concat(g.notes), [] as string[]);
   check('注意書きを材料から分けた', notes, ['出汁ガラを引き上げ後']);
 
   /* 全角スペース区切り・全角数字 */

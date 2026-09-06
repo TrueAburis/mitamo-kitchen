@@ -10,10 +10,8 @@
    別々のタグとして増殖して、タグ検索そのものが機能しなくなる。
    一覧（recipes.js の TAGS）に無い言葉は捨てる。 */
 
-(function (root, factory) {
-  if (typeof module === 'object' && module.exports) { module.exports = factory(); }
-  else { root.TagRules = factory(); }
-}(typeof self !== 'undefined' ? self : this, function () {
+
+import type { Parsed } from './parse-caption.ts';
 
   /* 香味野菜は「野菜」にしない。ネギや生姜が入っているだけの料理を
      野菜料理として出すと、野菜のタグを押した人の期待から外れる。 */
@@ -36,7 +34,7 @@
   ];
 
   /* ハッシュタグから引くタグ。表記ゆれをここで吸収する */
-  var FROM_HASHTAG = {
+  var FROM_HASHTAG: Record<string, string> = {
     '簡単レシピ': 'easy', '簡単': 'easy', 'お手軽': 'easy', '時短': 'easy', '時短レシピ': 'easy',
     '作り置き': 'makeahead', 'つくりおき': 'makeahead',
     'お弁当': 'bento', 'お弁当おかず': 'bento', 'べんとう': 'bento',
@@ -53,14 +51,16 @@
 
   /* 手順に書かれた時間から、合計の調理時間を見積もってタグにする。
      書かれていない時間は数えない（推測した加熱時間は事故になるので）。 */
-  function timeTag(steps) {
+  function timeTag(steps: string[]): string | null {
     if (!steps || !steps.length) { return null; }
     var total = 0, found = false;
     steps.forEach(function (s) {
       var m = String(s).match(/([0-9]+)\s*〜?\s*([0-9]+)?\s*分/g);
       if (!m) { return; }
       m.forEach(function (hit) {
-        var nums = hit.match(/[0-9]+/g).map(Number);
+        var digits = hit.match(/[0-9]+/g);
+        if (!digits) { return; }   /* 数字が取れない書き方だったら数えない */
+        var nums = digits.map(Number);
         total += Math.max.apply(null, nums);
         found = true;
       });
@@ -72,13 +72,13 @@
   }
 
   /* parsed は parse-caption.js の戻り値。known は recipes.js の TAGS のキー一覧 */
-  function decide(parsed, known) {
-    var found = [];
-    var add = function (t) {
+  function decide(parsed: Parsed, known: string[]): string[] {
+    var found: string[] = [];
+    var add = function (t: string | null) {
       if (t && known.indexOf(t) > -1 && found.indexOf(t) < 0) { found.push(t); }
     };
 
-    var names = [];
+    var names: string[] = [];
     (parsed.groupsJa || []).forEach(function (g) {
       g.items.forEach(function (it) { names.push(it.name); });
     });
@@ -113,5 +113,4 @@
     return found;
   }
 
-  return { decide: decide, timeTag: timeTag };
-}));
+export { decide, timeTag };

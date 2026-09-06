@@ -13,21 +13,47 @@
    だから、取れなかったものは null にして warnings に理由を残す。
    推測で埋めない。空欄のまま公開されるほうが、間違ったレシピが出るよりましなので。 */
 
-(function (root, factory) {
-  if (typeof module === 'object' && module.exports) { module.exports = factory(); }
-  else { root.CaptionParser = factory(); }
-}(typeof self !== 'undefined' ? self : this, function () {
+
+/* ---- 型 ----
+   ブラウザ用の UMD 包みは外した。tools/ は Node からしか使わないため。
+   Node 24 は TypeScript をそのまま実行できるので、ビルドは要らない。 */
+
+/** 材料1件。qty が null は「キャプションに分量が書かれていなかった」の意味。
+ *  0 や空文字と混同しないよう、null のまま扱うこと。 */
+export type Ingredient = { name: string; qty: string | null; kind: 'item' };
+
+/** 材料欄に混ざる注意書き。「出汁ガラを引き上げ後」のような行 */
+export type IngredientNote = { text: string; kind: 'note' };
+
+/** ☆で囲まれたグループ。name が null は無名の最初のかたまり */
+export type Group = { name: string | null; items: Ingredient[]; notes: string[] };
+
+export type Parsed = {
+  titleJa: string | null;
+  titleEn: string | null;
+  leadJa: string | null;
+  leadEn: string | null;
+  notesJa: string[];
+  notesEn: string[];
+  groupsJa: Group[];
+  groupsEn: Group[];
+  steps: string[];
+  hashtags: string[];
+  isPR: boolean;
+  warnings: string[];
+};
+
 
   /* 全角スペースと全角数字を、比較しやすい形にそろえる。
      表示用の文字列は元のまま使うので、ここでは判定用にだけ使う。 */
-  function normalize(s) {
+  function normalize(s: string): string {
     return s
       .replace(/\r\n?/g, '\n')
       .replace(/ /g, ' ')
       .replace(/　/g, ' ');
   }
 
-  function toHalfDigits(s) {
+  function toHalfDigits(s: string): string {
     return s.replace(/[０-９]/g, function (c) {
       return String.fromCharCode(c.charCodeAt(0) - 0xfee0);
     });
@@ -43,7 +69,7 @@
      先頭の数字＋単位をまとめて分量として切り出す。 */
   var EN_UNITS = '(?:g|kg|ml|l|cm|tablespoons?|teaspoons?|tbsp|tsp|pinch(?:es)?|cloves?|sheets?|pieces?|cups?)';
 
-  function parseIngredientLine(raw) {
+  function parseIngredientLine(raw: string): Ingredient | IngredientNote | null {
     var line = normalize(raw).trim();
     if (!line) { return null; }
 
@@ -81,8 +107,8 @@
   }
 
   /* 材料のかたまりを、☆グループ☆ ごとに分ける */
-  function parseIngredientBlock(lines) {
-    var groups = [{ name: null, items: [], notes: [] }];
+  function parseIngredientBlock(lines: string[]): Group[] {
+    var groups: Group[] = [{ name: null, items: [], notes: [] }];
     lines.forEach(function (raw) {
       var line = normalize(raw).trim();
       if (!line) { return; }
@@ -101,14 +127,14 @@
     return groups.filter(function (g) { return g.items.length || g.notes.length; });
   }
 
-  function parse(caption) {
+  function parse(caption: string): Parsed {
     var text = normalize(caption || '');
     var lines = text.split('\n');
     var warnings = [];
 
     /* ハッシュタグは末尾にまとまっている。行ごと取り除く */
-    var hashtags = [];
-    var body = [];
+    var hashtags: string[] = [];
+    var body: string[] = [];
     lines.forEach(function (line) {
       var t = line.trim();
       if (t && /^#/.test(t) && !/\s(?!#)/.test(t.replace(/#\S+/g, '').trim())) {
@@ -118,7 +144,7 @@
       }
     });
 
-    function findIndex(re) {
+    function findIndex(re: RegExp): number {
       for (var i = 0; i < body.length; i++) { if (re.test(body[i].trim())) { return i; } }
       return -1;
     }
@@ -140,14 +166,14 @@
     var titleJa = iTitleJa >= 0 ? body[iTitleJa].trim().replace(/^【|】$/g, '') : null;
     var titleEn = iTitleEn >= 0 ? body[iTitleEn].trim().replace(/^\[|\]$/g, '') : null;
 
-    function slice(from, to) {
+    function slice(from: number, to: number): string[] {
       if (from < 0) { return []; }
       return body.slice(from, to < 0 ? body.length : to);
     }
 
     /* リード文。空行で区切られた段落のうち、最初のひとかたまりだけを使う。
        全部入れると長すぎてカードに載らないため。 */
-    function firstParagraph(arr) {
+    function firstParagraph(arr: string[]): string | null {
       var out = [];
       for (var j = 0; j < arr.length; j++) {
         var t = arr[j].trim();
@@ -159,8 +185,8 @@
 
     /* 2段落目以降。実際の投稿では、ここに「茄子は箸がスッと刺されば引き上げ時」
        のようなコツが書かれている。1段落目（リード文）と分けて拾う。 */
-    function restParagraphs(arr) {
-      var paras = [], cur = [];
+    function restParagraphs(arr: string[]): string[] {
+      var paras: string[] = [], cur: string[] = [];
       arr.forEach(function (line) {
         var t = line.trim();
         if (!t) { if (cur.length) { paras.push(cur.join(' ')); cur = []; } }
@@ -180,7 +206,7 @@
     var groupsJa = iRecipeJa >= 0 ? parseIngredientBlock(slice(iRecipeJa + 1, ingJaEnd)) : [];
     var groupsEn = iRecipeEn >= 0 ? parseIngredientBlock(slice(iRecipeEn + 1, -1)) : [];
 
-    var noQty = [];
+    var noQty: string[] = [];
     groupsJa.forEach(function (g) {
       g.items.forEach(function (it) { if (!it.qty) { noQty.push(it.name); } });
     });
@@ -195,7 +221,7 @@
     /* 手順は、確認した投稿3本すべてに書かれていなかった。
        将来キャプションに【作り方】が入るようになったら、ここで拾う。 */
     var iSteps = findIndex(/^【\s*(作り方|手順)\s*】$/);
-    var steps = [];
+    var steps: string[] = [];
     if (iSteps >= 0) {
       slice(iSteps + 1, iRecipeJa > iSteps ? iRecipeJa : -1).forEach(function (line) {
         var t = normalize(line).trim();
@@ -223,5 +249,4 @@
     };
   }
 
-  return { parse: parse, parseIngredientLine: parseIngredientLine, normalize: normalize };
-}));
+export { parse, parseIngredientLine, normalize };

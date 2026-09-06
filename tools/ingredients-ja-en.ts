@@ -14,13 +14,9 @@
 
    出典：tools/fixtures/ の実際のキャプション3本から抜き出したものが中心。 */
 
-(function (root, factory) {
-  if (typeof module === 'object' && module.exports) { module.exports = factory(); }
-  else { root.IngredientDict = factory(); }
-}(typeof self !== 'undefined' ? self : this, function () {
 
   /* 材料名。キャプションに出てきた表記をそのままキーにする */
-  var NAMES = {
+  var NAMES: Record<string, string> = {
     /* 肉・魚介 */
     '鶏むね肉': 'Chicken breast',
     '鶏もも肉': 'Chicken thigh',
@@ -87,7 +83,7 @@
   /* 単位。数字はそのまま残し、単位語だけ置き換える。
      英語では「2 tbsp」のように分量が先に来るのが自然なので、
      置き換えたあとに語順を入れ替える。 */
-  var UNITS = [
+  var UNITS: [RegExp, string][] = [
     [/^大さじ\s*([0-9０-９/／.]+)$/, '$1 tbsp'],
     [/^小さじ\s*([0-9０-９/／.]+)$/, '$1 tsp'],
     [/^([0-9０-９/／.]+)\s*合$/, '$1 cups (rice)'],
@@ -103,7 +99,7 @@
     [/^お好みで$/, 'to taste']
   ];
 
-  function toHalfDigits(s) {
+  function toHalfDigits(s: string | null): string {
     return String(s).replace(/[０-９]/g, function (c) {
       return String.fromCharCode(c.charCodeAt(0) - 0xfee0);
     }).replace(/／/g, '/');
@@ -111,7 +107,7 @@
 
   /* 材料名を英語にする。辞書に無ければ null を返す。
      null は「訳せなかった」という意味で、呼ぶ側が日本語のまま残す。 */
-  function name(ja) {
+  function name(ja: string): string | null {
     var key = String(ja).trim();
     if (Object.prototype.hasOwnProperty.call(NAMES, key)) { return NAMES[key]; }
 
@@ -125,7 +121,7 @@
   }
 
   /* 分量を英語にする。g / ml / cm はそのまま通す */
-  function qty(ja) {
+  function qty(ja: string | null): string | null {
     if (ja == null) { return null; }
     var s = toHalfDigits(ja).trim();
     if (!s) { return null; }
@@ -137,11 +133,10 @@
   }
 
   /* 辞書がどれだけ埋まっているかを見るために使う */
-  function coverage(list) {
+  function coverage(list: string[]) {
     var known = 0;
     list.forEach(function (n) { if (name(n)) { known++; } });
     return { total: list.length, known: known, missing: list.filter(function (n) { return !name(n); }) };
   }
 
-  return { name: name, qty: qty, coverage: coverage, NAMES: NAMES };
-}));
+export { name, qty, coverage, NAMES };

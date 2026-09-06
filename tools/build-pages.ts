@@ -4,11 +4,29 @@
    本文はここに置いてある。HTMLに直接書かないのは、
    同じ内容から2言語ぶんを出すため。 */
 
-const fs = require('fs');
-const path = require('path');
-const B = require('./build.js');
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import * as B from './build.ts';
 
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(import.meta.dirname, '..');
+
+/* recipes.js はブラウザ用のファイル（window.RECIPES に代入している）。
+   Node から読むために、window の代わりを渡して評価する。
+   ブラウザとNodeで同じ1ファイルを使い続けるための割り切り。 */
+type SiteData = {
+  RECIPES: any[];
+  TAGS: Record<string, { ja: string; en: string; axis: string }>;
+  TAG_AXES: Record<string, { ja: string; en: string }>;
+  TAG_MIN: number;
+};
+
+function loadSiteData(root: string): SiteData {
+  const src = fs.readFileSync(path.join(root, 'recipes.js'), 'utf8');
+  const win = {} as SiteData;
+  new Function('window', src)(win);
+  return win;
+}
 const { esc, pick, page, LANGS } = B;
 
 /* ---------- 本文 ---------- */
@@ -91,7 +109,7 @@ const SNS = [
 ];
 
 /* ---------- 各ページ ---------- */
-function indexPage(lang) {
+function indexPage(lang: B.Lang): string {
   const lg = lang.code;
   const sns = SNS.map((s) => `        <a class="sns-btn" href="${s.url}" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${s.svg}</svg>
@@ -166,7 +184,7 @@ ${facts}
   }, body);
 }
 
-function recipesPage(lang) {
+function recipesPage(lang: B.Lang): string {
   const lg = lang.code;
   const body = `
   <section class="plain" id="recipes">
@@ -202,7 +220,7 @@ function recipesPage(lang) {
   }, body);
 }
 
-function gachaPage(lang) {
+function gachaPage(lang: B.Lang): string {
   const lg = lang.code;
   const body = `
   <section class="plain" id="gacha">
@@ -244,7 +262,7 @@ function gachaPage(lang) {
   }, body);
 }
 
-function workPage(lang) {
+function workPage(lang: B.Lang): string {
   const lg = lang.code;
   const body = `
   <section class="plain" id="work">
@@ -288,16 +306,16 @@ function workPage(lang) {
 }
 
 /* ---------- 実行 ---------- */
-function run() {
-  global.window = global.window || {};
-  delete require.cache[require.resolve(path.join(ROOT, 'recipes.js'))];
-  require(path.join(ROOT, 'recipes.js'));
-  const RECIPES = global.window.RECIPES;
+async function run() {
+
+
+  const site = loadSiteData(ROOT);
+  const RECIPES = site.RECIPES;
 
   const written = [];
   fs.mkdirSync(path.join(ROOT, 'en'), { recursive: true });
 
-  LANGS.forEach((lang) => {
+  for (const lang of LANGS) {
     const dir = lang.dir ? path.join(ROOT, lang.dir) : ROOT;
 
     const statics = [
@@ -311,30 +329,30 @@ function run() {
       written.push(path.join(lang.dir || '.', file));
     });
 
-    RECIPES.forEach((r) => {
+    for (const r of RECIPES) {
       const cPath = path.join(ROOT, 'content', r.slug + '.js');
       if (!fs.existsSync(cPath)) {
         console.log(`  ! content/${r.slug}.js が無いので飛ばしました`);
-        return;
+        continue;
       }
-      delete require.cache[require.resolve(cPath)];
-      const c = require(cPath);
+      /* 毎回読み直す。同じ実行の中で content を書き換えても反映されるように */
+      const c = (await import(pathToFileURL(cPath).href + '?t=' + Date.now())).default;
 
       /* 英語の本文が無いレシピは、英語ページを作らない。
          中身が日本語のままのページを「英語です」と出すと評価を下げるため。 */
       const hasEn = !!(r.en && r.en.title && c.intro.length && c.intro[0].en);
       if (lang.code === 'en' && !hasEn) {
         console.log(`  - ${r.slug}: 英語の本文が無いので英語ページは作りません`);
-        return;
+        continue;
       }
       fs.writeFileSync(path.join(dir, r.slug + '.html'), B.recipePage(lang, c, r), 'utf8');
       written.push(path.join(lang.dir || '.', r.slug + '.html'));
-    });
-  });
+    }
+  }
 
   console.log(`\n${written.length} ページを書き出しました:`);
   written.forEach((w) => console.log('  ' + w.replace(/\\/g, '/')));
 }
 
-module.exports = { run };
-if (require.main === module) { run(); }
+export { run };
+if (import.meta.main) { run(); }

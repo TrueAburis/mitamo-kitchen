@@ -3,7 +3,7 @@
    英語が null の項目は、キャプションに英語が無く、辞書でも引けなかったところ。
    訳を当てずに null のままにしてある。埋めるときは実際の英語を入れること。 */
 
-module.exports = {
+export default {
   slug: "hiyashi-tori-katsuo-somen",
 
   /* TODO: 何人前と時間がキャプションに無かった。分かり次第埋める */

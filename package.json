@@ -1,8 +1,15 @@
 {
   "name": "mitamo-kitchen-tools",
   "private": true,
-  "description": "サイトの開発用の道具だけ。サイト本体はビルド不要の素のHTMLで、ここには依存しない。",
+  "type": "module",
+  "description": "サイトの開発用の道具。サイト本体はビルド不要の静的HTMLで、ここには依存しない。",
   "scripts": {
-    "test": "node tools/test.js"
+    "build": "node tools/build-pages.ts",
+    "test": "node tools/test.ts",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^24.7.2"
   }
 }

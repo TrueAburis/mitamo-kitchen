@@ -1,6 +1,7 @@
 /* キャプションから、レシピ本文のデータ（content/<slug>.js）を書き出す。
 
-   実行： node tools/generate.js tools/fixtures/somen.txt <slug>
+
+   実行： node tools/generate.ts tools/fixtures/somen.txt <slug>
 
    ページのHTMLはここでは作らない。content/ に置いたデータを
    tools/build.js が読んで、日本語版と英語版の2枚に組み立てる。
@@ -8,25 +9,41 @@
    データとHTMLを分けているのは、同じ内容から2言語ぶんを出すため。
    HTMLを直接書くと、片方だけ直したときに必ずズレる。 */
 
-const fs = require('fs');
-const path = require('path');
-const CaptionParser = require('./parse-caption.js');
-const Dict = require('./ingredients-ja-en.js');
-const TagRules = require('./tag-rules.js');
+import fs from 'node:fs';
+import path from 'node:path';
+import * as CaptionParser from './parse-caption.ts';
+import * as Dict from './ingredients-ja-en.ts';
+import * as TagRules from './tag-rules.ts';
+import type { Parsed, Ingredient, Group } from './parse-caption.ts';
 
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(import.meta.dirname, '..');
 
-function knownTags() {
-  global.window = global.window || {};
-  require(path.join(ROOT, 'recipes.js'));
-  return Object.keys(global.window.TAGS);
+/* recipes.js はブラウザ用のファイル（window.RECIPES に代入している）。
+   Node から読むために、window の代わりを渡して評価する。
+   ブラウザとNodeで同じ1ファイルを使い続けるための割り切り。 */
+type SiteData = {
+  RECIPES: any[];
+  TAGS: Record<string, { ja: string; en: string; axis: string }>;
+  TAG_AXES: Record<string, { ja: string; en: string }>;
+  TAG_MIN: number;
+};
+
+function loadSiteData(root: string): SiteData {
+  const src = fs.readFileSync(path.join(root, 'recipes.js'), 'utf8');
+  const win = {} as SiteData;
+  new Function('window', src)(win);
+  return win;
 }
 
-const q = (v) => JSON.stringify(v);
+function knownTags(): string[] {
+  return Object.keys(loadSiteData(ROOT).TAGS);
+}
+
+const q = (v: unknown) => JSON.stringify(v);
 
 /* 材料1件をデータにする。英語が無ければ辞書で補い、
    辞書にも無ければ null（訳さず日本語のまま出す） */
-function item(ja, en) {
+function item(ja: Ingredient, en: Ingredient | undefined) {
   return {
     ja: ja.name,
     en: en ? en.name : Dict.name(ja.name),
@@ -35,7 +52,7 @@ function item(ja, en) {
   };
 }
 
-function buildContent(parsed, slug) {
+function buildContent(parsed: Parsed, slug: string): string {
   const groups = parsed.groupsJa.map((g, gi) => {
     const gEn = parsed.groupsEn[gi];
     return {
@@ -58,7 +75,7 @@ function buildContent(parsed, slug) {
   lines.push('   英語が null の項目は、キャプションに英語が無く、辞書でも引けなかったところ。');
   lines.push('   訳を当てずに null のままにしてある。埋めるときは実際の英語を入れること。 */');
   lines.push('');
-  lines.push('module.exports = {');
+  lines.push('export default {');
   lines.push('  slug: ' + q(slug) + ',');
   lines.push('');
   lines.push('  /* TODO: 何人前と時間がキャプションに無かった。分かり次第埋める */');

@@ -1,0 +1,15 @@
+{
+  "//": "型を書くだけでは意味がない。Node は型を消すだけで検査しないので、npm run check で別途チェックする。",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": false,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["tools/**/*.ts"]
+}

@@ -28,7 +28,9 @@ try {
   while ($listener.IsListening) {
     $ctx = $listener.GetContext()
     $rel = [Uri]::UnescapeDataString($ctx.Request.Url.LocalPath).TrimStart('/')
-    if ($rel -eq '') { $rel = 'index.html' }
+    # ディレクトリを指されたら index.html を返す。/en/ で開けるようにするため。
+    # 本番（CloudFront）でも同じ対応が要るので、ここで合わせておく。
+    if ($rel -eq '' -or $rel.EndsWith('/')) { $rel = $rel + 'index.html' }
     $path = Join-Path $root $rel
     $full = [IO.Path]::GetFullPath($path)
 

@@ -13,10 +13,56 @@
    英語の本文が無いレシピは、英語ページを作らない。
    中身が日本語のままのページを「英語です」と出すと、評価を下げるだけなので。 */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
 
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(import.meta.dirname, '..');
+
+/* ---- 型 ----
+   ここが全ページの組み立ての土台になるので、形をはっきりさせておく。
+   null は「まだ無い」の意味で、空文字とは区別する。 */
+
+/** 出力する言語。asset はCSSなどへの相対パス、other は別言語版への相対パス */
+export type Lang = { code: 'ja' | 'en'; dir: string; asset: string; other: string; otherCode: string };
+
+/** 日本語と英語の対。en が null は「英語がまだ無い」 */
+export type Bi = { ja: string | null; en: string | null };
+
+export type PageOpts = { file: string; title: string; desc: string; extraHead?: string; hasAlt?: boolean };
+
+export type ContentItem = { ja: string; en: string | null; qja: string | null; qen: string | null };
+export type ContentGroup = { name: Bi | null; items: ContentItem[]; note?: Bi | null };
+export type ContentStep = {
+  ja: string; en: string | null;
+  usesJa: string | null; usesEn: string | null;
+  wait?: { ja: string; en: string; long: boolean };
+};
+
+/** content/<slug>.js の中身 */
+export type RecipeContent = {
+  slug: string;
+  meta: { servings: Bi; time: Bi };
+  intro: Bi[];
+  groups: ContentGroup[];
+  steps: ContentStep[];
+  tips: Bi[];
+  jsonld: { cookTime: string | null; totalTime: string | null; yield: string | null; category?: string; cuisine?: string } | null;
+};
+
+/** recipes.js の1件 */
+export type RecipeMeta = {
+  slug: string;
+  ja: { title: string; lead: string };
+  en: { title: string; lead: string };
+  tags: string[];
+  image: string;
+  posted: string;
+  instagram: string | null;
+  likes: number | null;
+  comments: number | null;
+  views: number | null;
+  ready: boolean;
+};
 
 /* TODO: 独自ドメインが決まったらここを直す。
    hreflang と og:url は絶対URLでないと効かないので、ここだけが出どころ。 */
@@ -29,15 +75,15 @@ const SITE_URL = 'https://mitamo-kitchen.example';
    robots.txt では止めない。止めると、この noindex を読みに来てもらえなくなる。 */
 const INDEXABLE = false;
 
-const LANGS = [
+const LANGS: Lang[] = [
   { code: 'ja', dir: '', asset: '', other: 'en/', otherCode: 'en' },
   { code: 'en', dir: 'en', asset: '../', other: '../', otherCode: 'ja' }
 ];
 
-const esc = (s) => String(s == null ? '' : s)
+const esc = (s: unknown) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-const pick = (o, lang) => (o && o[lang] != null ? o[lang] : (o && o.ja) || '');
+const pick = (o: Partial<Bi> | null | undefined, lang: string): string => (o && (o as Record<string, string | null>)[lang] != null ? (o as Record<string, string | null>)[lang]! : (o && o.ja) || "");
 
 /* ---------- 画面に出る文言 ---------- */
 const T = {
@@ -80,7 +126,7 @@ const T = {
 };
 
 /* ---------- ページの外枠 ---------- */
-function head(lang, o) {
+function head(lang: Lang, o: PageOpts): string {
   const L = lang;
   const other = LANGS.find((x) => x.code !== L.code);
   const alt = o.hasAlt !== false;
@@ -126,7 +172,7 @@ ${o.extraHead || ''}</head>
 `;
 }
 
-function header(lang, o) {
+function header(lang: Lang, o: PageOpts): string {
   const L = lang;
   const otherHref = L.other + o.file;
   const navHtml = T.nav.map((n) => {
@@ -167,7 +213,7 @@ ${navHtml}
 `;
 }
 
-function footer(lang) {
+function footer(lang: Lang): string {
   const L = lang;
   const links = T.footNav.map((n) =>
     `      <a href="${n.href}">${esc(pick(n, L.code))}</a>`).join('\n');
@@ -192,10 +238,10 @@ ${links}
 `;
 }
 
-const page = (lang, o, body) => head(lang, o) + header(lang, o) + body + footer(lang);
+const page = (lang: Lang, o: PageOpts, body: string): string => head(lang, o) + header(lang, o) + body + footer(lang);
 
 /* ---------- レシピページ ---------- */
-function ingredientsHtml(c, lg) {
+function ingredientsHtml(c: RecipeContent, lg: 'ja' | 'en'): string {
   let out = '';
   c.groups.forEach((g) => {
     if (g.name) {
@@ -223,7 +269,7 @@ function ingredientsHtml(c, lg) {
   return out;
 }
 
-function stepsHtml(c, lg) {
+function stepsHtml(c: RecipeContent, lg: 'ja' | 'en'): string {
   if (!c.steps.length) {
     return `            <div class="prose draft">\n              <p>${esc(pick(T.stepsComing, lg))}</p>\n            </div>\n`;
   }
@@ -241,9 +287,9 @@ function stepsHtml(c, lg) {
   return out + '            </ol>\n';
 }
 
-function jsonLd(c, r, lg) {
+function jsonLd(c: RecipeContent, r: RecipeMeta, lg: 'ja' | 'en'): string {
   if (!c.steps.length || !c.jsonld || !c.jsonld.cookTime) { return ''; }
-  const data = {
+  const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Recipe',
     name: r[lg].title,
@@ -253,7 +299,7 @@ function jsonLd(c, r, lg) {
     recipeYield: c.jsonld.yield,
     cookTime: c.jsonld.cookTime,
     totalTime: c.jsonld.totalTime,
-    recipeIngredient: [].concat.apply([], c.groups.map((g) => g.items.map((it) => {
+    recipeIngredient: ([] as string[]).concat.apply([] as string[], c.groups.map((g) => g.items.map((it) => {
       const n = lg === 'en' ? (it.en || it.ja) : it.ja;
       const q = lg === 'en' ? (it.qen || it.qja) : it.qja;
       return q ? `${n} ${q}` : n;
@@ -267,7 +313,7 @@ function jsonLd(c, r, lg) {
          '<script type="application/ld+json">\n' + JSON.stringify(data, null, 2) + '\n</script>\n';
 }
 
-function recipePage(lang, c, r) {
+function recipePage(lang: Lang, c: RecipeContent, r: RecipeMeta): string {
   const lg = lang.code;
   const title = r[lg].title;
   const count = c.groups.reduce((n, g) => n + g.items.length, 0);
@@ -355,9 +401,5 @@ ${c.tips.map((t) => `                <li>${esc(pick(t, lg) || t.ja)}</li>`).join
   }, body);
 }
 
-module.exports = { T, page, esc, pick, LANGS, SITE_URL, recipePage };
+export { T, page, esc, pick, LANGS, SITE_URL, recipePage };
 
-/* 直接実行されたときだけ組み立てる */
-if (require.main === module) {
-  require('./build-pages.js').run();
-}

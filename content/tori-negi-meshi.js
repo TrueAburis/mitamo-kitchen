@@ -3,7 +3,7 @@
    HTMLに直接書かずデータにしているのは、日本語版と英語版の2枚を
    同じ内容から出すため。片方だけ直してズレるのを防ぐ。 */
 
-module.exports = {
+export default {
   slug: 'tori-negi-meshi',
 
   meta: {
