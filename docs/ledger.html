@@ -1,0 +1,320 @@
+<title>みたもキッチン 制作台帳</title>
+<style>
+  :root{
+    --ground:#FCFBF8;
+    --raise:#F5F2EA;
+    --ink:#1E2320;
+    --ink-soft:#5C6360;
+    --rule:#DCD8CF;
+    --kombu:#24443A;
+    --kombu-ink:#FCFBF8;
+    --mark:#B4472E;
+    --done:#2F6B4F;
+    --sans:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic UI","Noto Sans JP",Meiryo,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Noto Sans Mono",monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#151917;
+      --raise:#1D2320;
+      --ink:#ECE8DF;
+      --ink-soft:#9BA39D;
+      --rule:#2F3934;
+      --kombu:#3E6B5A;
+      --kombu-ink:#F2F5F1;
+      --mark:#E08268;
+      --done:#6FBF93;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#151917;
+    --raise:#1D2320;
+    --ink:#ECE8DF;
+    --ink-soft:#9BA39D;
+    --rule:#2F3934;
+    --kombu:#3E6B5A;
+    --kombu-ink:#F2F5F1;
+    --mark:#E08268;
+    --done:#6FBF93;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  body{
+    margin:0;background:var(--ground);color:var(--ink);
+    font-family:var(--sans);font-size:16px;line-height:1.8;
+    font-feature-settings:"palt";-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:0 clamp(18px,5vw,40px) 90px}
+
+  /* ---- 冒頭 ---- */
+  .top{padding:clamp(34px,6vw,60px) 0 26px;border-bottom:1px solid var(--rule)}
+  h1{margin:0;font-size:clamp(27px,5vw,40px);font-weight:700;line-height:1.3;letter-spacing:.01em;text-wrap:balance}
+  .sub{margin:12px 0 0;max-width:40em;color:var(--ink-soft);font-size:15px}
+  .asof{margin:16px 0 0;font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+
+  .tally{display:flex;flex-wrap:wrap;gap:0;margin:24px 0 0;border:1px solid var(--rule)}
+  .tally div{flex:1 1 33%;min-width:130px;padding:13px 16px}
+  .tally div+div{border-left:1px solid var(--rule)}
+  .tally b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:26px;font-weight:400;line-height:1.2}
+  .tally span{font-size:12.5px;color:var(--ink-soft)}
+  @media (max-width:560px){
+    .tally div+div{border-left:0;border-top:1px solid var(--rule)}
+    .tally div{flex-basis:100%}
+  }
+
+  /* ---- 節 ---- */
+  section{padding-top:44px}
+  h2{margin:0 0 4px;font-size:20px;font-weight:700;line-height:1.4}
+  h2 .n{font-family:var(--mono);font-size:13px;font-weight:400;color:var(--kombu);margin-right:10px}
+  .note{margin:0 0 16px;max-width:40em;color:var(--ink-soft);font-size:14px}
+  h3{margin:26px 0 8px;font-size:15px;font-weight:700}
+
+  /* ---- 項目の並び ---- */
+  .rows{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--rule)}
+  .rows li{display:grid;grid-template-columns:5.4em 1fr;gap:0 14px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+  .rows p{margin:3px 0 0;color:var(--ink-soft);font-size:13.5px;line-height:1.7}
+  .rows strong{font-weight:500}
+  @media (max-width:560px){
+    .rows li{grid-template-columns:1fr;gap:5px}
+  }
+
+  .chip{
+    display:inline-block;font-family:var(--mono);font-size:11px;line-height:1.6;
+    padding:2px 8px;border:1px solid currentColor;white-space:nowrap;
+  }
+  .c-done{color:var(--done)}
+  .c-todo{color:var(--ink-soft)}
+  .c-wait{color:var(--mark)}
+
+  /* ---- 聞くこと ---- */
+  .ask{background:var(--kombu);color:var(--kombu-ink);padding:clamp(20px,4vw,30px);margin-top:18px}
+  .ask h3{margin:22px 0 8px;color:var(--kombu-ink);font-size:15px}
+  .ask h3:first-child{margin-top:0}
+  .ask ol{margin:0;padding-left:1.35em}
+  .ask li{margin:0 0 9px}
+  .ask li b{font-weight:700}
+  .ask li span{display:block;font-size:13.5px;opacity:.78;line-height:1.7}
+  .ask .why{margin:20px 0 0;padding-top:16px;border-top:1px solid rgba(252,251,248,.22);font-size:13.5px;opacity:.85}
+
+  /* ---- 表 ---- */
+  .tablewrap{overflow-x:auto;margin:14px 0 0}
+  table{border-collapse:collapse;width:100%;min-width:420px;font-size:14px}
+  th,td{border-bottom:1px solid var(--rule);padding:9px 12px 9px 0;text-align:left;vertical-align:top}
+  th{font-weight:500;color:var(--ink-soft);font-size:13px;border-bottom-color:var(--ink)}
+  td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  .callout{border-left:3px solid var(--mark);padding:2px 0 2px 15px;margin:18px 0 0;color:var(--ink-soft);font-size:14px}
+  .callout b{color:var(--ink)}
+
+  code{font-family:var(--mono);font-size:.9em;background:var(--raise);padding:1px 5px}
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--mark);outline-offset:3px}
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <h1>みたもキッチン 制作台帳</h1>
+    <p class="sub">ここまでに決めたこと、作ったもの、残っていること、そしてみたもさんに聞かないと進まないこと。全部の一覧です。</p>
+    <p class="asof">最終更新 2026-09-06 ／ TrueAburis/mitamo-kitchen</p>
+
+    <div class="tally">
+      <div><b>18</b><span>実装済みの機能</span></div>
+      <div><b>13</b><span>未実装（着手可）</span></div>
+      <div><b>16</b><span>確認・依頼待ち</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2><span class="n">A</span>このサイトの目的</h2>
+    <p class="note">迷ったときの判断基準。ここに貢献しないものは足さない、と決めています。</p>
+    <ul class="rows">
+      <li><span class="chip c-done">確定</span><div><strong>一番の仕事</strong><p>レシピを最後まで読ませて、実際に作ってもらうこと。次に、お仕事の依頼フォームへ進んでもらうこと。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>他と違う一点</strong><p>「読むレシピ」ではなく「作りながら見るレシピ」。手順を読んでいる間、分量が画面から消えない。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>見に来る人</strong><p>動画を見て作り方を文字で読みたい日本の視聴者と、海外から日本の家庭料理を作ってみたい人。</p></div></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">B</span>確定している制作ルール</h2>
+    <p class="note">やり取りの中で決まったもの。変えるときは先に相談する、という扱いです。</p>
+    <ul class="rows">
+      <li><span class="chip c-done">確定</span><div><strong>素のHTML・CSS・JavaScript だけ</strong><p>ビルドツール、外部ライブラリ、Webフォントを使わない。ネットが無くても表示できる状態を保つ。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>外部読み込みは2つだけ</strong><p>お仕事のご依頼の Google フォームと、レシピページの Instagram 動画。これ以上増やさない。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>日本語と英語を対で用意する</strong><p>材料名だけは切り替えても両方を表示したまま。海外の人が店頭でパッケージと照合できるようにするため。常時表示の英語には <code>lang="en"</code> を付ける。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>色は CSS変数だけ</strong><p>白に近い紙色を背景に、昆布の深緑を面で、朱を印として少量。写真が入った時点で深緑と朱を写真から決め直す。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>動きは1ページ1か所</strong><p>現在はレシピガチャで結果が1枚ずつ出る部分のみ。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>見慣れた型を使わない</strong><p>クリーム色＋明朝＋テラコッタ、同じ角丸と影のカードの反復、意味のない連番、末尾の矢印など9項目を禁止として明文化。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>推測で埋めない</strong><p>情報が無い箇所は <code>TODO</code> と書く。数値が未取得のときは <code>null</code>（「0件」という別の意味になるので <code>0</code> と書かない）。</p></div></li>
+      <li><span class="chip c-done">確定</span><div><strong>PR（タイアップ）投稿は自動投稿の対象外</strong><p>契約範囲が案件ごとに違うため。載せる回だけ手で追加し、PRである旨を明記する。</p></div></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">C</span>実装済みの機能</h2>
+    <p class="note">すでに動いていて、GitHub にも上がっているものです。</p>
+
+    <h3>ページ構成</h3>
+    <ul class="rows">
+      <li><span class="chip c-done">済</span><div><strong>6ページ</strong><p>トップ／レシピ一覧／レシピガチャ／レシピ詳細×2／お仕事のご依頼。CSS と JavaScript は全ページ共通。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>2段のヘッダー</strong><p>上段にロゴ・検索・言語切替、下段にメニュー帯。6項目すべてを畳まず表示。スマホでは折り返して全項目が見える。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>日英切替</strong><p>右上のボタン。選択を記憶し、初回はブラウザの言語で開く（日本語以外なら英語）。</p></div></li>
+    </ul>
+
+    <h3>レシピを読む部分</h3>
+    <ul class="rows">
+      <li><span class="chip c-done">済</span><div><strong>分量バー</strong><p>このサイトの核。読んでいる手順で使う分量だけを表示し、スクロールに合わせて切り替わる。スマホは画面上端に固定、880px以上では左列に固定して全量を常時表示。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>手順の時間目盛り</strong><p>左に1本の縦線を通し、待ち時間をその区間の長さと色で表す。角丸カードには切り分けない。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>材料の日英併記</strong><p>言語を切り替えても材料名は両方表示。分量の単位だけ切り替わる。</p></div></li>
+    </ul>
+
+    <h3>探す部分</h3>
+    <ul class="rows">
+      <li><span class="chip c-done">済</span><div><strong>レシピ検索</strong><p>ヘッダーの検索欄から、料理名・説明文・タグを日英どちらでも絞り込み。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>タグ絞り込み</strong><p>タグを畳まず全部ボタンで表示。押すと絞り込み、もう一度押すと解除。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>並び替え</strong><p>新しい順／いいねが多い順。数値が未取得のものは後ろへ回す。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>人気のレシピ</strong><p>トップに上位3件。数値の出典と、未取得は「—」である旨を明記。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>レシピガチャ</strong><p>1／3／5／10連。タグで絞ってから引ける。重複なしで引き、対象が足りないときはその理由を表示する。</p></div></li>
+    </ul>
+
+    <h3>裏側の仕組み</h3>
+    <ul class="rows">
+      <li><span class="chip c-done">済</span><div><strong>レシピのデータファイル</strong><p><code>recipes.js</code>。一覧・検索・タグ・人気順・ガチャはすべてここから作られる。自動更新の受け皿でもある。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>キャプション解析</strong><p>タイトル・リード文・材料・グループ・ハッシュタグ・PR判定を取り出す。実際の投稿3本で検証済み。全角スペース、分量なし、語順違い、材料欄に混ざった注意書きにも対応。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>Instagram 動画とタグの枠</strong><p>データに投稿URLがあれば、レシピページに動画が自動で入る。いいね数・コメント数・再生数の表示枠も設置済み。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>お仕事のご依頼フォーム</strong><p>Google フォームを埋め込み。内側にスクロールが出ない高さを実測して設定済み。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>仮の文章の目印</strong><p>本番の文章が来ていない箇所は、画面に「仮の文章」と赤い縦線が出る。差し替えたらクラスを外すだけ。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>確認用サーバーと作業手順</strong><p><code>serve.ps1</code> で表示確認（Python も Node も不要）。レシピ追加の手順は <code>/add-recipe</code> スキルに登録済み。</p></div></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">D</span>これからやること</h2>
+    <p class="note">段階ごとに並べています。第0段階は費用ゼロ・トークン不要で、決めごとさえ済めば今日から着手できます。</p>
+
+    <h3>第0段階：いま着手できる（費用0円）</h3>
+    <ul class="rows">
+      <li><span class="chip c-todo">未</span><div><strong>JSON-LD（レシピ構造化データ）</strong><p>最優先。Google のレシピ検索に調理時間や写真つきで出る。Instagram では手に入らない流入経路で、レシピが増えるほど効く。</p></div></li>
+      <li><span class="chip c-todo">未</span><div><strong>OGP</strong><p>SNSで共有されたときにサムネイルとタイトルが出る。</p></div></li>
+      <li><span class="chip c-todo">未</span><div><strong>hreflang</strong><p>日本語版と英語版の対応を検索エンジンに伝える。</p></div></li>
+      <li><span class="chip c-todo">未</span><div><strong>関連レシピ</strong><p>同じタグの別のレシピをページ下部に出す。滞在時間が伸びる。</p></div></li>
+      <li><span class="chip c-todo">未</span><div><strong>タグ語彙の拡張</strong><p>食材・形式・場面・時間の4軸へ。該当が3件未満のタグは画面に出さない運用ルールも入れる。</p></div></li>
+      <li><span class="chip c-todo">未</span><div><strong>材料の日英対訳辞書</strong><p>過去のキャプションから作る。英語が無い回でも材料表だけは自動で英語化できる。</p></div></li>
+      <li><span class="chip c-todo">未</span><div><strong>キャプションからレシピページを生成</strong><p>解析部分は完成済み。ページ組み立てとタグ付けを繋ぐ。</p></div></li>
+      <li><span class="chip c-todo">未</span><div><strong>写真の枠を <code>img</code> に差し替え</strong><p>写真が入り次第。<code>alt</code> を必ず書く。</p></div></li>
+    </ul>
+
+    <h3>第1段階：Instagram の自動取り込み（費用0円・トークンが要る）</h3>
+    <ul class="rows">
+      <li><span class="chip c-wait">待</span><div><strong>GitHub Actions で定期取得</strong><p>いいね数・コメント数の更新、新規投稿の取り込み、サムネイルの保存までを自動化。公開リポジトリなら実行費用は無料。</p></div></li>
+      <li><span class="chip c-wait">待</span><div><strong>下書きとして提出</strong><p>新規レシピはプルリクエストとして出し、中身を見てボタン1つで公開。解析ミスがそのまま世に出るのを防ぐ。</p></div></li>
+      <li><span class="chip c-wait">待</span><div><strong>トークンの自動更新</strong><p>長期トークンの寿命は60日。更新も同じ仕組みの中で回す。</p></div></li>
+    </ul>
+
+    <h3>第2段階以降</h3>
+    <ul class="rows">
+      <li><span class="chip c-todo">未</span><div><strong>まとめページ</strong><p>「平日5日の晩ごはん」のように献立として束ねる。手作業だが、滞在時間と依頼獲得に効く。</p></div></li>
+      <li><span class="chip c-todo">未</span><div><strong>公開</strong><p>GitHub Pages ＋ 独自ドメイン。いまはリポジトリに置いてあるだけで、まだ誰でも見られる状態ではない。</p></div></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">E</span>みたもさんに聞くこと・お願いすること</h2>
+    <p class="note">ここが埋まらないと進めない部分です。上から効く順に並べています。</p>
+
+    <div class="ask">
+      <h3>いちばん効くお願い</h3>
+      <ol>
+        <li><b>キャプションに手順を書いてもらえないか</b>
+          <span>確認した投稿3本すべてに手順がありませんでした。材料は自動で取れるのに、手順だけが人の作業として残っています。キャプションに「【作り方】1. …」の数行が入るだけで、サイトの更新が完全に自動になります。Instagram 側でも「作り方が知りたい」というコメントに先回りできます。</span>
+        </li>
+      </ol>
+
+      <h3>アカウントの準備（本人でないとできない作業）</h3>
+      <ol start="2">
+        <li><b>Instagram をビジネスまたはクリエイターアカウントへ</b><span>自動取り込みの前提条件です。</span></li>
+        <li><b>Meta の開発者登録とアクセストークンの発行</b><span>Facebookページは不要です。手順書はこちらで用意します。</span></li>
+        <li><b>PR案件の契約範囲</b><span>タイアップの契約が、Instagram の投稿だけなのか、サイトへの転載まで含むのか。案件ごとに違うので、載せてよい回だけ教えてください。</span></li>
+      </ol>
+
+      <h3>いま画面に「TODO」と出ている箇所</h3>
+      <ol start="5">
+        <li><b>南蛮漬けの手順</b><span>キャプションに記載がなく、ページに「手順は準備中」と出ています。</span></li>
+        <li><b>同じく、何人前・調理時間・鶏むね肉の分量</b><span>「要確認」と表示中です。</span></li>
+        <li><b>プロフィール本文</b><span>いまは私が書いた仮の文章で、画面に「仮の文章」と出ています。</span></li>
+        <li><b>はじめた年・更新頻度・拠点</b><span>3項目とも「TODO」と表示中です。</span></li>
+        <li><b>写真</b><span>プロフィール用と、レシピごとの完成写真。リールは静止画が別途必要です。</span></li>
+        <li><b>チャンネル名の正式表記とロゴ</b><span>いまは仮のアイコンです。</span></li>
+        <li><b>公開用の連絡先メールアドレス</b><span>テスト用の個人アドレスは、公開リポジトリに残さないため外してあります。</span></li>
+      </ol>
+
+      <h3>方向性の確認</h3>
+      <ol start="12">
+        <li><b>よく作る料理のジャンル</b><span>タグの言葉を決めるためです。実際の投稿に合っていないタグは使われません。</span></li>
+        <li><b>物販の予定はあるか</b><span>あるなら早めに土台を相談したいです。無いなら今のまま（月額0円）で進めるのが得です。</span></li>
+      </ol>
+
+      <p class="why">上の11項目は、どれも「それらしく埋めることはできるが、埋めたら嘘になる」ものです。実際にそれを見て料理する人がいる以上、推測では書きません。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">F</span>あなたが決めること</h2>
+    <p class="note">私からの推奨を添えています。「それで進めて」の一言で着手できます。</p>
+    <ul class="rows">
+      <li><span class="chip c-wait">待</span><div><strong>英語が無い回をどう公開するか</strong><p><b>推奨：日本語だけで公開し、材料名は対訳辞書で自動的に英語化する。</b>公開を止めると更新が止まったことに気づけません。機械翻訳は、材料名の誤訳が海外の読者に直接害になるため使いません。</p></div></li>
+      <li><span class="chip c-wait">待</span><div><strong>タグ一覧の確定</strong><p><b>推奨：食材／形式／場面／時間の4軸。</b>材料の分類だけでなく「15分以内」「作り置き」「お弁当」のような探し方を入れる。該当3件未満のタグは表に出さない。</p></div></li>
+      <li><span class="chip c-wait">待</span><div><strong>公開のタイミング</strong><p>写真と手順が入る前に公開するか、揃ってからにするか。先に公開して中身を足していく形でも問題ありません。</p></div></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">G</span>費用</h2>
+    <p class="note">現時点の固定費はゼロです。</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>項目</th><th>費用</th><th>備考</th></tr></thead>
+        <tbody>
+          <tr><td>サイトの表示（GitHub Pages）</td><td class="num">0円</td><td>静的HTMLのため</td></tr>
+          <tr><td>自動取り込み（GitHub Actions）</td><td class="num">0円</td><td>公開リポジトリは無料</td></tr>
+          <tr><td>Instagram / Google フォーム</td><td class="num">0円</td><td>—</td></tr>
+          <tr><td>独自ドメイン</td><td class="num">年 1,000〜2,000円程度</td><td>唯一の固定費</td></tr>
+          <tr><td>物販を始める場合</td><td class="num">0円</td><td>BASE または STORES の無料プラン。売れたときの手数料のみ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout"><b>物販でも土台は変えません。</b>レシピサイトは静的HTMLのまま、店だけ別に持って相互リンクします。Shopify は月額3,650円〜が売上ゼロでもかかるため、規模が育ってからで十分です。</div>
+  </section>
+
+  <section>
+    <h2><span class="n">H</span>更新履歴</h2>
+    <p class="note">このページは作業のたびに書き換えています。前に見たときから何が変わったかは、ここで確認できます。</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>日付</th><th>やったこと</th></tr></thead>
+        <tbody>
+          <tr><td class="num">2026-09-06</td><td>制作台帳（このページ）を作成。以後、作業のたびに更新</td></tr>
+          <tr><td class="num">2026-09-06</td><td>レシピガチャを追加。PR投稿を自動投稿の対象外に</td></tr>
+          <tr><td class="num">2026-09-06</td><td>キャプション解析を追加（実際の投稿3本で検証）</td></tr>
+          <tr><td class="num">2026-09-06</td><td>上部メニュー・検索・タグ・人気順を追加（Allrecipes型の構成へ）</td></tr>
+          <tr><td class="num">2026-09-06</td><td>点検で見つかった不具合を修正（フォームの内部スクロール、読み上げの言語指定ほか）</td></tr>
+          <tr><td class="num">2026-09-02</td><td>レシピ追加：鶏むね肉と茄子の南蛮漬け。レシピ一覧を新設</td></tr>
+          <tr><td class="num">2026-09-02</td><td>サイトを白紙から作り直し。4ページ構成に分割</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">I</span>できないこと（確認済み）</h2>
+    <p class="note">調べた結果、実現できないと分かったものです。期待値をずらさないために残します。</p>
+    <ul class="rows">
+      <li><span class="chip c-wait">不可</span><div><strong>Instagram のコメント欄の表示</strong><p>公式の埋め込みには出ません。APIで取っても、他人のコメントを転載することになるため設計としても勧めません。投稿へのリンクを置いています。</p></div></li>
+      <li><span class="chip c-wait">不可</span><div><strong>いいね数を埋め込みから取ること</strong><p>埋め込みからは取れません。APIで取得してデータに保存する方式にします。</p></div></li>
+      <li><span class="chip c-wait">不可</span><div><strong>手順の自動生成</strong><p>キャプションに書かれていない限り不可能です。動画からは文字が取れません。</p></div></li>
+      <li><span class="chip c-wait">要注意</span><div><strong>再生数</strong><p>insights の追加権限が必要です。実装時に改めて確認します。</p></div></li>
+      <li><span class="chip c-wait">要注意</span><div><strong>JavaScript が無効な環境</strong><p>言語切替と検索が動きません。静的サイトの割り切りとして許容しています。</p></div></li>
+    </ul>
+  </section>
+
+</div>
