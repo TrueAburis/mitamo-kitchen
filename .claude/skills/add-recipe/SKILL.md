@@ -85,9 +85,10 @@ cp tori-negi-meshi.html <slug>.html
 トップとレシピページを丸ごと同じ内容にしないこと。
 同じものが2回続くと、2回とも読み流される。トップは入口で、続きがページにある状態を保つ。
 
-### 5. recipes.js に1件足す
+### 5. data/recipes.ts に1件足す
 
-一覧・検索・タグ・人気順は `recipes.js` の `window.RECIPES` から作られる。
+一覧・検索・タグ・人気順は `data/recipes.ts` の `RECIPES` から作られる。
+（`recipes.js` は書き出されるものなので直接編集しない）
 **ページを作っただけでは一覧に出てこない。** 配列の先頭に足す（新しい順）。
 
 ```js
@@ -99,17 +100,17 @@ cp tori-negi-meshi.html <slug>.html
   image: "images/<slug>.jpg",
   posted: "YYYY-MM-DD",
   instagram: "https://www.instagram.com/reel/xxxx/",
-  likes: null, comments: null, views: null,
+  /* いいね数は書かない。Instagram から取り込まれて自動で入る */
   ready: true
 }
 ```
 
 気をつけること。
 
-- `tags` は `window.TAGS` のキー。新しいタグを使うなら TAGS にも日英の表示名を足す
-- 数値が分からないうちは `null`。`0` と書かない（「いいねが0件」という別の意味になる）
+- `tags` は `data/recipes.ts` の `TAGS` のキー。新しいタグを使うなら TAGS にも日英と軸を足す
+- **いいね数などは書かない。** Instagram から取り込まれて自動で入る
 - 手順がまだ入っていないレシピは `ready: false`。一覧に「手順は準備中」と出る
-- `instagram` に投稿URLを入れると、レシピページに動画の埋め込みが自動で入る
+- `instagram` に投稿URLを入れると、レシピページに動画が入り、いいね数の取り込み対象にもなる
 
 ヘッダーのメニューと `recipes.html` は触らなくてよい。どちらもデータから作られる。
 

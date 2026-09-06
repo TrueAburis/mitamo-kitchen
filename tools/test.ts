@@ -12,6 +12,7 @@ import path from 'node:path';
 import * as CaptionParser from './parse-caption.ts';
 import * as IngredientDict from './ingredients-ja-en.ts';
 import type { Group } from './parse-caption.ts';
+import { permalinkCode, toFigures, merge } from './fetch-instagram.ts';
 
 const dir = path.join(import.meta.dirname, 'fixtures');
 const read = (f: string) => fs.readFileSync(path.join(dir, f), 'utf8');
@@ -118,6 +119,34 @@ check('400ml', IngredientDict.qty('400ml'), '400ml');
 check('適量', IngredientDict.qty('適量'), 'to taste');
 check('二つまみ', IngredientDict.qty('二つまみ'), '2 pinches');
 check('訳せないものは null', IngredientDict.qty('お好きなだけ'), null);
+
+/* ---------- Instagram の取り込み ---------- */
+console.log('\nInstagram の取り込み');
+{
+  check('リールのURLからコードを取れる',
+    permalinkCode('https://www.instagram.com/reel/DcaOmyvRcAI/'), 'DcaOmyvRcAI');
+  check('通常投稿のURLからも取れる',
+    permalinkCode('https://www.instagram.com/p/ABC123/?utm_source=x'), 'ABC123');
+  check('URLが無ければ null', permalinkCode(null), null);
+
+  const media = [
+    { id: '1', permalink: 'https://www.instagram.com/reel/DcaOmyvRcAI/', like_count: 1842, comments_count: 37 },
+    { id: '2', permalink: 'https://www.instagram.com/reel/NOTMINE/', like_count: 99 }
+  ];
+  const figs = toFigures(media, '2026-09-07');
+
+  check('投稿URLのあるレシピに数値が付く', figs['tori-mune-nasu-nanbanzuke']?.likes, 1842);
+  check('投稿URLの無いレシピは対象外', figs['tori-negi-meshi'], undefined);
+  check('再生数は権限がまだ無いので null', figs['tori-mune-nasu-nanbanzuke']?.views, null);
+
+  /* ここが一番大事。取れなかったときに前の数字を消してしまうと、
+     画面から数値が消えて「取り込みが壊れた」ように見える */
+  const prev = { 'tori-negi-meshi': { likes: 500, comments: 8, views: null, fetchedAt: '2026-09-01' } };
+  const merged = merge(prev, { 'tori-negi-meshi': { likes: null, comments: null, views: null, fetchedAt: '2026-09-07' } });
+  check('取れなかったときは前の数字を残す', merged['tori-negi-meshi']?.likes, 500);
+  check('取れたときは新しい数字で置き換える',
+    merge(prev, { 'tori-negi-meshi': { likes: 640, comments: 9, views: null, fetchedAt: '2026-09-07' } })['tori-negi-meshi']?.likes, 640);
+}
 
 /* ---------- 結果 ---------- */
 console.log(`\n${checked} 件中 ${checked - failed} 件が期待どおり。`);

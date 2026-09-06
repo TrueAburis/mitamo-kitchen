@@ -1,0 +1,55 @@
+# Instagram のいいね数・コメント数を取り込む。
+#
+# 動かすには、リポジトリの Secrets に IG_TOKEN（長期アクセストークン）が要る。
+# **トークンはリポジトリのファイルには絶対に書かない。**
+#
+# 書き換えるのは data/instagram.json だけ。人が書いたファイルには触らない。
+# 変化があったときだけコミットするので、無駄な履歴は増えない。
+
+name: fetch-instagram
+
+on:
+  schedule:
+    # 毎日 朝6時（日本時間）。UTC で書く必要がある
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-instagram
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - run: npm ci
+
+      - name: Instagram から数値を取り込む
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node tools/fetch-instagram.ts
+
+      # 数値が入った recipes.js を作り直す
+      - name: ページを組み立て直す
+        run: npm run build
+
+      - name: 変化があればコミットする
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "数値に変化がありませんでした。コミットしません。"
+          else
+            git add data/instagram.json recipes.js *.html en/*.html
+            git commit -m "Instagram の数値を取り込み"
+            git push
+          fi

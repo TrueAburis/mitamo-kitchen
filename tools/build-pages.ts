@@ -8,25 +8,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as B from './build.ts';
+import { siteRecipes, writeRecipesJs } from './site-data.ts';
 
 const ROOT = path.join(import.meta.dirname, '..');
-
-/* recipes.js はブラウザ用のファイル（window.RECIPES に代入している）。
-   Node から読むために、window の代わりを渡して評価する。
-   ブラウザとNodeで同じ1ファイルを使い続けるための割り切り。 */
-type SiteData = {
-  RECIPES: any[];
-  TAGS: Record<string, { ja: string; en: string; axis: string }>;
-  TAG_AXES: Record<string, { ja: string; en: string }>;
-  TAG_MIN: number;
-};
-
-function loadSiteData(root: string): SiteData {
-  const src = fs.readFileSync(path.join(root, 'recipes.js'), 'utf8');
-  const win = {} as SiteData;
-  new Function('window', src)(win);
-  return win;
-}
 const { esc, pick, page, LANGS } = B;
 
 /* ---------- 本文 ---------- */
@@ -309,8 +293,9 @@ function workPage(lang: B.Lang): string {
 async function run() {
 
 
-  const site = loadSiteData(ROOT);
-  const RECIPES = site.RECIPES;
+  /* 人が書いた情報と取り込んだ数値を合流させ、recipes.js を書き出す */
+  writeRecipesJs();
+  const RECIPES = siteRecipes();
 
   const written = [];
   fs.mkdirSync(path.join(ROOT, 'en'), { recursive: true });

@@ -14,29 +14,14 @@ import path from 'node:path';
 import * as CaptionParser from './parse-caption.ts';
 import * as Dict from './ingredients-ja-en.ts';
 import * as TagRules from './tag-rules.ts';
-import type { Parsed, Ingredient, Group } from './parse-caption.ts';
+import type { Parsed, Ingredient } from './parse-caption.ts';
+import { TAGS } from '../data/recipes.ts';
 
 const ROOT = path.join(import.meta.dirname, '..');
 
-/* recipes.js はブラウザ用のファイル（window.RECIPES に代入している）。
-   Node から読むために、window の代わりを渡して評価する。
-   ブラウザとNodeで同じ1ファイルを使い続けるための割り切り。 */
-type SiteData = {
-  RECIPES: any[];
-  TAGS: Record<string, { ja: string; en: string; axis: string }>;
-  TAG_AXES: Record<string, { ja: string; en: string }>;
-  TAG_MIN: number;
-};
-
-function loadSiteData(root: string): SiteData {
-  const src = fs.readFileSync(path.join(root, 'recipes.js'), 'utf8');
-  const win = {} as SiteData;
-  new Function('window', src)(win);
-  return win;
-}
 
 function knownTags(): string[] {
-  return Object.keys(loadSiteData(ROOT).TAGS);
+  return Object.keys(TAGS);
 }
 
 const q = (v: unknown) => JSON.stringify(v);
@@ -170,7 +155,6 @@ console.log(`  {
     image: ${q('images/' + slug + '.jpg')},
     posted: ${q(new Date().toISOString().slice(0, 10))},
     instagram: null,
-    likes: null, comments: null, views: null,
     ready: ${parsed.steps.length > 0}
   },`);
 console.log('\nそのあと node tools/build.js でページを組み立てます。');
