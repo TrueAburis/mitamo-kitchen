@@ -68,9 +68,15 @@ export type RecipeMeta = {
   ready: boolean;
 };
 
-/* TODO: 独自ドメインが決まったらここを直す。
-   hreflang と og:url は絶対URLでないと効かないので、ここだけが出どころ。 */
-const SITE_URL = 'https://mitamo-kitchen.example';
+/* いまサイトが置かれている場所。hreflang と og:url は
+   絶対URLでないと効かないので、ここだけが出どころ。
+
+   TODO: 独自ドメインが決まったらここを直して組み立て直す。
+   それまでは GitHub Pages の確認用URL。
+   届かないドメイン（.example）を指したままだと、
+   リンクを共有したときの見え方まで嘘になるので、実在する側にしてある。
+   リンクはすべて相対なので、/mitamo-kitchen/ の下に置かれても崩れない。 */
+const SITE_URL = 'https://trueaburis.github.io/mitamo-kitchen';
 
 /* 検索エンジンに載せるかどうか。
    写真と手順が揃うまでは false。手順が「準備中」のレシピが検索結果に出ると、
