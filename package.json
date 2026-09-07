@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node tools/build-pages.ts",
     "test": "node tools/test.ts",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "build:phrasebook": "node tools/build-phrasebook.ts"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

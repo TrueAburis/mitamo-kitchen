@@ -14,7 +14,8 @@ import path from 'node:path';
 import * as CaptionParser from './parse-caption.ts';
 import * as Dict from './ingredients-ja-en.ts';
 import * as TagRules from './tag-rules.ts';
-import type { Parsed, Ingredient } from './parse-caption.ts';
+import * as Phrasebook from './phrasebook-apply.ts';
+import type { Parsed, Ingredient, Group } from './parse-caption.ts';
 import { TAGS } from '../data/recipes.ts';
 
 const ROOT = path.join(import.meta.dirname, '..');
@@ -26,31 +27,61 @@ function knownTags(): string[] {
 
 const q = (v: unknown) => JSON.stringify(v);
 
-/* 材料1件をデータにする。英語が無ければ辞書で補い、
-   辞書にも無ければ null（訳さず日本語のまま出す） */
-function item(ja: Ingredient, en: Ingredient | undefined) {
+/* 材料1件をデータにする。
+
+   名前の英語は**辞書を先に引く**。キャプションの英語は回ごとに揺れる
+   （昆布が kombu seaweed / Kombu (kelp) / Kelp と3通りあった）ので、
+   全レシピで同じ言葉にするには辞書側を正にするしかない。
+   辞書に無いときだけキャプションの英語を使い、
+   それも使わないと決めた言い回し（対訳表の avoid）を含むなら捨てて null にする。
+   null は「訳を当てず日本語のまま出す」の意味。間違った英語より日本語のほうが調べられる。 */
+function item(ja: Ingredient, en: Ingredient | undefined, warn: (s: string) => void) {
+  const fromDict = Dict.name(ja.name);
+  let name: string | null = fromDict;
+  if (!name && en) {
+    const hits = Phrasebook.avoidHits(en.name);
+    if (hits.length) {
+      warn('材料「' + ja.name + '」の英語 "' + en.name + '" に ' +
+           hits.map((h) => '"' + h.avoid + '"').join('・') + ' が入っていたので外した');
+    } else {
+      /* 「2 tbsp of red vinegar」から分量を切ると「of red vinegar」が残る。
+         材料名として並べたときに前置詞から始まるので落とす。 */
+      name = en.name.replace(/^(?:of|de)\s+/i, '');
+    }
+  }
   return {
     ja: ja.name,
-    en: en ? en.name : Dict.name(ja.name),
+    en: name,
     qja: ja.qty,
-    qen: en ? en.qty : Dict.qty(ja.qty)
+    /* 分量は辞書の単位換算を正にする。大さじ・合などは機械的に決まる */
+    qen: Dict.qty(ja.qty) || (en ? en.qty : null)
   };
 }
 
-function buildContent(parsed: Parsed, slug: string): string {
+function buildContent(parsed: Parsed, slug: string, warn: (s: string) => void): string {
+  const ov = Phrasebook.overrides(slug);
+  const en = (ja: string | null, posted: string | null) => Phrasebook.sentence(ov, ja, posted);
+
   const groups = parsed.groupsJa.map((g, gi) => {
-    const gEn = parsed.groupsEn[gi];
+    const gEn: Group | undefined = parsed.groupsEn[gi];
+    /* 日英で品数が違うグループは、英語を順番で当てると1つずつずれる。
+       ずれた英語を出すくらいなら辞書だけで組む。 */
+    const aligned = gEn && gEn.items.length === g.items.length ? gEn : undefined;
+    if (gEn && !aligned) {
+      warn('材料の品数が日英で違うので、英語を順番で当てるのをやめた（日 ' +
+           g.items.length + ' / 英 ' + gEn.items.length + '）');
+    }
     return {
-      name: g.name ? { ja: g.name, en: (gEn && gEn.name) || null } : null,
-      items: g.items.map((it, i) => item(it, gEn && gEn.items[i])),
-      note: g.notes.length ? { ja: g.notes[0], en: null } : null
+      name: g.name ? { ja: g.name, en: en(g.name, (gEn && gEn.name) || null) } : null,
+      items: g.items.map((it, i) => item(it, aligned && aligned.items[i], warn)),
+      note: g.notes.length ? { ja: g.notes[0], en: en(g.notes[0], null) } : null
     };
   });
 
   const intro = [];
-  if (parsed.leadJa) { intro.push({ ja: parsed.leadJa, en: parsed.leadEn }); }
+  if (parsed.leadJa) { intro.push({ ja: parsed.leadJa, en: en(parsed.leadJa, parsed.leadEn) }); }
 
-  const tips = parsed.notesJa.map((n, i) => ({ ja: n, en: parsed.notesEn[i] || null }));
+  const tips = parsed.notesJa.map((n, i) => ({ ja: n, en: en(n, parsed.notesEn[i] || null) }));
 
   const steps = parsed.steps.map((s) => ({ ja: s, en: null, usesJa: null, usesEn: null }));
 
@@ -63,9 +94,13 @@ function buildContent(parsed: Parsed, slug: string): string {
   lines.push('export default {');
   lines.push('  slug: ' + q(slug) + ',');
   lines.push('');
-  lines.push('  /* TODO: 何人前と時間がキャプションに無かった。分かり次第埋める */');
+  if (parsed.servingsJa) {
+    lines.push('  /* TODO: 時間がキャプションに無かった。分かり次第埋める */');
+  } else {
+    lines.push('  /* TODO: 何人前と時間がキャプションに無かった。分かり次第埋める */');
+  }
   lines.push('  meta: {');
-  lines.push('    servings: { ja: null, en: null },');
+  lines.push('    servings: { ja: ' + q(parsed.servingsJa) + ', en: ' + q(parsed.servingsEn) + ' },');
   lines.push('    time: { ja: null, en: null }');
   lines.push('  },');
   lines.push('');
@@ -135,26 +170,45 @@ if (!parsed.titleJa || !parsed.groupsJa.length) {
 const slug = process.argv[3] || path.basename(file, path.extname(file));
 const tags = TagRules.decide(parsed, knownTags());
 
+const extra: string[] = [];
+const warn = (s: string) => { if (!extra.includes(s)) { extra.push(s); } };
+
+if (!Phrasebook.known(slug)) {
+  warn('対訳表（data/phrasebook.ts）にこの回がない。英文はキャプションのまま出る');
+}
+
 fs.mkdirSync(path.join(ROOT, 'content'), { recursive: true });
 const out = path.join(ROOT, 'content', slug + '.js');
-fs.writeFileSync(out, buildContent(parsed, slug), 'utf8');
+fs.writeFileSync(out, buildContent(parsed, slug, warn), 'utf8');
+
+/* 一覧に出すタイトルとリード文も、対訳表を通す */
+const ov = Phrasebook.overrides(slug);
+const titleEn = Phrasebook.sentence(ov, parsed.titleJa, parsed.titleEn) || parsed.titleJa;
+const leadEn = Phrasebook.sentence(ov, parsed.leadJa, parsed.leadEn) || '';
+
+/* 対訳表に書いてあるのに一度も当たらなかった行。
+   日本語が1字でも違うと当たらず、そのぶん投稿のままの英語が出る。
+   黙って通すと直したつもりのものが直っていないので、必ず知らせる。 */
+Phrasebook.unused(slug).forEach((k) => {
+  warn('対訳表の「' + k + '」がキャプションのどの行にも当たらなかった。日本語を見比べること');
+});
 
 const itemCount = parsed.groupsJa.reduce((n, g) => n + g.items.length, 0);
 console.log(`\ncontent/${slug}.js を書き出しました`);
-console.log(`  タイトル: ${parsed.titleJa}${parsed.titleEn ? ' / ' + parsed.titleEn : '（英語なし）'}`);
+console.log(`  タイトル: ${parsed.titleJa}${titleEn && titleEn !== parsed.titleJa ? " / " + titleEn : "（英語なし）"}`);
 console.log(`  材料: ${itemCount}品 / 手順: ${parsed.steps.length}`);
 console.log(`  タグ: ${tags.join(' / ') || '（付きませんでした）'}`);
-parsed.warnings.forEach((w) => console.log('  ・' + w));
+parsed.warnings.concat(extra).forEach((w) => console.log('  ・' + w));
 
-console.log('\nrecipes.js の配列の先頭に、これを足してください:\n');
+console.log('\ndata/recipes.ts の配列に、これを足してください:\n');
 console.log(`  {
     slug: ${q(slug)},
     ja: { title: ${q(parsed.titleJa)}, lead: ${q(parsed.leadJa || '')} },
-    en: { title: ${q(parsed.titleEn || parsed.titleJa)}, lead: ${q(parsed.leadEn || '')} },
+    en: { title: ${q(titleEn)}, lead: ${q(leadEn)} },
     tags: ${JSON.stringify(tags)},
     image: ${q('images/' + slug + '.jpg')},
-    posted: ${q(new Date().toISOString().slice(0, 10))},
+    posted: null,
     instagram: null,
     ready: ${parsed.steps.length > 0}
   },`);
-console.log('\nそのあと node tools/build.js でページを組み立てます。');
+console.log('\nそのあと npm run build でページを組み立てます。');

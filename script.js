@@ -110,7 +110,7 @@
 
     var meta = el('div', 'card-meta');
     meta.appendChild(el('span', null, (ja ? 'いいね ' : 'Likes ') + num(r.likes)));
-    meta.appendChild(el('span', null, r.posted));
+    if (r.posted) { meta.appendChild(el('span', null, r.posted)); }
     a.appendChild(meta);
 
     var tags = el('div', 'card-tags');
@@ -126,12 +126,19 @@
 
   function byPopular(a, b) {
     /* いいね数が未取得のものは、数値のあるものより後ろに置く */
-    if (a.likes == null && b.likes == null) { return b.posted.localeCompare(a.posted); }
+    if (a.likes == null && b.likes == null) { return byNewest(a, b); }
     if (a.likes == null) { return 1; }
     if (b.likes == null) { return -1; }
     return b.likes - a.likes;
   }
-  function byNewest(a, b) { return b.posted.localeCompare(a.posted); }
+  /* 投稿日が分からない回（posted が null）は、日付のある回より後ろ。
+     並べようがないものを新しい側に置くと、一覧の先頭が意味を持たなくなる。 */
+  function byNewest(a, b) {
+    if (!a.posted && !b.posted) { return 0; }
+    if (!a.posted) { return 1; }
+    if (!b.posted) { return -1; }
+    return b.posted.localeCompare(a.posted);
+  }
 
   /* タグのボタンを軸ごとに並べる。
      件数がそろっていないタグは出さない。1件しか出ないタグを押させると、
@@ -347,7 +354,7 @@
           return { r: r, shared: r.tags.filter(function (t) { return rec.tags.indexOf(t) > -1; }).length };
         })
         .filter(function (x) { return x.shared > 0; })
-        .sort(function (a, b) { return b.shared - a.shared || b.r.posted.localeCompare(a.r.posted); })
+        .sort(function (a, b) { return b.shared - a.shared || byNewest(a.r, b.r); })
         .slice(0, 3);
 
       var wrap = rel.closest('.related-wrap');

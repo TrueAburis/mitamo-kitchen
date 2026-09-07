@@ -56,7 +56,7 @@ export type RecipeMeta = {
   en: { title: string; lead: string };
   tags: string[];
   image: string;
-  posted: string;
+  posted: string | null;
   instagram: string | null;
   likes: number | null;
   comments: number | null;
@@ -422,7 +422,7 @@ function recipeCardHtml(r: RecipeMeta & { likes: number | null }, lg: 'ja' | 'en
             <figure class="card-shot"><span>${esc(r.image)}</span></figure>
             <h3 class="card-title">${esc(title)}${sub}</h3>
             <p class="card-lead">${esc(r[lg].lead)}</p>
-            <div class="card-meta"><span>${lg === 'ja' ? 'いいね ' : 'Likes '}${likes}</span><span>${esc(r.posted)}</span></div>
+            <div class="card-meta"><span>${lg === 'ja' ? 'いいね ' : 'Likes '}${likes}</span>${r.posted ? `<span>${esc(r.posted)}</span>` : ''}</div>
             <div class="card-tags">${tags}</div>${draft}
           </a>
         </li>`;

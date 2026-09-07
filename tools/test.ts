@@ -13,6 +13,7 @@ import * as CaptionParser from './parse-caption.ts';
 import * as IngredientDict from './ingredients-ja-en.ts';
 import type { Group } from './parse-caption.ts';
 import { permalinkCode, toFigures, merge } from './fetch-instagram.ts';
+import { findAvoided } from './check-english.ts';
 
 const dir = path.join(import.meta.dirname, 'fixtures');
 const read = (f: string) => fs.readFileSync(path.join(dir, f), 'utf8');
@@ -146,6 +147,18 @@ console.log('\nInstagram の取り込み');
   check('取れなかったときは前の数字を残す', merged['tori-negi-meshi']?.likes, 500);
   check('取れたときは新しい数字で置き換える',
     merge(prev, { 'tori-negi-meshi': { likes: 640, comments: 9, views: null, fetchedAt: '2026-09-07' } })['tori-negi-meshi']?.likes, 640);
+}
+
+/* ---------- 出来上がったものを読み返す ---------- */
+/* ここまでの検査は「キャプションを正しく読めたか」だけを見ている。
+   読めたあと、書き出したページに何が載っているかは誰も見ていなかった。
+   実際、多言語化のときにトップの分量表が丸ごと消えたのに気づけなかったので、
+   出口側の検査をここに足す。 */
+{
+  console.log('\n── 書き出したレシピ本文（content/）');
+  const found = await findAvoided();
+  check('使わないと決めた英語が残っていない', found.map((f) => f.where + ': ' + f.avoid), []);
+  found.forEach((f) => console.log(`      ${f.where}\n        "${f.text}"\n        → "${f.avoid}" ではなく ${f.use}`));
 }
 
 /* ---------- 結果 ---------- */

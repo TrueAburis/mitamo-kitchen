@@ -45,6 +45,16 @@ export function siteRecipes(): SiteRecipe[] {
 
 export { TAGS, TAG_AXES, TAG_MIN };
 
+/* 新しい順。投稿日が分からない回（posted が null）は後ろに回す。
+   script.js にも同じ並べ方が入っている（あちらはブラウザが読む側）。
+   並べようがないものを新しい側に置くと、一覧の先頭が意味を持たなくなるため。 */
+export function byNewest(a: Recipe, b: Recipe): number {
+  if (!a.posted && !b.posted) { return 0; }
+  if (!a.posted) { return 1; }
+  if (!b.posted) { return -1; }
+  return b.posted.localeCompare(a.posted);
+}
+
 /** ブラウザが読む recipes.js を書き出す */
 export function writeRecipesJs(): string {
   const rows = siteRecipes();

@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as B from './build.ts';
-import { siteRecipes, writeRecipesJs, TAGS, type SiteRecipe } from './site-data.ts';
+import { siteRecipes, writeRecipesJs, byNewest, TAGS, type SiteRecipe } from './site-data.ts';
 import { COLLECTIONS, type Collection } from '../data/collections.ts';
 
 const ROOT = path.join(import.meta.dirname, '..');
@@ -430,8 +430,9 @@ async function run() {
   const written = [];
   fs.mkdirSync(path.join(ROOT, 'en'), { recursive: true });
 
-  /* トップに出す「最新のレシピ」。投稿日がいちばん新しいもの */
-  const newest = RECIPES.slice().sort((a, b) => b.posted.localeCompare(a.posted))[0];
+  /* トップに出す「最新のレシピ」。投稿日がいちばん新しいもの。
+     投稿日が分からない回は候補にならない（byNewest が後ろに回す） */
+  const newest = RECIPES.slice().sort(byNewest)[0];
   let latest: { r: SiteRecipe; c: B.RecipeContent } | undefined;
   if (newest) {
     const p = path.join(ROOT, 'content', newest.slug + '.js');

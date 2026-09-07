@@ -4,3 +4,6 @@ claude-html-workflow.md
 node_modules/
 infra/node_modules/
 infra/cdk.out/
+
+# 手元に置いてあるだけの参考資料。サイトには使わない
+参考画像.png
