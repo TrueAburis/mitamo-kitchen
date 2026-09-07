@@ -54,16 +54,22 @@ export function byNewest(a: Recipe, b: Recipe): number {
   return b.posted.localeCompare(a.posted);
 }
 
-/** ブラウザが読む recipes.js を書き出す */
-export function writeRecipesJs(): string {
-  const rows = siteRecipes();
+/** ブラウザが読む dist/recipes.js を書き出す。
+ *  withEn には英語ページを作った回の slug を渡す。
+ *  一覧・ガチャ・関連レシピは画面側で組み立てているので、
+ *  ここで教えておかないと、英語ページで「英語版が無い回」へのリンクを出してしまう。 */
+export function writeRecipesJs(withEn?: Set<string>): string {
+  const rows = siteRecipes().map((r) => ({ ...r, hasEn: withEn ? withEn.has(r.slug) : true }));
   const body = `/* このファイルは書き出されたものです。直接編集しないでください。上書きされます。
    人が書く元データ … data/recipes.ts
    取り込んだ数値   … data/instagram.json
    書き出し         … npm run build
 
    likes などが null は「まだ取り込めていない」の意味。
-   0 と null は違う。0 と書くと「いいねが0件」という嘘になる。 */
+   0 と null は違う。0 と書くと「いいねが0件」という嘘になる。
+
+   hasEn が false は「この回の英語ページは作っていない」の意味。
+   英語で見ているときは、一覧にもガチャにも出さない（開いても 404 になるため）。 */
 
 window.RECIPES = ${JSON.stringify(rows, null, 2)};
 

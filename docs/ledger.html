@@ -185,8 +185,8 @@
 
     <h3>裏側の仕組み</h3>
     <ul class="rows">
-      <li><span class="chip c-done">済</span><div><strong>レシピのデータファイル</strong><p><code>recipes.js</code>。一覧・検索・タグ・人気順・ガチャはすべてここから作られる。自動更新の受け皿でもある。</p></div></li>
-      <li><span class="chip c-done">済</span><div><strong>キャプション解析</strong><p>タイトル・リード文・材料・グループ・ハッシュタグ・PR判定を取り出す。実際の投稿3本で検証済み。全角スペース、分量なし、語順違い、材料欄に混ざった注意書きにも対応。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>レシピのデータファイル</strong><p>レシピの一覧情報を1か所にまとめてある。一覧・検索・タグ・人気順・ガチャはすべてここから作られる。自動更新の受け皿でもある。</p></div></li>
+      <li><span class="chip c-done">済</span><div><strong>キャプション解析</strong><p>タイトル・リード文・材料・グループ・ハッシュタグ・PR判定を取り出す。<b>いただいた20回すべてで確かめてあります。</b>全角スペース、分量なし、語順違い、材料欄に混ざった一文、目印の行に付いた「2人前」などにも対応。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>Instagram 動画とタグの枠</strong><p>データに投稿URLがあれば、レシピページに動画が自動で入る。いいね数・コメント数・再生数の表示枠も設置済み。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>お仕事のご依頼フォーム</strong><p>Google フォームを埋め込み。内側にスクロールが出ない高さを実測して設定済み。</p></div></li>
       <li><span class="chip c-done">済</span><div><strong>仮の文章の目印</strong><p>本番の文章が来ていない箇所は、画面に「仮の文章」と赤い縦線が出る。差し替えたらクラスを外すだけ。</p></div></li>
@@ -234,8 +234,6 @@
         <li><b>キャプションに手順を書いてもらえないか</b>
           <span>いただいた<b>20回すべてに手順がありませんでした</b>。材料は自動で取れているので、サイトには17件のレシピが並んでいますが、そのうち16件が「手順は準備中」の表示です。キャプションに「【作り方】1. …」の数行が入るだけで、更新が完全に自動になります。Instagram 側でも「作り方が知りたい」というコメントに先回りできます。書き方の案は<b>日英対訳表</b>のページの後半に入れてあります。</span>
         </li>
-      </ol>
-
         <li><b>キャプションに英語も毎回書いてもらえないか</b>
           <span>英語の本文が無い回は、英語のページを作れません（中身が日本語のままのページを「英語です」と検索エンジンに出すと、評価が下がるため）。<b>いただいた20回のうち、PRの3回を除く17回すべてに英語がありました</b>ので、習慣としてはもう出来ています。このまま続けてください、というだけのお願いです。言い回しの直しは対訳表にまとめてあります。</span>
         </li>
@@ -297,13 +295,13 @@
 
   <section>
     <h2><span class="n">G</span>費用</h2>
-    <p class="note">現時点の固定費はゼロです。</p>
+    <p class="note">現時点の固定費はゼロです。公開してからは、AWS の実費（見に来る人の数しだいで月0〜100円程度）とドメイン代だけになります。</p>
     <div class="tablewrap">
       <table>
         <thead><tr><th>項目</th><th>費用</th><th>備考</th></tr></thead>
         <tbody>
-          <tr><td>サイトの表示（GitHub Pages）</td><td class="num">0円</td><td>静的HTMLのため</td></tr>
-          <tr><td>自動取り込み（GitHub Actions）</td><td class="num">0円</td><td>公開リポジトリは無料</td></tr>
+          <tr><td>サイトの表示（AWS）</td><td class="num">月 0〜100円程度</td><td>静的HTMLなので、見に来る人が少ないうちは無料枠にほぼ収まります</td></tr>
+          <tr><td>自動取り込み・公開（GitHub Actions）</td><td class="num">0円</td><td>公開リポジトリは無料</td></tr>
           <tr><td>Instagram / Google フォーム</td><td class="num">0円</td><td>—</td></tr>
           <tr><td>独自ドメイン</td><td class="num">年 1,000〜2,000円程度</td><td>唯一の固定費</td></tr>
           <tr><td>物販を始める場合</td><td class="num">0円</td><td>BASE または STORES の無料プラン。売れたときの手数料のみ</td></tr>

@@ -40,15 +40,27 @@
     var steps = [].slice.call(document.querySelectorAll('.steps li'));
     if (!steps.length || !peek) { return; }
 
-    var def = peek.textContent, queued = false;
+    var def = peek.textContent;
+
+    /* 「いま読んでいる」とみなす高さ。
+       スマホではバーが画面上端に貼り付いて本文を隠すので、そのすぐ下。
+       広い画面ではバーは左の列にいて本文を隠さないので、画面の上から3分の1あたり。
+       バーの下端を基準にすると、材料が全部見えている広い画面では
+       線が画面の下のほうまで下がってしまい、いつも最後の手順が選ばれる。 */
+    function readingLine() {
+      var r = bar.getBoundingClientRect();
+      var coversText = r.width > window.innerWidth * 0.8;
+      return coversText ? r.bottom + 24 : window.innerHeight * 0.34;
+    }
 
     function update() {
-      queued = false;
-      var line = bar.getBoundingClientRect().bottom + 48;
+      var line = readingLine();
       var cur = null, idx = 0;
+      /* 線を上に越えた手順のうち、いちばん下のもの＝いま読んでいる手順。
+         「まだ画面に残っているか」は見ない。見てしまうと、
+         手順を読み終えて次に移っても古い手順が選ばれ続ける。 */
       for (var i = 0; i < steps.length; i++) {
-        var box = steps[i].getBoundingClientRect();
-        if (box.top <= line && box.bottom > 0) { cur = steps[i]; idx = i + 1; }
+        if (steps[i].getBoundingClientRect().top <= line) { cur = steps[i]; idx = i + 1; }
       }
       if (cur && cur.getAttribute('data-uses')) {
         peek.textContent = cur.getAttribute('data-uses');
@@ -58,14 +70,33 @@
         stepTag.textContent = '';
       }
     }
-    window.addEventListener('scroll', function () {
-      if (!queued) { queued = true; requestAnimationFrame(update); }
-    }, { passive: true });
+    /* スクロールのたびに直接呼ぶ。
+
+       以前は requestAnimationFrame でまとめていたが、
+       **requestAnimationFrame は止められることがある**（裏のタブ、省電力、
+       アプリ内ブラウザなど）。止まると、このサイトの核である
+       「いま読んでいる手順の分量」が古いまま固まってしまう。
+       止まらないほうを選んだ。
+
+       読み取っているのは手順の数だけの位置情報で、
+       いちばん多いレシピでも数十件。毎回読んでも重くならない。 */
+    window.addEventListener('scroll', update, { passive: true });
+
+    /* 画面の幅が変わると、貼り付き方も線の位置も変わる */
+    window.addEventListener('resize', update, { passive: true });
+
     update();
   })();
 
   /* ============ ここから下は recipes.js のデータを使う ============ */
-  var DATA = window.RECIPES || [];
+
+  /* 英語で見ているときは、英語ページを作っていない回を外す。
+     一覧・検索・タグ・人気順・ガチャ・関連レシピが全部ここを見ているので、
+     ここで1回外せば、どこからも 404 へのリンクが出なくなる。
+     日本語ページは全件そのまま（日本語は必ずある）。 */
+  var DATA = (window.RECIPES || []).filter(function (r) {
+    return ja || r.hasEn !== false;
+  });
   var TAGS = window.TAGS || {};
   var AXES = window.TAG_AXES || {};
   var TAG_MIN = window.TAG_MIN || 1;

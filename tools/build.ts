@@ -28,6 +28,10 @@ export type Lang = { code: 'ja' | 'en'; dir: string; asset: string; other: strin
 /** 日本語と英語の対。en が null は「英語がまだ無い」 */
 export type Bi = { ja: string | null; en: string | null };
 
+/** hasAlt を false にすると、別言語版が無いページとして組み立てる。
+ *  英語の本文が無いレシピがこれにあたる。
+ *  false のときは hreflang を出さず、言語切替の行き先も一覧ページに変える。
+ *  出していない英語ページを hreflang で指すと、検索エンジンに 404 を教えることになる。 */
 export type PageOpts = { file: string; title: string; desc: string; extraHead?: string; hasAlt?: boolean };
 
 export type ContentItem = { ja: string; en: string | null; qja: string | null; qen: string | null };
@@ -131,7 +135,6 @@ const T = {
 /* ---------- ページの外枠 ---------- */
 function head(lang: Lang, o: PageOpts): string {
   const L = lang;
-  const other = LANGS.find((x) => x.code !== L.code);
   const alt = o.hasAlt !== false;
   const canonical = `${SITE_URL}/${L.dir ? L.dir + '/' : ''}${o.file}`;
 
@@ -177,7 +180,9 @@ ${o.extraHead || ''}</head>
 
 function header(lang: Lang, o: PageOpts): string {
   const L = lang;
-  const otherHref = L.other + o.file;
+  /* 別言語版が無いページでは、そのページの別言語版を指すと 404 になる。
+     押した人を行き止まりに送らないよう、一覧ページに寄せる。 */
+  const otherHref = o.hasAlt === false ? L.other + 'recipes.html' : L.other + o.file;
   const navHtml = T.nav.map((n) => {
     const cur = n.href === o.file ? ' aria-current="page"' : '';
     return `      <a href="${n.href}"${cur}>${esc(pick(n, L.code))}</a>`;
@@ -299,9 +304,7 @@ function jsonLd(c: RecipeContent, r: RecipeMeta, lg: 'ja' | 'en'): string {
     inLanguage: lg,
     description: r[lg].lead,
     author: { '@type': 'Organization', name: 'みたもっちゃんねる' },
-    recipeYield: c.jsonld.yield,
     cookTime: c.jsonld.cookTime,
-    totalTime: c.jsonld.totalTime,
     recipeIngredient: ([] as string[]).concat.apply([] as string[], c.groups.map((g) => g.items.map((it) => {
       const n = lg === 'en' ? (it.en || it.ja) : it.ja;
       const q = lg === 'en' ? (it.qen || it.qja) : it.qja;
@@ -309,6 +312,12 @@ function jsonLd(c: RecipeContent, r: RecipeMeta, lg: 'ja' | 'en'): string {
     }))),
     recipeInstructions: c.steps.map((s) => ({ '@type': 'HowToStep', text: pick(s, lg) || s.ja }))
   };
+  /* 値の無い項目は、キーごと出さない。
+     "totalTime": null のように書くと、schema.org の記述としては
+     「所要時間が null である」という主張になってしまう。
+     分からないことは黙っているのが正しい。 */
+  if (c.jsonld.totalTime) { data.totalTime = c.jsonld.totalTime; }
+  if (c.jsonld.yield) { data.recipeYield = c.jsonld.yield; }
   if (c.jsonld.category && lg === 'ja') { data.recipeCategory = c.jsonld.category; }
   if (c.jsonld.cuisine && lg === 'ja') { data.recipeCuisine = c.jsonld.cuisine; }
   return '<!-- Google のレシピ検索に出すための記述。手順と時間がそろっているレシピにだけ書く。\n' +
@@ -316,7 +325,7 @@ function jsonLd(c: RecipeContent, r: RecipeMeta, lg: 'ja' | 'en'): string {
          '<script type="application/ld+json">\n' + JSON.stringify(data, null, 2) + '\n</script>\n';
 }
 
-function recipePage(lang: Lang, c: RecipeContent, r: RecipeMeta): string {
+function recipePage(lang: Lang, c: RecipeContent, r: RecipeMeta, hasAlt: boolean): string {
   const lg = lang.code;
   const title = r[lg].title;
   const count = c.groups.reduce((n, g) => n + g.items.length, 0);
@@ -326,7 +335,6 @@ function recipePage(lang: Lang, c: RecipeContent, r: RecipeMeta): string {
     return `${n} ${q || ''}`.trim();
   }).join(' ／ ');
 
-  const noEn = lg === 'en' ? '' : '';
   const body = `
   <section class="recipes" id="recipes">
     <div class="wrap">
@@ -400,7 +408,8 @@ ${c.tips.map((t) => `                <li>${esc(pick(t, lg) || t.ja)}</li>`).join
     file: c.slug + '.html',
     title: lg === 'ja' ? `${title}｜みたもっちゃんねる` : `${title}｜Mitamo Kitchen`,
     desc: r[lg].lead || title,
-    extraHead: jsonLd(c, r, lg)
+    extraHead: jsonLd(c, r, lg),
+    hasAlt
   }, body);
 }
 

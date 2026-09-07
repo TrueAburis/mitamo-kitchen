@@ -136,10 +136,19 @@ h1,h2,h3{margin:0;font-weight:700;line-height:1.35;letter-spacing:.01em}
 .recipe-meta dd{margin:0 0 0 8px;font-family:var(--mono);font-variant-numeric:tabular-nums}
 .recipe-meta div{display:flex}
 
-.cook{margin-top:clamp(22px,4vw,34px);display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+/* 分量と手順の並び。
+
+   **スマホでは grid にしない。** position:sticky の要素が grid の子だと、
+   貼り付ける範囲がその要素自身の行の高さだけになる。
+   1列のときは行＝バーの高さなので、少しスクロールしただけで剥がれてしまう。
+   ふつうの積み上げ（block）にすると、貼り付く範囲が .cook 全体になり、
+   手順を読んでいるあいだずっと分量が画面に残る。このサイトの核はここ。
+
+   2列になる幅では、バーの行の高さが手順の列の高さと同じになるので grid でよい。 */
+.cook{margin-top:clamp(22px,4vw,34px)}
 .cook > *{min-width:0}
 @media (min-width:880px){
-  .cook{grid-template-columns:288px minmax(0,1fr);gap:52px;align-items:start}
+  .cook{display:grid;grid-template-columns:288px minmax(0,1fr);gap:52px;align-items:start}
 }
 
 /* 分量。スマホでは画面上端に貼り付き、広い画面では左列に貼り付く */

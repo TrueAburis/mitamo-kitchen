@@ -446,22 +446,39 @@ async function run() {
   /* そのまま配るものを写す。加工しないので、assets/ を直接編集してよい */
   copyAssets();
 
-  /* 人が書いた情報と取り込んだ数値を合流させ、dist/recipes.js を書き出す */
-  writeRecipesJs();
   const RECIPES = siteRecipes();
+
+  /* 先にレシピ本文を全部読んで、どの回に英語ページを作れるかを決めておく。
+
+     組み立ての途中で判断すると、日本語ページを書き出すときに
+     「この回の英語版があるかどうか」がまだ分からない。
+     分からないまま hreflang と言語切替を出していたので、
+     英語の無い回が来たら 404 を指すようになっていた。 */
+  const contents = new Map<string, B.RecipeContent>();
+  const withEn = new Set<string>();
+  for (const r of RECIPES) {
+    const p = path.join(CONTENT, r.slug + '.js');
+    if (!fs.existsSync(p)) {
+      console.log(`  ! content/${r.slug}.js が無いので飛ばしました`);
+      continue;
+    }
+    /* 毎回読み直す。同じ実行の中で content を書き換えても反映されるように */
+    const c: B.RecipeContent = (await import(pathToFileURL(p).href + '?t=' + Date.now())).default;
+    contents.set(r.slug, c);
+    if (r.en && r.en.title && c.intro.length && c.intro[0].en) { withEn.add(r.slug); }
+  }
+
+  /* 人が書いた情報と取り込んだ数値を合流させ、dist/recipes.js を書き出す。
+     英語ページの有無も渡す。画面側は、英語のときに無い回を一覧から外す */
+  writeRecipesJs(withEn);
 
   const written = [];
 
   /* トップに出す「最新のレシピ」。投稿日がいちばん新しいもの。
      投稿日が分からない回は候補にならない（byNewest が後ろに回す） */
   const newest = RECIPES.slice().sort(byNewest)[0];
-  let latest: { r: SiteRecipe; c: B.RecipeContent } | undefined;
-  if (newest) {
-    const p = path.join(CONTENT, newest.slug + '.js');
-    if (fs.existsSync(p)) {
-      latest = { r: newest, c: (await import(pathToFileURL(p).href + '?t=' + Date.now())).default };
-    }
-  }
+  const newestContent = newest && contents.get(newest.slug);
+  const latest = newest && newestContent ? { r: newest, c: newestContent } : undefined;
 
   for (const lang of LANGS) {
     const dir = lang.dir ? path.join(DIST, lang.dir) : DIST;
@@ -487,7 +504,9 @@ async function run() {
           throw new Error(`data/collections.ts の「${col.slug}」に、存在しないレシピ「${slug}」が入っています`);
         }
         return found;
-      });
+      /* 英語ページを作っていない回は、英語の献立ページから外す。
+         カードを出すと、開いたときに 404 になる。 */
+      }).filter((r) => lang.code === 'ja' || withEn.has(r.slug));
       const tagNames: Record<string, string> = {};
       Object.keys(TAGS).forEach((k) => { tagNames[k] = TAGS[k]![lang.code]; });
 
@@ -499,22 +518,17 @@ async function run() {
     }
 
     for (const r of RECIPES) {
-      const cPath = path.join(CONTENT, r.slug + '.js');
-      if (!fs.existsSync(cPath)) {
-        console.log(`  ! content/${r.slug}.js が無いので飛ばしました`);
-        continue;
-      }
-      /* 毎回読み直す。同じ実行の中で content を書き換えても反映されるように */
-      const c = (await import(pathToFileURL(cPath).href + '?t=' + Date.now())).default;
+      const c = contents.get(r.slug);
+      if (!c) { continue; }
 
       /* 英語の本文が無いレシピは、英語ページを作らない。
          中身が日本語のままのページを「英語です」と出すと評価を下げるため。 */
-      const hasEn = !!(r.en && r.en.title && c.intro.length && c.intro[0].en);
+      const hasEn = withEn.has(r.slug);
       if (lang.code === 'en' && !hasEn) {
         console.log(`  - ${r.slug}: 英語の本文が無いので英語ページは作りません`);
         continue;
       }
-      fs.writeFileSync(path.join(dir, r.slug + '.html'), B.recipePage(lang, c, r), 'utf8');
+      fs.writeFileSync(path.join(dir, r.slug + '.html'), B.recipePage(lang, c, r, hasEn), 'utf8');
       written.push(path.join(lang.dir || '.', r.slug + '.html'));
     }
   }
