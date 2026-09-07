@@ -1,16 +1,22 @@
-# サイトを組み立てて AWS に置く。
+# サイトを組み立てて、公開先に送る。
 #
-# アクセスキーは保存していない。OIDC で「このリポジトリの main から来た」ことを
-# AWS 側が確認し、その場限りの資格情報を渡す。鍵がどこにも無いので漏れようがない。
+# 3つに分けてある。
 #
-# 公開するものは dist/ に全部そろう。dist/ は git に入れていないので、
-# ここで組み立ててから送る。手元とCIで同じ npm run build を通る。
+#   build … 型検査・検証・組み立て。**いつも動く。** ここが緑なら壊れていない
+#   pages … GitHub Pages に出す。変数 PUBLISH_PAGES が true のときだけ
+#   aws   … AWS に出す。変数 AWS_DEPLOY_ROLE_ARN が入っているときだけ
 #
-# 動かすには、先に infra/ を1度デプロイして、下の3つを
+# 送り先が未設定のうちは、送る仕事は**動かさずに飛ばす**（失敗にしない）。
+# 設定していないだけで毎回失敗のメールが届くと、本当に壊れた日に気づけなくなる。
+#
+# aws を動かすときは、先に infra/ を1度デプロイして、下の3つを
 # リポジトリの Variables（Secrets ではない。秘密ではないので）に入れる。
 #   AWS_DEPLOY_ROLE_ARN   … cdk deploy の出力 DeployRoleArn
 #   AWS_S3_BUCKET         … 同 BucketName
 #   AWS_CLOUDFRONT_ID     … 同 DistributionId
+#
+# アクセスキーは保存していない。OIDC で「このリポジトリの main から来た」ことを
+# AWS 側が確認し、その場限りの資格情報を渡す。鍵がどこにも無いので漏れようがない。
 
 name: deploy
 
@@ -19,18 +25,16 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# OIDC のトークンを受け取るために必要
 permissions:
   contents: read
-  id-token: write
 
-# 同時に走らせない。後から来たものを優先する
 concurrency:
   group: deploy
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  # ---- 組み立てと検査。送り先の設定に関係なく、いつも動く ----
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,6 +55,58 @@ jobs:
 
       - name: ページを組み立てる
         run: npm run build
+
+      # 後ろの仕事が同じものを送れるように、組み立てた dist/ を受け渡す
+      - name: 組み立てたものを受け渡す
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+  # ---- GitHub Pages に出す（任意）----
+  # 動かすには2つ要る。どちらもリポジトリの設定画面から。
+  #   1. Settings → Pages → Source を「GitHub Actions」にする
+  #   2. Settings → Variables に PUBLISH_PAGES = true を足す
+  # Source が「Deploy from a branch」のままだとこの仕事は失敗するので、
+  # 変数で明示的に有効にするまで動かさないようにしてある。
+  pages:
+    needs: build
+    if: vars.PUBLISH_PAGES == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  # ---- AWS に出す（本番）----
+  aws:
+    needs: build
+    if: vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # OIDC のトークンを受け取るために必要
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
 
       - name: AWS の資格情報を受け取る
         uses: aws-actions/configure-aws-credentials@v4

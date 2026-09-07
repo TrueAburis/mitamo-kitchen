@@ -563,11 +563,36 @@ npx cdk deploy -c domain=example.com  ドメインを付けて公開
 
 ### デプロイ
 
-`.github/workflows/deploy.yml` が main への push で動く。
-**型検査とキャプション解析の検証を通ってからでないと公開されない。**
+`.github/workflows/deploy.yml` が main への push で動く。3つに分けてある。
+
+| 仕事 | いつ動くか |
+|---|---|
+| `build` | **いつも。** 型検査・検証・組み立て。ここが緑なら壊れていない |
+| `pages` | 変数 `PUBLISH_PAGES` が `true` のときだけ |
+| `aws` | 変数 `AWS_DEPLOY_ROLE_ARN` が入っているときだけ |
+
+**送り先が未設定のうちは、送る仕事は動かさずに飛ばす。失敗にしない。**
+設定していないだけで毎回失敗のメールが届くと、
+本当に壊れた日にそのメールを見なくなる。同じ理由で
+`fetch-instagram.yml` も、`IG_TOKEN` が無ければ何もせずに終わる。
 
 `cdk deploy` の出力（DeployRoleArn / BucketName / DistributionId）を
-リポジトリの Variables に入れると動き出す。秘密ではないので Secrets ではなく Variables でよい。
+リポジトリの Variables に入れると `aws` が動き出す。
+秘密ではないので Secrets ではなく Variables でよい。
+
+GitHub Pages に出すなら、設定画面で2つ。
+**Settings → Pages → Source を「GitHub Actions」に**した上で、
+Variables に `PUBLISH_PAGES = true` を足す。
+Source が「Deploy from a branch」のままだとこの仕事は失敗するので、
+変数で明示的に有効にするまで動かさないようにしてある。
+
+### 依存の版がずれると npm ci が落ちる
+
+`package.json` と `package-lock.json` は**必ずそろえること。**
+`npm ci` は食い違うと即座に落ちる（`npm install` と違って直してくれない）。
+実際、手元で新しい版に入れ替えたときに package.json を直し忘れて、
+main への push が毎回失敗していた。
+版を上げたら `npm install` を走らせて、lock ごとコミットする。
 
 ### 実行前に必要なもの
 

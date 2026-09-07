@@ -5,6 +5,9 @@
 #
 # 書き換えるのは data/instagram.json だけ。人が書いたファイルには触らない。
 # 変化があったときだけコミットするので、無駄な履歴は増えない。
+#
+# **トークンが未設定のうちは、何もせずに終わる。**
+# 毎朝ここが失敗してメールが届くと、本当に壊れた日に気づけなくなるため。
 
 name: fetch-instagram
 
@@ -31,9 +34,24 @@ jobs:
         with:
           node-version: '24'
 
-      - run: npm ci
+      # トークンが無ければ、ここから先は飛ばす。
+      # secrets は job の if では読めないので、いったん出力に移してから判定する
+      - id: token
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: |
+          if [ -n "$IG_TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "IG_TOKEN が未設定です。取り込みは飛ばします（失敗ではありません）。"
+          fi
+
+      - if: steps.token.outputs.ready == 'true'
+        run: npm ci
 
       - name: Instagram から数値を取り込む
+        if: steps.token.outputs.ready == 'true'
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: node tools/fetch-instagram.ts
@@ -42,6 +60,7 @@ jobs:
       # ページは dist/ に組み立てられるもので、git では追っていない。
       # ここへの push が deploy を動かし、そちらが組み立て直して公開する。
       - name: 変化があればコミットする
+        if: steps.token.outputs.ready == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
