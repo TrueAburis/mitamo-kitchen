@@ -16,7 +16,7 @@ import { pathToFileURL } from 'node:url';
 import { avoidHits } from './phrasebook-apply.ts';
 import { RECIPES } from '../data/recipes.ts';
 
-const ROOT = path.join(import.meta.dirname, '..');
+import { CONTENT } from './paths.ts';
 
 export type Finding = { where: string; text: string; avoid: string; use: string };
 
@@ -51,7 +51,7 @@ export async function findAvoided(): Promise<Finding[]> {
   const out: Finding[] = [];
   walk(RECIPES, 'data/recipes.ts', out);
 
-  const dir = path.join(ROOT, 'content');
+  const dir = CONTENT;
   if (!fs.existsSync(dir)) { return out; }
   for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.js'))) {
     const mod = await import(pathToFileURL(path.join(dir, file)).href + '?t=' + Date.now());

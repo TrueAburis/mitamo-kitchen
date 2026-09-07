@@ -16,8 +16,8 @@ import {
   type Line, type Post, type Term
 } from '../data/phrasebook.ts';
 
-const ROOT = path.join(import.meta.dirname, '..');
-const OUT = path.join(ROOT, 'docs', 'phrasebook.html');
+import { DOCS } from './paths.ts';
+const OUT = path.join(DOCS, 'phrasebook.html');
 
 /* 最終更新の日付。中身を変えた日と表示がずれないよう、書き出した日を入れる */
 const TODAY = new Date().toLocaleDateString('sv-SE');

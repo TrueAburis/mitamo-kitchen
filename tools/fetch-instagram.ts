@@ -18,8 +18,8 @@ import path from 'node:path';
 import { RECIPES } from '../data/recipes.ts';
 import type { Figures } from './site-data.ts';
 
-const ROOT = path.join(import.meta.dirname, '..');
-const OUT = path.join(ROOT, 'data', 'instagram.json');
+import { ROOT, INSTAGRAM_JSON } from './paths.ts';
+const OUT = INSTAGRAM_JSON;
 
 /** API が返す1件。使うものだけ書いている */
 export type Media = {

@@ -10,8 +10,7 @@ import { pathToFileURL } from 'node:url';
 import * as B from './build.ts';
 import { siteRecipes, writeRecipesJs, byNewest, TAGS, type SiteRecipe } from './site-data.ts';
 import { COLLECTIONS, type Collection } from '../data/collections.ts';
-
-const ROOT = path.join(import.meta.dirname, '..');
+import { ASSETS, CONTENT, DIST, DIST_EN, COPY_TO_DIST, COPY_DIRS } from './paths.ts';
 const { esc, pick, page, LANGS } = B;
 
 /* ---------- 本文 ---------- */
@@ -419,30 +418,53 @@ ${cards}
   }, body);
 }
 
+/* assets/ の中身を dist/ に写す。
+   CSS も JS も写真も、組み立てで作り変えるものではないので、
+   ここでは中身に触れずに置き場所だけ移す。 */
+function copyAssets(): void {
+  COPY_TO_DIST.forEach((name) => {
+    const from = path.join(ASSETS, name);
+    if (fs.existsSync(from)) { fs.copyFileSync(from, path.join(DIST, name)); }
+  });
+  COPY_DIRS.forEach((name) => {
+    const from = path.join(ASSETS, name);
+    fs.mkdirSync(path.join(DIST, name), { recursive: true });
+    if (fs.existsSync(from)) { fs.cpSync(from, path.join(DIST, name), { recursive: true }); }
+  });
+}
+
 /* ---------- 実行 ---------- */
 async function run() {
 
 
-  /* 人が書いた情報と取り込んだ数値を合流させ、recipes.js を書き出す */
+  /* dist/ は毎回まっさらから作り直す。
+     消したページや名前を変えたページが古いまま残るのを防ぐ。
+     ここに手で置いたものは消えるので、置かないこと。 */
+  fs.rmSync(DIST, { recursive: true, force: true });
+  fs.mkdirSync(DIST_EN, { recursive: true });
+
+  /* そのまま配るものを写す。加工しないので、assets/ を直接編集してよい */
+  copyAssets();
+
+  /* 人が書いた情報と取り込んだ数値を合流させ、dist/recipes.js を書き出す */
   writeRecipesJs();
   const RECIPES = siteRecipes();
 
   const written = [];
-  fs.mkdirSync(path.join(ROOT, 'en'), { recursive: true });
 
   /* トップに出す「最新のレシピ」。投稿日がいちばん新しいもの。
      投稿日が分からない回は候補にならない（byNewest が後ろに回す） */
   const newest = RECIPES.slice().sort(byNewest)[0];
   let latest: { r: SiteRecipe; c: B.RecipeContent } | undefined;
   if (newest) {
-    const p = path.join(ROOT, 'content', newest.slug + '.js');
+    const p = path.join(CONTENT, newest.slug + '.js');
     if (fs.existsSync(p)) {
       latest = { r: newest, c: (await import(pathToFileURL(p).href + '?t=' + Date.now())).default };
     }
   }
 
   for (const lang of LANGS) {
-    const dir = lang.dir ? path.join(ROOT, lang.dir) : ROOT;
+    const dir = lang.dir ? path.join(DIST, lang.dir) : DIST;
 
     const statics = [
       ['index.html', indexPage(lang, latest)],
@@ -477,7 +499,7 @@ async function run() {
     }
 
     for (const r of RECIPES) {
-      const cPath = path.join(ROOT, 'content', r.slug + '.js');
+      const cPath = path.join(CONTENT, r.slug + '.js');
       if (!fs.existsSync(cPath)) {
         console.log(`  ! content/${r.slug}.js が無いので飛ばしました`);
         continue;

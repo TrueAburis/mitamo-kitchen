@@ -4,7 +4,14 @@
 # 日本語を正しく表示するため、出力の文字コードを UTF-8 にする
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-$root = (Get-Location).Path
+# 配るのは dist/ の中身だけ。本番（S3）に置くものと同じものを見ることになる。
+# リポジトリの根元を配ると、data/ や tools/ まで見えてしまい、
+# 手元では動くのに本番で 404、という食い違いも起きる。
+$root = Join-Path (Get-Location).Path 'dist'
+if (-not (Test-Path -LiteralPath $root)) {
+  Write-Host "dist/ がありません。先に npm run build を実行してください。"
+  exit 1
+}
 $port = 8000
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")

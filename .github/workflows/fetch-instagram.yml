@@ -38,18 +38,17 @@ jobs:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: node tools/fetch-instagram.ts
 
-      # 数値が入った recipes.js を作り直す
-      - name: ページを組み立て直す
-        run: npm run build
-
+      # コミットするのは data/instagram.json だけ。
+      # ページは dist/ に組み立てられるもので、git では追っていない。
+      # ここへの push が deploy を動かし、そちらが組み立て直して公開する。
       - name: 変化があればコミットする
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet; then
+          if git diff --quiet -- data/instagram.json; then
             echo "数値に変化がありませんでした。コミットしません。"
           else
-            git add data/instagram.json recipes.js *.html en/*.html
+            git add data/instagram.json
             git commit -m "Instagram の数値を取り込み"
             git push
           fi

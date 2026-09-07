@@ -3,7 +3,10 @@
 # アクセスキーは保存していない。OIDC で「このリポジトリの main から来た」ことを
 # AWS 側が確認し、その場限りの資格情報を渡す。鍵がどこにも無いので漏れようがない。
 #
-# 動かすには、先に infra/ を1度デプロイして、下の2つを
+# 公開するものは dist/ に全部そろう。dist/ は git に入れていないので、
+# ここで組み立ててから送る。手元とCIで同じ npm run build を通る。
+#
+# 動かすには、先に infra/ を1度デプロイして、下の3つを
 # リポジトリの Variables（Secrets ではない。秘密ではないので）に入れる。
 #   AWS_DEPLOY_ROLE_ARN   … cdk deploy の出力 DeployRoleArn
 #   AWS_S3_BUCKET         … 同 BucketName
@@ -43,7 +46,7 @@ jobs:
       - name: 型を検査する
         run: npm run check
 
-      - name: キャプション解析を検証する
+      - name: キャプション解析と英文を検証する
         run: npm test
 
       - name: ページを組み立てる
@@ -55,27 +58,16 @@ jobs:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
-      # HTML は毎回変わるのでキャッシュを短く、
-      # CSS と JS は変わったら消せばよいので長めに持たせる
-      - name: 画像・CSS・JS を送る
-        run: |
-          aws s3 sync . "s3://${{ vars.AWS_S3_BUCKET }}" \
-            --delete \
-            --exclude "*" \
-            --include "style.css" --include "script.js" --include "recipes.js" \
-            --include "images/*" \
-            --cache-control "public,max-age=86400"
+      # CSS・JS・写真を先に送る。HTML を先に送ると、
+      # まだ置かれていないCSSを読みに行く瞬間ができる。
+      # HTML 以外は変わる頻度が低いので、キャッシュを長めに持たせる。
+      - name: CSS・JS・写真を送る
+        run: aws s3 sync dist/ "s3://${{ vars.AWS_S3_BUCKET }}" --exclude "*.html" --cache-control "public,max-age=86400"
 
+      # HTML は毎回変わるのでキャッシュを短く。
+      # --delete はここだけ。消したページを S3 からも消す
       - name: HTML を送る
-        run: |
-          aws s3 sync . "s3://${{ vars.AWS_S3_BUCKET }}" \
-            --delete \
-            --exclude "*" \
-            --include "*.html" --include "en/*.html" \
-            --cache-control "public,max-age=300"
+        run: aws s3 sync dist/ "s3://${{ vars.AWS_S3_BUCKET }}" --delete --cache-control "public,max-age=300"
 
       - name: キャッシュを消す
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id "${{ vars.AWS_CLOUDFRONT_ID }}" \
-            --paths "/*"
+        run: aws cloudfront create-invalidation --distribution-id "${{ vars.AWS_CLOUDFRONT_ID }}" --paths "/*"

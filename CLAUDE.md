@@ -20,30 +20,43 @@
 
 ## ファイル構成
 
-**HTMLファイルは手で直さないこと。組み立てで上書きされる。**
-直す場所は下の対応表を見ること。
+いちばん大事な線は、**人が書くもの**と**機械が作るもの**の境。
+書いたものは `dist/` に出る。**`dist/` の中は手で直さない。次の組み立てで消える。**
 
 ```
-data/recipes.ts       レシピの一覧情報（人が書く）
-data/collections.ts   献立（人が書く）
-data/instagram.json   いいね数など（機械が書く）
-data/phrasebook.ts    キャプションの日英対訳（人が書く）
-content/<slug>.js     レシピ本文＝材料・手順・コツ（人が書く／生成もできる）
+人が書く（git で追う）
+  data/recipes.ts       レシピの一覧情報
+  data/collections.ts   献立
+  data/phrasebook.ts    キャプションの日英対訳
+  data/captions/        みたもさんからもらったキャプション本文
+  data/instagram.json   いいね数など ←ここだけ機械が書き換える
+  content/<slug>.js     レシピ本文＝材料・手順・コツ
+  assets/style.css      全ページ共通のCSS
+  assets/script.js      全ページ共通のJS
+  assets/images/        写真
+  tools/                組み立てと検証の道具（TypeScript）
+  infra/                公開用インフラの定義（AWS CDK）
 
-tools/                組み立てと検証の道具（TypeScript）
-infra/                公開用インフラの定義（AWS CDK）
-style.css             全ページ共通のCSS（手で直してよい）
-script.js             全ページ共通のJS（手で直してよい）
-images/               写真
+機械が作る（git で追わない）
+  dist/                 公開するものが全部ここに入る
+  dist/index.html …     日本語のページ
+  dist/en/…             英語のページ
+  dist/recipes.js       一覧・検索・ガチャが読むデータ
+  dist/style.css        assets/ から写したもの
 
-*.html, en/*.html     ←【生成物】触らない
-recipes.js            ←【生成物】触らない
-
-serve.ps1             確認用サーバー（サイト本体ではない）
-docs/ledger.html      制作台帳の元ファイル（サイト本体ではない）
-docs/phrasebook.html  ←【生成物】日英対訳表。data/phrasebook.ts から組み立てる
-.claude/skills/       このプロジェクト専用のスキル
+そのほか
+  serve.ps1             確認用サーバー（dist/ を配る）
+  docs/ledger.html      制作台帳。みたもさんと共有しているページ
+  docs/phrasebook.html  ←【生成物】日英対訳表。data/phrasebook.ts から作る
+  .claude/skills/       このプロジェクト専用のスキル
 ```
+
+**`dist/` を git に入れていない理由。** ソースから何度でも同じものが作れるため。
+入れると、文章を1文字直すたびに46ファイルの差分が出て、
+本当の変更が履歴の中で埋もれる。公開は GitHub Actions がその場で組み立てて送る。
+
+**置き場所を決めているのは `tools/paths.ts` だけ。**
+書き出し先を動かすときは、そこだけ直せばよいようにしてある。
 
 ### 直したいものと、直す場所
 
@@ -56,17 +69,18 @@ docs/phrasebook.html  ←【生成物】日英対訳表。data/phrasebook.ts か
 | 献立の組み合わせ | `data/collections.ts` |
 | キャプションの英文の直し | `data/phrasebook.ts` の POSTS |
 | 材料名・言い回しの定訳 | `data/phrasebook.ts` の TERMS と `tools/ingredients-ja-en.ts` |
-| 見た目 | `style.css` |
-| 画面の動き | `script.js` |
+| 見た目 | `assets/style.css` |
+| 画面の動き | `assets/script.js` |
+| ファイルの置き場所そのもの | `tools/paths.ts` |
 
 ### よく使うコマンド
 
 ```
-npm run build    全ページを日本語版と英語版で書き出す
-npm test         キャプション解析と取り込みの検証
+npm run build    dist/ に全ページを日本語版と英語版で書き出す（46ページ）
+npm test         キャプション解析・材料辞書・書き出した英文の検証（41項目）
 npm run check    型検査
 npm run build:phrasebook    日英対訳表（docs/phrasebook.html）を書き出す
-powershell -ExecutionPolicy Bypass -File serve.ps1    確認用サーバー
+powershell -ExecutionPolicy Bypass -File serve.ps1    確認用サーバー（先に build が要る）
 ```
 
 レシピを増やすときは `/add-recipe` スキルを使う。
@@ -200,7 +214,7 @@ OS標準だけで組むと、閲覧者の環境ごとに顔が変わり、どれ
 - 本番用の連絡先メールアドレス。テスト用の個人アドレスは、公開リポジトリに載せないため work.html から外してある（雛形はコメントで残してある）
 - 「このチャンネルについて」の本文（いまは仮の文章）と、はじめた年・更新頻度・拠点の実データ
 - 鶏むね肉と茄子の南蛮漬けの**手順**（Instagram のキャプションに記載が無かった）、何人前、時間、鶏むね肉の分量
-- すべてのレシピの写真（images/ が空。Instagram の投稿から持ってくる予定）
+- すべてのレシピの写真（`assets/images/` が空。Instagram の投稿から持ってくる予定）
 
 これらはコード中で `TODO:` と明記し、それらしい嘘で埋めないこと。
 
@@ -223,7 +237,7 @@ OS標準だけで組むと、閲覧者の環境ごとに顔が変わり、どれ
 | TikTok | https://www.tiktok.com/@mitamokitchen |
 | YouTube | https://www.youtube.com/channel/UCY5Py2DIsgdurOYtN0ayV3A |
 
-アイコンは公式ロゴではなく、こちらで描いた簡略版のSVG（`index.html` に直接書いてある）。
+アイコンは公式ロゴではなく、こちらで描いた簡略版のSVG（`tools/build-pages.ts` に書いてある）。
 正式なブランドロゴに差し替えたくなったら、各社の利用規約を確認してから入れ替える。
 
 トップの構成は BayashiTV の公式サイトを参考にしている。
@@ -240,13 +254,13 @@ OS標準だけで組むと、閲覧者の環境ごとに顔が変わり、どれ
 
 ## レシピのデータ（人が書く側と、機械が書く側）
 
-**`recipes.js` は書き出されたもの。直接編集しないこと。上書きされる。**
+**`dist/recipes.js` は書き出されたもの。直接編集しないこと。上書きされる。**
 
 | ファイル | 誰が書くか | 中身 |
 |---|---|---|
 | `data/recipes.ts` | **人** | タイトル・タグ・投稿URL・手順の有無 |
 | `data/instagram.json` | **機械** | いいね数・コメント数・取り込んだ日 |
-| `recipes.js` | 組み立て | 上の2つを合流させたもの。ブラウザが読む |
+| `dist/recipes.js` | 組み立て | 上の2つを合流させたもの。ブラウザが読む |
 
 **分けている理由。** 機械にコメント付きのファイルを書き換えさせると、いつか必ず壊す。
 人が書く側と機械が書く側を別のファイルにしておけば、その事故が起きない。
@@ -258,7 +272,7 @@ OS標準だけで組むと、閲覧者の環境ごとに顔が変わり、どれ
 過去のキャプションから起こした14件は投稿日が分からないので null にしてある。
 それらしい日付で埋めると、画面に出る日付が嘘になるうえ、
 「新しい順」の並びまで嘘になる。null の回は日付を出さず、
-日付のある回より後ろに並ぶ（`tools/site-data.ts` の `byNewest` と `script.js` に同じ規則がある）。
+日付のある回より後ろに並ぶ（`tools/site-data.ts` の `byNewest` と `assets/script.js` に同じ規則がある）。
 
 ## Instagram の自動取り込み（トークン待ち）
 
@@ -398,7 +412,7 @@ URL を指定せずに公開すると別のページが増えてしまい、
 
 ## タグの設計
 
-食材・料理の形・場面・時間の4軸。`recipes.js` の `TAGS` に軸ごと定義してある。
+食材・料理の形・場面・時間の4軸。`data/recipes.ts` の `TAGS` に軸ごと定義してある。
 材料の分類だけにしないのは、探す人が「弁当に入れたい」「15分しかない」で
 探すため。材料の軸だけでは、その問いに答えられない。
 
@@ -452,14 +466,9 @@ URL を指定せずに公開すると別のページが増えてしまい、
 
 ## 開発用の道具（TypeScript）
 
-**サイト本体はビルド不要のまま。** `tools/` は組み立てと検証のための道具で、
-サイトのHTMLは Node が無くてもそのまま開ける。
-
-```
-npm run build    全ページを日本語版と英語版で書き出す（46ページ）
-npm test         キャプション解析・材料辞書・書き出した英文の検証（41項目）
-npm run check    型検査
-```
+**閲覧する側にビルドは要らない。** `tools/` は書き出すための道具で、
+出来上がった `dist/` の中身は素のHTML・CSS・JS。Node が無くてもそのまま開ける。
+コマンドの一覧は冒頭の「よく使うコマンド」にまとめてある。
 
 ### なぜ TypeScript にしたか
 
@@ -482,7 +491,7 @@ Node 24 は **TypeScript をそのまま実行できる**ので、ビルド段�
 ## キャプションからレシピページを作る
 
 ```
-node tools/generate.ts tools/fixtures/somen.txt <slug>
+node tools/generate.ts data/captions/somen.txt <slug>
 ```
 
 `content/<slug>.js`（レシピ本文のデータ）を書き出し、`recipes.js` に貼る1件分を表示する。
@@ -490,7 +499,7 @@ node tools/generate.ts tools/fixtures/somen.txt <slug>
 
 - ヘッダーとフッターは `index.html` から読み取って使う。
   テンプレートとして別に持つと、片方だけ直したときにズレるため
-- **タグは `recipes.js` の TAGS にあるものしか付けない。**
+- **タグは `data/recipes.ts` の TAGS にあるものしか付けない。**
   本文から新しいタグ名を作らせると「お手軽」「手軽」「かんたん」が
   別タグとして増殖して、タグ検索そのものが機能しなくなる
 - 香味野菜（ネギ・生姜・にんにく・大葉・みょうが）は「野菜」として数えない。

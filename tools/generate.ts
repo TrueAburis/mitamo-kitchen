@@ -1,7 +1,7 @@
 /* キャプションから、レシピ本文のデータ（content/<slug>.js）を書き出す。
 
 
-   実行： node tools/generate.ts tools/fixtures/somen.txt <slug>
+   実行： node tools/generate.ts data/captions/somen.txt <slug>
 
    ページのHTMLはここでは作らない。content/ に置いたデータを
    tools/build.js が読んで、日本語版と英語版の2枚に組み立てる。
@@ -18,7 +18,7 @@ import * as Phrasebook from './phrasebook-apply.ts';
 import type { Parsed, Ingredient, Group } from './parse-caption.ts';
 import { TAGS } from '../data/recipes.ts';
 
-const ROOT = path.join(import.meta.dirname, '..');
+import { CONTENT } from './paths.ts';
 
 
 function knownTags(): string[] {
@@ -177,8 +177,8 @@ if (!Phrasebook.known(slug)) {
   warn('対訳表（data/phrasebook.ts）にこの回がない。英文はキャプションのまま出る');
 }
 
-fs.mkdirSync(path.join(ROOT, 'content'), { recursive: true });
-const out = path.join(ROOT, 'content', slug + '.js');
+fs.mkdirSync(CONTENT, { recursive: true });
+const out = path.join(CONTENT, slug + '.js');
 fs.writeFileSync(out, buildContent(parsed, slug, warn), 'utf8');
 
 /* 一覧に出すタイトルとリード文も、対訳表を通す */

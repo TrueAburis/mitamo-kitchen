@@ -1,6 +1,6 @@
 /* 人が書いたレシピ情報（data/recipes.ts）と、
    Instagram から取り込んだ数値（data/instagram.json）を合流させて、
-   ブラウザが読む recipes.js を書き出す。
+   ブラウザが読む dist/recipes.js を書き出す。
 
    分けている理由：
    機械にコメント付きのファイルを書き換えさせると、いつか必ず壊す。
@@ -9,8 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { RECIPES, TAGS, TAG_AXES, TAG_MIN, type Recipe } from '../data/recipes.ts';
-
-const ROOT = path.join(import.meta.dirname, '..');
+import { INSTAGRAM_JSON, RECIPES_JS } from './paths.ts';
 
 /** Instagram から取り込んだ1件分。取れていない項目は null のまま */
 export type Figures = {
@@ -27,7 +26,7 @@ const EMPTY: Figures = { likes: null, comments: null, views: null, fetchedAt: nu
 
 /** data/instagram.json を読む。無ければ空として扱う（初回や、取り込み前） */
 export function loadFigures(): Record<string, Figures> {
-  const file = path.join(ROOT, 'data', 'instagram.json');
+  const file = INSTAGRAM_JSON;
   if (!fs.existsSync(file)) { return {}; }
   try {
     return JSON.parse(fs.readFileSync(file, 'utf8')) as Record<string, Figures>;
@@ -74,6 +73,7 @@ window.TAG_AXES = ${JSON.stringify(TAG_AXES, null, 2)};
 
 window.TAG_MIN = ${TAG_MIN};
 `;
-  fs.writeFileSync(path.join(ROOT, 'recipes.js'), body, 'utf8');
+  fs.mkdirSync(path.dirname(RECIPES_JS), { recursive: true });
+  fs.writeFileSync(RECIPES_JS, body, 'utf8');
   return body;
 }

@@ -25,11 +25,12 @@ description: みたもキッチンの制作台帳（docs/ledger.html）を最新
 
 ```bash
 git log --date=format:'%Y-%m-%d' --pretty='%ad|%s' | head -10
-grep -rn 'TODO' --include='*.html' --include='*.js' *.html *.js | cut -c1-100
+grep -rn 'TODO' data/ content/ tools/build.ts tools/build-pages.ts | cut -c1-100
 sed -n '/^## まだ決まっていないこと/,/^これらは/p' CLAUDE.md
 ```
 
-`recipes.js` のレシピ件数と `ready: false` の数も見ておく。
+`data/recipes.ts` のレシピ件数と `ready: false` の数も見ておく。
+（`dist/` の中は組み立てで作られるものなので、数えるなら元データのほうを見る）
 
 ### 2. 4か所を直す
 
@@ -49,7 +50,7 @@ sed -n '/^## まだ決まっていないこと/,/^これらは/p' CLAUDE.md
 みたもさんが**前に見たときから何が変わったか**が分かればよい。
 
 - よい：`レシピガチャを追加。PR投稿を自動投稿の対象外に`
-- わるい：`fix: refactor script.js and update styles`
+- わるい：`fix: refactor assets/script.js and update styles`
 
 コミットメッセージをそのまま貼らない。1日に何回作業しても、
 みたもさんから見て意味のあるまとまりで1行にする。

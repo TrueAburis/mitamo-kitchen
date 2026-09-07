@@ -1,7 +1,7 @@
 /* キャプション解析と材料辞書の検証。
    実行： node tools/test.js
 
-   実際の投稿（tools/fixtures/）に対して、取れるはずのものが取れているかを確かめる。
+   実際の投稿（data/captions/）に対して、取れるはずのものが取れているかを確かめる。
    キャプションの書き方は回によって揺れるので、
    「1本でたまたま動いた」を「3本とも動く」に変えるのがこのファイルの役目。
 
@@ -14,8 +14,9 @@ import * as IngredientDict from './ingredients-ja-en.ts';
 import type { Group } from './parse-caption.ts';
 import { permalinkCode, toFigures, merge } from './fetch-instagram.ts';
 import { findAvoided } from './check-english.ts';
+import { CAPTIONS } from './paths.ts';
 
-const dir = path.join(import.meta.dirname, 'fixtures');
+const dir = CAPTIONS;
 const read = (f: string) => fs.readFileSync(path.join(dir, f), 'utf8');
 
 let failed = 0;
