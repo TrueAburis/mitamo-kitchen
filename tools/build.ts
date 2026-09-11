@@ -107,8 +107,6 @@ const T = {
   nav: [
     { href: 'index.html', ja: 'トップ', en: 'Home' },
     { href: 'recipes.html', ja: 'レシピ', en: 'Recipes' },
-    { href: 'recipes.html?sort=popular', ja: '人気のレシピ', en: 'Popular' },
-    { href: 'recipes.html#tags', ja: 'タグから探す', en: 'Tags' },
     { href: 'collections.html', ja: '献立', en: 'Menus' },
     { href: 'gacha.html', ja: 'レシピガチャ', en: 'Recipe gacha' },
     { href: 'index.html#profile', ja: 'みたもっちゃんねるとは', en: 'Profile' },
@@ -132,10 +130,6 @@ const T = {
   notes: { ja: 'コツ', en: 'Notes' },
   similar: { ja: '似ているレシピ', en: 'Similar recipes' },
   recipesLabel: { ja: 'レシピ', en: 'Recipes' },
-  figuresNote: {
-    ja: '数値は Instagram の投稿から取り込んだものです。「—」はまだ取り込めていません。',
-    en: 'Figures come from Instagram. A dash means it has not been fetched yet.'
-  },
 };
 
 /* ---------- ページの外枠 ---------- */
@@ -364,9 +358,8 @@ ${c.intro.map((p) => `          <p>${esc(pick(p, lg) || p.ja)}</p>`).join('\n')}
           </div>
         </dl>
 
-        <!-- いいね数・コメント数・タグは recipes.js から入る -->
-        <div class="figures" id="figures"></div>
-        <p class="figures-note">${esc(pick(T.figuresNote, lg))}</p>
+        <!-- タグのリンクは recipes.js から入る。押すと一覧が絞り込まれる -->
+        <div class="card-tags" id="recipe-tags"></div>
 
         <!-- Instagram の動画。permalink があるレシピにだけ入る -->
         <div id="video"></div>
@@ -423,11 +416,10 @@ ${c.tips.map((t) => `                <li>${esc(pick(t, lg) || t.ja)}</li>`).join
    一覧やガチャは画面側（script.js）で組み立てているが、
    献立ページは**組み立て時にHTMLへ書き出す**。
    検索エンジンに中身を読ませたいので、JavaScript 頼みにしない。 */
-function recipeCardHtml(r: RecipeMeta & { likes: number | null }, lg: 'ja' | 'en', tagNames: Record<string, string>): string {
+function recipeCardHtml(r: RecipeMeta, lg: 'ja' | 'en', tagNames: Record<string, string>): string {
   const title = r[lg].title;
   const sub = lg === 'ja' && r.en.title !== r.ja.title
     ? `<span class="en" lang="en">${esc(r.en.title)}</span>` : '';
-  const likes = r.likes == null ? '—' : String(r.likes);
   const tags = r.tags.map((t) => `<span>${esc(tagNames[t] ?? t)}</span>`).join('');
   const draft = r.ready ? '' :
     `<span class="card-draft">${lg === 'ja' ? '手順は準備中' : 'Steps coming'}</span>`;
@@ -437,7 +429,7 @@ function recipeCardHtml(r: RecipeMeta & { likes: number | null }, lg: 'ja' | 'en
             <figure class="card-shot"><span>${esc(r.image)}</span></figure>
             <h3 class="card-title">${esc(title)}${sub}</h3>
             <p class="card-lead">${esc(r[lg].lead)}</p>
-            <div class="card-meta"><span>${lg === 'ja' ? 'いいね ' : 'Likes '}${likes}</span>${r.posted ? `<span>${esc(r.posted)}</span>` : ''}</div>
+            ${r.posted ? `<div class="card-meta"><span>${esc(r.posted)}</span></div>` : ''}
             <div class="card-tags">${tags}</div>${draft}
           </a>
         </li>`;
