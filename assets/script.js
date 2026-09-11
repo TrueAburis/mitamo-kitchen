@@ -91,7 +91,7 @@
   /* ============ ここから下は recipes.js のデータを使う ============ */
 
   /* 英語で見ているときは、英語ページを作っていない回を外す。
-     一覧・検索・タグ・ガチャ・関連レシピが全部ここを見ているので、
+     一覧・検索・タグ・人気順・ガチャ・関連レシピが全部ここを見ているので、
      ここで1回外せば、どこからも 404 へのリンクが出なくなる。
      日本語ページは全件そのまま（日本語は必ずある）。 */
   var DATA = (window.RECIPES || []).filter(function (r) {
@@ -108,6 +108,7 @@
     return n;
   }
 
+  function num(v) { return v == null ? '—' : Number(v).toLocaleString('en-US'); }
   function plural(n) { return n === 1 ? 'recipe' : 'recipes'; }
   function tagName(key) { return TAGS[key] ? TAGS[key][LG] : key; }
 
@@ -138,11 +139,10 @@
     a.appendChild(h);
     a.appendChild(el('p', 'card-lead', r[LG].lead));
 
-    if (r.posted) {
-      var meta = el('div', 'card-meta');
-      meta.appendChild(el('span', null, r.posted));
-      a.appendChild(meta);
-    }
+    var meta = el('div', 'card-meta');
+    meta.appendChild(el('span', null, (ja ? 'いいね ' : 'Likes ') + num(r.likes)));
+    if (r.posted) { meta.appendChild(el('span', null, r.posted)); }
+    a.appendChild(meta);
 
     var tags = el('div', 'card-tags');
     r.tags.forEach(function (t) { tags.appendChild(el('span', null, tagName(t))); });
@@ -155,6 +155,13 @@
     return li;
   }
 
+  function byPopular(a, b) {
+    /* いいね数が未取得のものは、数値のあるものより後ろに置く */
+    if (a.likes == null && b.likes == null) { return byNewest(a, b); }
+    if (a.likes == null) { return 1; }
+    if (b.likes == null) { return -1; }
+    return b.likes - a.likes;
+  }
   /* 投稿日が分からない回（posted が null）は、日付のある回より後ろ。
      並べようがないものを新しい側に置くと、一覧の先頭が意味を持たなくなる。 */
   function byNewest(a, b) {
@@ -209,7 +216,8 @@
     var params = new URLSearchParams(location.search);
     var state = {
       q: params.get('q') || '',
-      tag: params.get('tag') || ''
+      tag: params.get('tag') || '',
+      sort: params.get('sort') === 'popular' ? 'popular' : 'new'
     };
 
     var search = document.querySelector('[data-search]');
@@ -226,7 +234,7 @@
     };
 
     var render = function () {
-      var rows = DATA.filter(matches).sort(byNewest);
+      var rows = DATA.filter(matches).sort(state.sort === 'popular' ? byPopular : byNewest);
 
       list.innerHTML = '';
       rows.forEach(function (r) { list.appendChild(card(r)); });
@@ -246,7 +254,17 @@
       if (chipsHost) {
         buildChips(chipsHost, state.tag, function (k) { state.tag = k; render(); });
       }
+      document.querySelectorAll('[data-sort]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.sort === state.sort ? 'true' : 'false');
+        b.textContent = b.dataset.sort === 'popular'
+          ? (ja ? 'いいねが多い順' : 'Most liked')
+          : (ja ? '新しい順' : 'Newest');
+      });
     };
+
+    document.querySelectorAll('[data-sort]').forEach(function (b) {
+      b.addEventListener('click', function () { state.sort = b.dataset.sort; render(); });
+    });
 
     if (search) {
       search.form.addEventListener('submit', function (e) { e.preventDefault(); });
@@ -254,6 +272,12 @@
     }
 
     render();
+  }
+
+  /* ---------- トップの人気のレシピ ---------- */
+  var pop = document.getElementById('popular');
+  if (pop) {
+    DATA.slice().sort(byPopular).slice(0, 3).forEach(function (r) { pop.appendChild(card(r)); });
   }
 
   /* ---------- レシピガチャ ----------
@@ -329,17 +353,26 @@
   if (article) {
     var rec = DATA.filter(function (r) { return r.slug === article.id; })[0];
 
-    /* このレシピのタグ。押すと一覧がそのタグで絞り込まれた状態で開く。
-       レシピから一覧へ戻る道でもあるので、メニューを減らしたぶん大事になった。 */
-    var tagHost = document.getElementById('recipe-tags');
-    if (rec && tagHost) {
+    var figs = document.getElementById('figures');
+    if (rec && figs) {
+      /* 再生数は insights の追加権限がまだ無く、取りようがない。
+         永久に「—」のままの欄を出すと、壊れているように見えるので出さない。
+         取れるようになったら戻す。 */
+      [[ja ? 'いいね' : 'Likes', rec.likes],
+       [ja ? 'コメント' : 'Comments', rec.comments]].forEach(function (pair) {
+        var s = el('span', null, pair[0] + ' ');
+        s.appendChild(el('b', null, num(pair[1])));
+        figs.appendChild(s);
+      });
+      var tg = el('div', 'card-tags');
       rec.tags.forEach(function (t) {
         var link = el('a', null, tagName(t));
         link.href = 'recipes.html?tag=' + encodeURIComponent(t);
         var w = el('span');
         w.appendChild(link);
-        tagHost.appendChild(w);
+        tg.appendChild(w);
       });
+      figs.appendChild(tg);
     }
 
     /* 関連レシピ。タグの重なりが多い順に3件まで。

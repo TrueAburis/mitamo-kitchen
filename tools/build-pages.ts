@@ -22,6 +22,13 @@ const C = {
   photoMissing: { ja: '写真がまだありません', en: 'No photo yet' },
   workCta: { ja: 'お仕事のご依頼はこちら', en: 'Work with us' },
 
+  popularLabel: { ja: '人気のレシピ', en: 'Popular' },
+  popularTitle: { ja: 'よく見られているもの', en: 'Most viewed' },
+  popularNote: {
+    ja: 'いいね数は Instagram の投稿から取り込んだ数値です。「—」はまだ取り込めていないものです。',
+    en: 'Like counts come from Instagram. A dash means the number has not been fetched yet.'
+  },
+  seeAll: { ja: 'レシピをすべて見る', en: 'See all recipes' },
 
   latestLabel: { ja: 'レシピ', en: 'Recipes' },
 
@@ -47,6 +54,7 @@ const C = {
     en: 'Use the search box above to filter by ingredient or dish name.'
   },
   browseByTag: { ja: 'タグから探す', en: 'Browse by tag' },
+  sortLabel: { ja: '並び順', en: 'Sort' },
   emptyResult: {
     ja: '条件に合うレシピがありませんでした。検索の言葉を短くするか、タグを外してみてください。',
     en: 'No recipes matched. Try a shorter search term, or clear the tag.'
@@ -180,6 +188,21 @@ ${sns}
   </section>
 
 ${latest ? latestDishHtml(lg, latest.r, latest.c) : ''}
+  <section class="plain" id="popular-section">
+    <div class="wrap">
+      <p class="sec-title">${esc(pick(C.popularLabel, lg))}</p>
+      <h2 class="sec-h2">${esc(pick(C.popularTitle, lg))}</h2>
+
+      <!-- カードは recipes.js のデータから作る。いいねが多い順の上位3件 -->
+      <ul class="cards" id="popular"></ul>
+
+      <p class="figures-note">${esc(pick(C.popularNote, lg))}</p>
+
+      <p class="form-alt" style="margin-top:16px">
+        <a href="recipes.html?sort=popular">${esc(pick(C.seeAll, lg))}</a>
+      </p>
+    </div>
+  </section>
 
   <section class="plain" id="profile">
     <div class="wrap">
@@ -219,9 +242,15 @@ function recipesPage(lang: B.Lang): string {
 
       <p class="prose" style="margin-top:10px">${esc(pick(C.recipesIntro, lg))}</p>
 
-      <h2 class="sec-title" style="margin-top:24px">${esc(pick(C.browseByTag, lg))}</h2>
+      <h2 class="sec-title" id="tags" style="margin-top:24px">${esc(pick(C.browseByTag, lg))}</h2>
       <!-- タグのボタンは recipes.js の TAGS から作る -->
       <div class="filters" id="chips"></div>
+
+      <div class="sort">
+        <span>${esc(pick(C.sortLabel, lg))}</span>
+        <button class="chip" type="button" data-sort="new" aria-pressed="true"></button>
+        <button class="chip" type="button" data-sort="popular" aria-pressed="false"></button>
+      </div>
 
       <p class="result-count" id="count" aria-live="polite"></p>
 
