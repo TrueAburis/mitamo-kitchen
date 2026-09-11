@@ -42,6 +42,8 @@ export type Parsed = {
   /** 同じく [Recipe] の行の後ろ（「Serves 2」）。無ければ null */
   servingsEn: string | null;
   steps: string[];
+  /** 英語の手順。[Steps] があれば入る。日本語と同じ数になるとは限らない */
+  stepsEn: string[];
   hashtags: string[];
   isPR: boolean;
   warnings: string[];
@@ -190,26 +192,70 @@ export type Parsed = {
       return -1;
     }
 
-    /* 目印の行に、何人前が書き足されていることがある（「【レシピ】2人前」）。
+    /* ---- 目印を全部拾ってから、範囲を決める ----
+
+       キャプションは「日本語のかたまり → 英語のかたまり」の順で、
+       それぞれが目印の行で区切られている。
+       どこからどこまでが何なのかは、**次の目印までの範囲**で決まる。
+
+       以前は「この目印からあの目印まで」と個別に書いていたので、
+       目印が1つ増えただけで全体が崩れた。実際、【作り方】を足した
+       テンプレートを通すと、手順が英語のかたまりごと飲み込んで16件になり、
+       英語のタイトルも本文も取れなくなっていた。
+
+       目印の行に何人前が書き足されていることがある（「【レシピ】2人前」）。
        目印だけの行にしてほしいとテンプレートには書いたが、
        すでに投稿された回を読めないほうが困るので、後ろの文字は許して拾う。 */
     var RE_RECIPE_JA = /^【\s*レシピ\s*】\s*(.*)$/;
     var RE_RECIPE_EN = /^\[\s*Recipe\s*\]\s*(.*)$/i;
+    var RE_STEPS_JA = /^【\s*(?:作り方|手順)\s*】\s*(.*)$/;
+    var RE_STEPS_EN = /^\[\s*Steps\s*\]\s*(.*)$/i;
 
-    var iTitleJa = findIndex(/^【.+】$/);
-    var iRecipeJa = findIndex(RE_RECIPE_JA);
-    var iTitleEn = -1, iRecipeEn = -1;
+    /** 【…】の中身が英字だけなら、英語のタイトルの行 */
+    function isLatin(s: string): boolean {
+      return /[A-Za-z]/.test(s) && !/[ぁ-んァ-ヶ一-龥]/.test(s);
+    }
+
+    var iTitleJa = -1;      /* 【日本語のタイトル】 */
+    var iTitleEnTop = -1;   /* 【English Title】。新しいテンプレートで先頭に並ぶ */
+    var iTitleEnBody = -1;  /* [English Title]。英語の本文が始まる目印 */
+    var iRecipeJa = -1, iRecipeEn = -1, iStepsJa = -1, iStepsEn = -1;
+
     for (var i = 0; i < body.length; i++) {
-      var t = body[i].trim();
-      if (iTitleEn < 0 && /^\[.+\]$/.test(t) && !RE_RECIPE_EN.test(t) && (iRecipeJa < 0 || i < iRecipeJa)) { iTitleEn = i; }
-      if (iRecipeEn < 0 && RE_RECIPE_EN.test(t)) { iRecipeEn = i; }
+      var t = body[i]!.trim();
+      if (!t) { continue; }
+      if (RE_RECIPE_JA.test(t)) { if (iRecipeJa < 0) { iRecipeJa = i; } continue; }
+      if (RE_RECIPE_EN.test(t)) { if (iRecipeEn < 0) { iRecipeEn = i; } continue; }
+      if (RE_STEPS_JA.test(t)) { if (iStepsJa < 0) { iStepsJa = i; } continue; }
+      if (RE_STEPS_EN.test(t)) { if (iStepsEn < 0) { iStepsEn = i; } continue; }
+
+      var kakko = t.match(/^【\s*(.+?)\s*】$/);
+      if (kakko) {
+        if (isLatin(kakko[1]!)) { if (iTitleEnTop < 0) { iTitleEnTop = i; } }
+        else if (iTitleJa < 0) { iTitleJa = i; }
+        continue;
+      }
+      if (iTitleEnBody < 0 && /^\[.+\]$/.test(t)) { iTitleEnBody = i; }
+    }
+
+    /* 目印の位置を並べておく。ある区間の終わりは「次の目印」で決まる */
+    var marks = [iTitleJa, iTitleEnTop, iRecipeJa, iStepsJa, iTitleEnBody, iRecipeEn, iStepsEn]
+      .filter(function (x) { return x >= 0; })
+      .sort(function (a, b) { return a - b; });
+
+    /** idx の次に来る目印の位置。無ければ -1（最後まで） */
+    function nextMark(idx: number): number {
+      for (var k = 0; k < marks.length; k++) {
+        if (marks[k]! > idx) { return marks[k]!; }
+      }
+      return -1;
     }
 
     /* 目印の行の後ろに残った文字。「2人前」「Serves 2」だけを何人前として受け取り、
        それ以外の文字だったら捨てる（推測で埋めない）。 */
     function tail(idx: number, re: RegExp): string {
       if (idx < 0) { return ''; }
-      var m = body[idx].trim().match(re);
+      var m = body[idx]!.trim().match(re);
       return m && m[1] ? m[1].trim() : '';
     }
     var tailJa = tail(iRecipeJa, RE_RECIPE_JA);
@@ -221,13 +267,18 @@ export type Parsed = {
     var servingsEn = mServes ? mServes[1] : null;
     if (tailJa && !servingsJa) { warnings.push('【レシピ】の行に「' + tailJa + '」が付いていた。何人前と読めないので捨てた'); }
 
+    /* 英語のタイトルは、先頭の【English Title】を優先する。
+       無ければ、英語の本文の前に置かれた [English Title] を使う（これまでの形）。 */
+    var iTitleEn = iTitleEnTop >= 0 ? iTitleEnTop : iTitleEnBody;
+
     if (iTitleJa < 0) { warnings.push('日本語タイトル【】が見つからない'); }
     if (iRecipeJa < 0) { warnings.push('【レシピ】が見つからない。材料を取り出せない'); }
     if (iTitleEn < 0) { warnings.push('英語タイトルが無い'); }
     if (iRecipeEn < 0) { warnings.push('英語の材料が無い'); }
 
-    var titleJa = iTitleJa >= 0 ? body[iTitleJa].trim().replace(/^【|】$/g, '') : null;
-    var titleEn = iTitleEn >= 0 ? body[iTitleEn].trim().replace(/^\[|\]$/g, '') : null;
+    var titleJa = iTitleJa >= 0 ? body[iTitleJa]!.trim().replace(/^【\s*|\s*】$/g, '') : null;
+    var titleEn = iTitleEn >= 0
+      ? body[iTitleEn]!.trim().replace(/^[【\[]\s*|\s*[】\]]$/g, '') : null;
 
     function slice(from: number, to: number): string[] {
       if (from < 0) { return []; }
@@ -239,9 +290,9 @@ export type Parsed = {
     function firstParagraph(arr: string[]): string | null {
       var out = [];
       for (var j = 0; j < arr.length; j++) {
-        var t = arr[j].trim();
-        if (!t) { if (out.length) { break; } else { continue; } }
-        out.push(t);
+        var t2 = arr[j]!.trim();
+        if (!t2) { if (out.length) { break; } else { continue; } }
+        out.push(t2);
       }
       return out.length ? out.join(' ') : null;
     }
@@ -251,23 +302,30 @@ export type Parsed = {
     function restParagraphs(arr: string[]): string[] {
       var paras: string[] = [], cur: string[] = [];
       arr.forEach(function (line) {
-        var t = line.trim();
-        if (!t) { if (cur.length) { paras.push(cur.join(' ')); cur = []; } }
-        else { cur.push(t); }
+        var t2 = line.trim();
+        if (!t2) { if (cur.length) { paras.push(cur.join(' ')); cur = []; } }
+        else { cur.push(t2); }
       });
       if (cur.length) { paras.push(cur.join(' ')); }
       return paras.slice(1);
     }
 
-    var leadJaEnd = iTitleEn >= 0 ? iTitleEn : iRecipeJa;
-    var leadJa = firstParagraph(slice(iTitleJa + 1, leadJaEnd));
-    var leadEn = iTitleEn >= 0 ? firstParagraph(slice(iTitleEn + 1, iRecipeJa)) : null;
-    var notesJa = restParagraphs(slice(iTitleJa + 1, leadJaEnd));
-    var notesEn = iTitleEn >= 0 ? restParagraphs(slice(iTitleEn + 1, iRecipeJa)) : [];
+    /* 日本語の本文は、タイトルのかたまりが終わったところから。
+       新しいテンプレートでは【日本語】【English】と2行並ぶので、後ろのほうから始める。 */
+    var bodyJaStart = iTitleJa;
+    if (iTitleEnTop >= 0 && (iRecipeJa < 0 || iTitleEnTop < iRecipeJa) && iTitleEnTop > iTitleJa) {
+      bodyJaStart = iTitleEnTop;
+    }
+    var jaBody = slice(bodyJaStart + 1, nextMark(bodyJaStart));
+    var enBody = iTitleEnBody >= 0 ? slice(iTitleEnBody + 1, nextMark(iTitleEnBody)) : [];
 
-    var ingJaEnd = iRecipeEn >= 0 ? iRecipeEn : -1;
-    var groupsJa = iRecipeJa >= 0 ? parseIngredientBlock(slice(iRecipeJa + 1, ingJaEnd)) : [];
-    var groupsEn = iRecipeEn >= 0 ? parseIngredientBlock(slice(iRecipeEn + 1, -1)) : [];
+    var leadJa = firstParagraph(jaBody);
+    var leadEn = firstParagraph(enBody);
+    var notesJa = restParagraphs(jaBody);
+    var notesEn = restParagraphs(enBody);
+
+    var groupsJa = iRecipeJa >= 0 ? parseIngredientBlock(slice(iRecipeJa + 1, nextMark(iRecipeJa))) : [];
+    var groupsEn = iRecipeEn >= 0 ? parseIngredientBlock(slice(iRecipeEn + 1, nextMark(iRecipeEn))) : [];
 
     var noQty: string[] = [];
     groupsJa.forEach(function (g) {
@@ -281,18 +339,24 @@ export type Parsed = {
       warnings.push('材料の数が日英で違う（日 ' + jaCount + ' / 英 ' + enCount + '）');
     }
 
-    /* 手順は、確認した投稿3本すべてに書かれていなかった。
-       将来キャプションに【作り方】が入るようになったら、ここで拾う。 */
-    var iSteps = findIndex(/^【\s*(作り方|手順)\s*】$/);
-    var steps: string[] = [];
-    if (iSteps >= 0) {
-      slice(iSteps + 1, iRecipeJa > iSteps ? iRecipeJa : -1).forEach(function (line) {
-        var t = normalize(line).trim();
-        if (!t) { return; }
-        steps.push(toHalfDigits(t).replace(/^[0-9]+[.、)．]\s*/, ''));
+    /* 手順。行頭の「1.」は画面側で番号を振り直すので落とす */
+    function readSteps(from: number): string[] {
+      if (from < 0) { return []; }
+      var out: string[] = [];
+      slice(from + 1, nextMark(from)).forEach(function (line) {
+        var t2 = normalize(line).trim();
+        if (!t2) { return; }
+        out.push(toHalfDigits(t2).replace(/^[0-9]+[.、)．]\s*/, ''));
       });
+      return out;
     }
+    var steps = readSteps(iStepsJa);
+    var stepsEn = readSteps(iStepsEn);
+
     if (!steps.length) { warnings.push('手順がキャプションに無い'); }
+    if (steps.length && stepsEn.length && steps.length !== stepsEn.length) {
+      warnings.push('手順の数が日英で違う（日 ' + steps.length + ' / 英 ' + stepsEn.length + '）');
+    }
 
     var isPR = hashtags.some(function (h) { return /^(PR|pr|ＰＲ|ad|Ad|AD|sponsored)$/.test(h); });
 
@@ -308,6 +372,7 @@ export type Parsed = {
       servingsJa: servingsJa,
       servingsEn: servingsEn,
       steps: steps,
+      stepsEn: stepsEn,
       hashtags: hashtags,
       isPR: isPR,
       warnings: warnings

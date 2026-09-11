@@ -112,6 +112,26 @@ console.log('\n小籠包（英語なし・PR案件）');
   check('商品名だけ訳さない', cov.missing, ['これ!うま‼つゆ']);
 }
 
+/* ---------- 新しいテンプレート（先頭に英語タイトル、【作り方】つき） ----------
+   みたもさんが次から使う形。ここが崩れると、手順を書いてもらっても
+   取り込みが丸ごとおかしくなるので、形ごと固めておく。
+   _template-sample.txt は実際の投稿ではなく、テンプレートどおりに書いた見本。 */
+console.log('\n新しいテンプレート（英語タイトル先頭・手順つき）');
+{
+  const r = CaptionParser.parse(read('_template-sample.txt'));
+  check('日本語タイトル', r.titleJa, '鴨ネギ蕎麦');
+  check('英語タイトルは【English Title】から取る', r.titleEn, 'Duck and Negi Soba');
+  check('日本語の書き出しに英語タイトルが混ざらない', r.leadJa, '出汁から鴨葱蕎麦を作ってみました');
+  check('英語の書き出しが取れる',
+    (r.leadEn || '').slice(0, 24), 'I made duck and negi sob');
+  check('日本語の手順', r.steps.length, 3);
+  check('英語の手順', r.stepsEn.length, 3);
+  check('手順に英語のかたまりが混ざらない', r.steps[2], '鰹節を入れて2分おき、こします。');
+  check('行頭の番号は落とす', r.steps[0], '鍋に水と昆布を入れて30分おきます。');
+  check('【作り方】が材料に混ざらない',
+    allNames(r.groupsJa).filter((n) => n.indexOf('作り方') > -1), []);
+}
+
 /* ---------- 単位の変換 ---------- */
 console.log('\n単位の変換');
 check('大さじ2', IngredientDict.qty('大さじ2'), '2 tbsp');

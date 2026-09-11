@@ -83,7 +83,17 @@ function buildContent(parsed: Parsed, slug: string, warn: (s: string) => void): 
 
   const tips = parsed.notesJa.map((n, i) => ({ ja: n, en: en(n, parsed.notesEn[i] || null) }));
 
-  const steps = parsed.steps.map((s) => ({ ja: s, en: null, usesJa: null, usesEn: null }));
+  /* 手順。英語は [Steps] があれば入る。
+     日英で数が違うときは順番で対応づけられないので、英語は付けない
+     （1つずれた英語を出すより、無いほうがまし）。
+     usesJa / usesEn（その手順で使う分量）はキャプションから決めようがないので、
+     ここでは空にしておく。人が書く。 */
+  const pairEn = parsed.stepsEn.length === parsed.steps.length;
+  const steps = parsed.steps.map((s, i) => ({
+    ja: s,
+    en: pairEn ? parsed.stepsEn[i]! : null,
+    usesJa: null, usesEn: null
+  }));
 
   const lines = [];
   lines.push('/* ' + parsed.titleJa + ' の本文。');
